@@ -22,8 +22,8 @@ public class UserController {
 
     private final UserServiceImpl service;
 
-    private UUID getSubject(String accessToken) {
-        String idFromToken = JWT.decode(accessToken.replace("Bearer ", "")).getSubject();
+    private UUID getSubject(String bearerToken) {
+        String idFromToken = JWT.decode(bearerToken.replace("Bearer ", "")).getSubject();
         return UUID.fromString(idFromToken);
     }
 
@@ -34,12 +34,20 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.CREATED).body(new CreateUserRES(user));
     }
 
-    @PatchMapping("/{id}/message")
+    @PatchMapping("/message")
     @Transactional
-    public ResponseEntity<Void> patchMessage(@PathVariable("id") UUID idFromPath, @RequestHeader("Authorization") String accessToken, @Valid @RequestBody PatchMsgREQ dto) {
+    public ResponseEntity<Void> patchMessage(@RequestHeader("Authorization") String accessToken, @Valid @RequestBody PatchMsgREQ dto) {
         UUID idFromToken = getSubject(accessToken);
-        service.patchMessage(idFromPath, idFromToken, dto.message());
+        service.patchMessage(idFromToken, dto.message());
         return ResponseEntity.status(HttpStatus.ACCEPTED).build();
+    }
+
+    @DeleteMapping("/delete")
+    @Transactional
+    public ResponseEntity<Void> deleteUser(@RequestHeader("Authorization") String accessToken) {
+        UUID idFromToken = getSubject(accessToken);
+        service.delete(idFromToken);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
 }

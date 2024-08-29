@@ -1,7 +1,7 @@
 package com.adm.lucas.microblog.service;
 
-import com.adm.lucas.microblog.model.Token;
-import com.adm.lucas.microblog.model.User;
+import com.adm.lucas.microblog.domain.model.Token;
+import com.adm.lucas.microblog.domain.model.User;
 import com.auth0.jwt.exceptions.TokenExpiredException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Service;
@@ -20,8 +20,14 @@ public interface SecurityService {
 
     Token auth(String username, String password) throws BadCredentialsException;
 
+    Token authWithGoogleAcc(String jwt);
+
+    Token authWithGitHubAcc(Integer id, String login, String avatar_url);
+
     void deleteAndFlush(Token token);
 
     Token recreateToken(UUID refreshToken) throws TokenExpiredException;
+
+    void logout(String accessToken);
 
 }

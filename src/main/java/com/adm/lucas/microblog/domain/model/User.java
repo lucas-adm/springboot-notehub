@@ -1,6 +1,5 @@
 package com.adm.lucas.microblog.model;
 
-import com.adm.lucas.microblog.model.type.Role;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -40,10 +39,21 @@ public class User implements UserDetails {
 
     private String password;
 
-    @Enumerated(EnumType.STRING)
-    private Role role = Role.BASIC;
+    private String host;
+
+    private boolean hidden = false;
+
+    private boolean sponsor = false;
+
+    private Long score = 0L;
+
+    private boolean active = true;
+
+    @OneToOne(mappedBy = "user", orphanRemoval = true)
+    private Token token;
 
     public User(String email, String username, String displayName, String avatar, String password) {
+        this.host = "Microblog";
         this.email = email;
         this.displayName = displayName;
         this.username = username;
@@ -51,10 +61,24 @@ public class User implements UserDetails {
         this.password = password;
     }
 
+    public User(String email, String username, String displayName, String avatar) {
+        this.host = "Google";
+        this.email = email;
+        this.username = username;
+        this.displayName = displayName;
+        this.avatar = avatar;
+    }
+
+    public User(String username, String displayName, String avatar) {
+        this.host = "GitHub";
+        this.username = username;
+        this.displayName = displayName;
+        this.avatar = avatar;
+    }
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        if (this.role == Role.BASIC) return List.of(new SimpleGrantedAuthority("ROLE_BASIC"));
-        else return List.of(new SimpleGrantedAuthority("ROLE_BASIC"), new SimpleGrantedAuthority("ROLE_ADMIN"));
+        return List.of(new SimpleGrantedAuthority("ROLE_BASIC"));
     }
 
     @Override

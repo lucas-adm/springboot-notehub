@@ -19,7 +19,7 @@ public class Token {
     private UUID id;
 
     @JoinColumn(name = "user_id")
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     private User user;
 
     private String accessToken;

@@ -1,4 +1,4 @@
-package com.adm.lucas.microblog.dto.request.user;
+package com.adm.lucas.microblog.application.controller.dto.request.user;
 
 import com.adm.lucas.microblog.model.User;
 import jakarta.validation.constraints.NotBlank;

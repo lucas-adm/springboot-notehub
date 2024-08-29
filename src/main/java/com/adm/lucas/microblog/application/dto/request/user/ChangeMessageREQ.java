@@ -1,4 +1,4 @@
-package com.adm.lucas.microblog.dto.request.user;
+package com.adm.lucas.microblog.application.dto.request.user;
 
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;

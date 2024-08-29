@@ -10,4 +10,6 @@ public interface TokenRepository extends JpaRepository<Token, UUID> {
 
     Optional<Token> findByUserId(UUID id);
 
+    Optional<Token> findByAccessToken(String accessToken);
+
 }

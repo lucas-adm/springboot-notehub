@@ -1,7 +1,6 @@
-package com.adm.lucas.microblog.dto.response.user;
+package com.adm.lucas.microblog.application.controller.dto.response.user;
 
 import com.adm.lucas.microblog.model.User;
-import com.adm.lucas.microblog.model.type.Role;
 
 import java.util.UUID;
 
@@ -10,8 +9,11 @@ public record CreateUserRES(
         String email,
         String username,
         String displayName,
-        String message,
-        Role role
+        String avatar,
+        String host,
+        boolean hidden,
+        boolean sponsor,
+        Long score
 ) {
     public CreateUserRES(User user) {
         this(
@@ -19,8 +21,11 @@ public record CreateUserRES(
                 user.getEmail(),
                 user.getUsername(),
                 user.getDisplayName(),
-                user.getMessage(),
-                user.getRole()
+                user.getAvatar(),
+                user.getHost(),
+                user.isHidden(),
+                user.isSponsor(),
+                user.getScore()
         );
     }
 }

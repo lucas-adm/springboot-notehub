@@ -1,15 +1,17 @@
 package com.adm.lucas.microblog.service.impl;
 
-import com.adm.lucas.microblog.model.Token;
-import com.adm.lucas.microblog.model.User;
-import com.adm.lucas.microblog.repository.TokenRepository;
-import com.adm.lucas.microblog.repository.UserRepository;
+import com.adm.lucas.microblog.domain.model.Token;
+import com.adm.lucas.microblog.domain.model.User;
+import com.adm.lucas.microblog.domain.repository.TokenRepository;
+import com.adm.lucas.microblog.domain.repository.UserRepository;
 import com.adm.lucas.microblog.service.SecurityService;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTCreationException;
+import com.auth0.jwt.exceptions.JWTDecodeException;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.exceptions.TokenExpiredException;
+import com.auth0.jwt.interfaces.DecodedJWT;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -77,11 +79,46 @@ public class SecurityServiceImpl implements SecurityService {
         boolean matches = encoder.matches(password, user.getPassword());
         if (!matches) throw new BadCredentialsException("password");
 
-        Optional<Token> token = repository.findByUserId(user.getId());
-        token.ifPresent(this::deleteAndFlush);
+        repository.findByUserId(user.getId()).ifPresent(this::deleteAndFlush);
 
         String accessToken = generateToken(user);
         Instant expiresAt = getExpirationTime("refresh");
+        return repository.save(new Token(user, accessToken, expiresAt));
+    }
+
+    @Override
+    public Token authWithGoogleAcc(String jwt) {
+        try {
+            DecodedJWT decoded = JWT.decode(jwt);
+            String email = decoded.getClaims().get("email").asString();
+            String givenName = decoded.getClaims().get("given_name").asString();
+            String sub = decoded.getClaims().get("sub").asString().substring(0, 8);
+            String username = String.format("%s%s", givenName, sub);
+            String displayName = decoded.getClaims().get("name").asString();
+            String avatar = decoded.getClaims().get("picture").asString();
+
+            User user = userRepository.findByEmail(email).orElseGet(() -> userRepository.save(new User(email, username, displayName, avatar)));
+            repository.findByUserId(user.getId()).ifPresent(this::deleteAndFlush);
+
+            String accessToken = generateToken(user);
+            Instant expiresAt = getExpirationTime("refresh");
+
+            return repository.save(new Token(user, accessToken, expiresAt));
+        } catch (JWTDecodeException exception) {
+            throw new JWTDecodeException("Formato inválido");
+        }
+    }
+
+    @Override
+    public Token authWithGitHubAcc(Integer id, String login, String avatar_url) {
+        String username = String.format("%s%s", login, id);
+
+        User user = userRepository.findByUsername(username).orElseGet(() -> userRepository.save(new User(username, login, avatar_url)));
+        repository.findByUserId(user.getId()).ifPresent(this::deleteAndFlush);
+
+        String accessToken = generateToken(user);
+        Instant expiresAt = getExpirationTime("refresh");
+
         return repository.save(new Token(user, accessToken, expiresAt));
     }
 
@@ -106,6 +143,12 @@ public class SecurityServiceImpl implements SecurityService {
 
         deleteAndFlush(token);
         return repository.save(new Token(user, jwt, expiresAt));
+    }
+
+    @Override
+    public void logout(String accessToken) {
+        Optional<Token> token = repository.findByAccessToken(accessToken);
+        token.ifPresent(repository::delete);
     }
 
 }

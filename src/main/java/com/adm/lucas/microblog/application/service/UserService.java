@@ -1,6 +1,6 @@
 package com.adm.lucas.microblog.service;
 
-import com.adm.lucas.microblog.model.User;
+import com.adm.lucas.microblog.domain.model.User;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
@@ -10,8 +10,8 @@ public interface UserService {
 
     User create(User user);
 
-    void validateUser(UUID idFromPath, UUID idFromToken);
+    void patchMessage(UUID idFromToken, String message);
 
-    void patchMessage(UUID idFromPath, UUID idFromToken, String message);
+    void delete(UUID idFromToken);
 
 }

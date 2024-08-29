@@ -1,4 +1,4 @@
-package com.adm.lucas.microblog.dto.request.token;
+package com.adm.lucas.microblog.application.controller.dto.request.token;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
