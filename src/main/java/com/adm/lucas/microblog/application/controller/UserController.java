@@ -1,24 +1,30 @@
-package com.adm.lucas.microblog.controller;
+package com.adm.lucas.microblog.application.controller;
 
-import com.adm.lucas.microblog.dto.request.user.CreateUserREQ;
-import com.adm.lucas.microblog.dto.request.user.PatchMsgREQ;
-import com.adm.lucas.microblog.dto.response.user.CreateUserRES;
-import com.adm.lucas.microblog.model.User;
-import com.adm.lucas.microblog.service.impl.UserServiceImpl;
+import com.adm.lucas.microblog.application.dto.request.user.*;
+import com.adm.lucas.microblog.application.dto.response.user.CreateUserRES;
+import com.adm.lucas.microblog.application.service.impl.UserServiceImpl;
+import com.adm.lucas.microblog.domain.model.User;
 import com.auth0.jwt.JWT;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URI;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/microblog/api/v1.0/users")
+@RequestMapping("/api/v1/users")
+@SecurityRequirement(name = "bearer-key")
 @RequiredArgsConstructor
 public class UserController {
+
+    @Value("${frontend.host}")
+    private String domain;
 
     private final UserServiceImpl service;
 
@@ -34,11 +40,74 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.CREATED).body(new CreateUserRES(user));
     }
 
+    @GetMapping("/active/{id}")
+    @Transactional
+    public ResponseEntity<Void> activeUser(@PathVariable("id") UUID id) {
+        service.active(id);
+        return ResponseEntity.status(HttpStatus.FOUND).location(URI.create(String.format("%s/swagger-ui.html", domain))).build();
+    }
+
+    @PatchMapping("/profile/change-visibility")
+    @Transactional
+    public ResponseEntity<Void> changeProfileVisibility(@RequestHeader("Authorization") String accessToken) {
+        UUID idFromToken = getSubject(accessToken);
+        service.changeProfileVisibility(idFromToken);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    @PatchMapping("/email")
+    @Transactional
+    public ResponseEntity<Void> patchEmail(@RequestHeader("Authorization") String accessToken, @Valid @RequestBody ChangeEmailREQ dto) {
+        UUID idFromToken = getSubject(accessToken);
+        service.changeEmail(idFromToken, dto.email());
+        return ResponseEntity.status(HttpStatus.ACCEPTED).build();
+    }
+
+    @PatchMapping("/username")
+    @Transactional
+    public ResponseEntity<Void> patchUsername(@RequestHeader("Authorization") String accessToken, @Valid @RequestBody ChangeUsernameREQ dto) {
+        UUID idFromToken = getSubject(accessToken);
+        service.changeUsername(idFromToken, dto.username());
+        return ResponseEntity.status(HttpStatus.ACCEPTED).build();
+    }
+
+    @PatchMapping("/display-name")
+    @Transactional
+    public ResponseEntity<Void> patchDisplayName(@RequestHeader("Authorization") String accessToken, @Valid @RequestBody ChangeDisplayNameREQ dto) {
+        UUID idFromToken = getSubject(accessToken);
+        service.changeDisplayName(idFromToken, dto.displayName());
+        return ResponseEntity.status(HttpStatus.ACCEPTED).build();
+    }
+
+    @PatchMapping("/profile/change-picture")
+    @Transactional
+    public ResponseEntity<Void> patchAvatar(@RequestHeader("Authorization") String accessToken, @Valid @RequestBody ChangeAvatarREQ dto) {
+        UUID idFromToken = getSubject(accessToken);
+        service.changeAvatar(idFromToken, dto.avatar());
+        return ResponseEntity.status(HttpStatus.ACCEPTED).build();
+    }
+
+    @PatchMapping("/profile/change-banner")
+    @Transactional
+    public ResponseEntity<Void> patchBanner(@RequestHeader("Authorization") String accessToken, @Valid @RequestBody ChangeBannerREQ dto) {
+        UUID idFromToken = getSubject(accessToken);
+        service.changeBanner(idFromToken, dto.banner());
+        return ResponseEntity.status(HttpStatus.ACCEPTED).build();
+    }
+
     @PatchMapping("/message")
     @Transactional
-    public ResponseEntity<Void> patchMessage(@RequestHeader("Authorization") String accessToken, @Valid @RequestBody PatchMsgREQ dto) {
+    public ResponseEntity<Void> patchMessage(@RequestHeader("Authorization") String accessToken, @Valid @RequestBody ChangeMessageREQ dto) {
         UUID idFromToken = getSubject(accessToken);
-        service.patchMessage(idFromToken, dto.message());
+        service.changeMessage(idFromToken, dto.message());
+        return ResponseEntity.status(HttpStatus.ACCEPTED).build();
+    }
+
+    @PatchMapping("/reset")
+    @Transactional
+    public ResponseEntity<Void> patchPassword(@PathVariable("jwt") String jwt, @Valid @RequestBody ChangePasswordREQ dto) {
+        String emailFromToken = JWT.decode(jwt.replace("Bearer ", "")).getSubject();
+        service.changePassword(emailFromToken, dto.password());
         return ResponseEntity.status(HttpStatus.ACCEPTED).build();
     }
 

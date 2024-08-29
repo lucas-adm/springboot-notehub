@@ -1,6 +1,6 @@
-package com.adm.lucas.microblog.repository;
+package com.adm.lucas.microblog.domain.repository;
 
-import com.adm.lucas.microblog.model.User;
+import com.adm.lucas.microblog.domain.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

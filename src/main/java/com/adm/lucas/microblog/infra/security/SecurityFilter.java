@@ -1,8 +1,8 @@
 package com.adm.lucas.microblog.infra.security;
 
-import com.adm.lucas.microblog.model.User;
-import com.adm.lucas.microblog.repository.UserRepository;
-import com.adm.lucas.microblog.service.SecurityService;
+import com.adm.lucas.microblog.application.service.SecurityService;
+import com.adm.lucas.microblog.domain.model.User;
+import com.adm.lucas.microblog.domain.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -36,12 +36,23 @@ public class SecurityFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        String token = getToken(request);
-        if (token != null) {
-            UUID id = UUID.fromString(service.validateToken(token));
-            User user = repository.findById(id).orElseThrow(EntityNotFoundException::new);
-            var authentication = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
-            SecurityContextHolder.getContext().setAuthentication(authentication);
+        String accessToken = getToken(request);
+        if (accessToken != null) {
+            try {
+                UUID id = UUID.fromString(service.validateToken(accessToken));
+                User user = repository.findById(id).orElseThrow(EntityNotFoundException::new);
+                var authentication = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+            } catch (IllegalArgumentException | EntityNotFoundException ex) {
+                try {
+                    String email = service.validateToken(accessToken);
+                    User user = repository.findByEmail(email).orElseThrow(EntityNotFoundException::new);
+                    var authentication = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
+                } catch (EntityNotFoundException exception) {
+                    throw new EntityNotFoundException();
+                }
+            }
         }
         filterChain.doFilter(request, response);
     }

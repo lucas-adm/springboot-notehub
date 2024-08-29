@@ -1,4 +1,4 @@
-package com.adm.lucas.microblog.model;
+package com.adm.lucas.microblog.domain.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
@@ -7,6 +7,10 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
@@ -41,16 +45,21 @@ public class User implements UserDetails {
 
     private String host;
 
-    private boolean hidden = false;
+    private boolean profilePrivate = false;
 
     private boolean sponsor = false;
 
     private Long score = 0L;
 
-    private boolean active = true;
+    private Instant createdAt = LocalDateTime.now().toInstant(ZoneOffset.of("-03:00"));
+
+    private boolean active;
 
     @OneToOne(mappedBy = "user", orphanRemoval = true)
     private Token token;
+
+    @OneToMany(mappedBy = "user")
+    private List<UserHistory> history = new ArrayList<>();
 
     public User(String email, String username, String displayName, String avatar, String password) {
         this.host = "Microblog";
@@ -59,6 +68,7 @@ public class User implements UserDetails {
         this.username = username;
         this.avatar = avatar;
         this.password = password;
+        this.active = false;
     }
 
     public User(String email, String username, String displayName, String avatar) {
@@ -67,6 +77,7 @@ public class User implements UserDetails {
         this.username = username;
         this.displayName = displayName;
         this.avatar = avatar;
+        this.active = true;
     }
 
     public User(String username, String displayName, String avatar) {
@@ -74,6 +85,7 @@ public class User implements UserDetails {
         this.username = username;
         this.displayName = displayName;
         this.avatar = avatar;
+        this.active = true;
     }
 
     @Override

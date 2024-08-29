@@ -1,6 +1,6 @@
-package com.adm.lucas.microblog.application.controller.dto.request.user;
+package com.adm.lucas.microblog.application.dto.request.user;
 
-import com.adm.lucas.microblog.model.User;
+import com.adm.lucas.microblog.domain.model.User;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;

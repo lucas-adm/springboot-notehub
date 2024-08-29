@@ -1,6 +1,6 @@
 package com.adm.lucas.microblog.infra.security;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -16,10 +16,10 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @Configuration
 @EnableWebSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
 
-    @Autowired
-    private SecurityFilter securityFilter;
+    private final SecurityFilter securityFilter;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -28,10 +28,12 @@ public class SecurityConfig {
                 .sessionManagement((sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS)))
                 .authorizeHttpRequests(req -> {
                     req.requestMatchers("/h2-console", "/h2-console/**").permitAll();
-                    req.requestMatchers(HttpMethod.POST, "/microblog/api/v1.0/users/register").permitAll();
-                    req.requestMatchers(HttpMethod.POST, "/microblog/api/v1.0/auth/login").permitAll();
-                    req.requestMatchers(HttpMethod.POST, "/microblog/api/v1.0/auth/refresh").permitAll();
-                    req.anyRequest().hasAnyRole("BASIC", "ADMIN");
+                    req.requestMatchers("/v3/api-docs/**", "/swagger-ui.html", "/swagger-ui/**").permitAll();
+                    req.requestMatchers(HttpMethod.GET, "/", "/docs").permitAll();
+                    req.requestMatchers(HttpMethod.POST, "/api/v1/users/register", "/api/v1/auth/**").permitAll();
+                    req.requestMatchers(HttpMethod.PATCH, "/api/v1/users/{jwt}").permitAll();
+                    req.requestMatchers(HttpMethod.GET, "/api/v1/users/active/{id}", "/api/v1/auth/refresh").permitAll();
+                    req.anyRequest().hasAnyRole("BASIC");
                 })
                 .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();

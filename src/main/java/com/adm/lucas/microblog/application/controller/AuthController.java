@@ -1,10 +1,11 @@
-package com.adm.lucas.microblog.controller;
+package com.adm.lucas.microblog.application.controller;
 
-import com.adm.lucas.microblog.dto.request.token.AuthREQ;
-import com.adm.lucas.microblog.dto.request.token.OAuth2GitHubREQ;
-import com.adm.lucas.microblog.dto.request.token.OAuth2GoogleREQ;
-import com.adm.lucas.microblog.dto.response.token.AuthRES;
-import com.adm.lucas.microblog.service.SecurityService;
+import com.adm.lucas.microblog.application.dto.request.token.AuthREQ;
+import com.adm.lucas.microblog.application.dto.request.token.OAuth2GitHubREQ;
+import com.adm.lucas.microblog.application.dto.request.token.OAuth2GoogleREQ;
+import com.adm.lucas.microblog.application.dto.request.token.RecoverPasswordREQ;
+import com.adm.lucas.microblog.application.dto.response.token.AuthRES;
+import com.adm.lucas.microblog.application.service.SecurityService;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -15,13 +16,19 @@ import org.springframework.web.bind.annotation.*;
 import javax.security.auth.login.LoginException;
 import java.util.UUID;
 
-@CrossOrigin
 @RestController
-@RequestMapping("/microblog/api/v1.0/auth")
+@CrossOrigin
+@RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
 public class AuthController {
 
     private final SecurityService service;
+
+    @PostMapping("/recover-password")
+    public ResponseEntity<String> recoverPassword(@Valid @RequestBody RecoverPasswordREQ dto) {
+        String jwt = service.generateChangePasswordToken(dto.email());
+        return ResponseEntity.status(HttpStatus.OK).body(jwt);
+    }
 
     @PostMapping("/login")
     @Transactional

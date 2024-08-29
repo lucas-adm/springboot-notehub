@@ -1,4 +1,4 @@
-package com.adm.lucas.microblog.service;
+package com.adm.lucas.microblog.application.service;
 
 import com.adm.lucas.microblog.domain.model.Token;
 import com.adm.lucas.microblog.domain.model.User;
@@ -29,5 +29,7 @@ public interface SecurityService {
     Token recreateToken(UUID refreshToken) throws TokenExpiredException;
 
     void logout(String accessToken);
+
+    String generateChangePasswordToken(String email);
 
 }

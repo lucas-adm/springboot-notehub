@@ -1,4 +1,4 @@
-package com.adm.lucas.microblog.model;
+package com.adm.lucas.microblog.domain.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.UUID;
 
 @Entity
@@ -24,7 +25,7 @@ public class Token {
 
     private String accessToken;
 
-    private LocalDateTime createdAt = LocalDateTime.now();
+    private Instant createdAt = LocalDateTime.now().toInstant(ZoneOffset.of("-03:00"));
 
     private Instant expiresAt;
 

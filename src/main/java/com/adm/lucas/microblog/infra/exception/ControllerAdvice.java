@@ -1,5 +1,6 @@
 package com.adm.lucas.microblog.infra.exception;
 
+import com.auth0.jwt.exceptions.JWTDecodeException;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.exceptions.TokenExpiredException;
 import jakarta.persistence.EntityNotFoundException;
@@ -8,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -76,6 +78,12 @@ public class ControllerAdvice {
         };
     }
 
+    @ExceptionHandler(DisabledException.class)
+    private ResponseEntity<List<CustomResponse>> handlerDisabledException(DisabledException ex) {
+        errors.add(new FieldError("user", "username", ex.getMessage()));
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(errors.stream().map(CustomResponse::new).toList());
+    }
+
     @ExceptionHandler(AccessDeniedException.class)
     private ResponseEntity<List<CustomResponse>> handleAccessDeniedException(AccessDeniedException ex) {
         errors.add(new FieldError("user", "accessToken", "Não autorizado."));
@@ -93,6 +101,12 @@ public class ControllerAdvice {
     private ResponseEntity<List<CustomResponse>> handleTokenExpiredException(TokenExpiredException ex) {
         errors.add(new FieldError("token", "refreshToken", ex.getMessage()));
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(errors.stream().map(CustomResponse::new).toList());
+    }
+
+    @ExceptionHandler(JWTDecodeException.class)
+    private ResponseEntity<List<CustomResponse>> handleJWTDecodedException(JWTDecodeException ex) {
+        errors.add(new FieldError("token", "oAuth2Token", ex.getMessage()));
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors.stream().map(CustomResponse::new).toList());
     }
 
 }

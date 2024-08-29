@@ -1,10 +1,10 @@
-package com.adm.lucas.microblog.service.impl;
+package com.adm.lucas.microblog.application.service.impl;
 
+import com.adm.lucas.microblog.application.service.SecurityService;
 import com.adm.lucas.microblog.domain.model.Token;
 import com.adm.lucas.microblog.domain.model.User;
 import com.adm.lucas.microblog.domain.repository.TokenRepository;
 import com.adm.lucas.microblog.domain.repository.UserRepository;
-import com.adm.lucas.microblog.service.SecurityService;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTCreationException;
@@ -16,13 +16,13 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
-import java.util.Optional;
 import java.util.UUID;
 
 @Component
@@ -76,6 +76,8 @@ public class SecurityServiceImpl implements SecurityService {
     @Override
     public Token auth(String username, String password) throws BadCredentialsException {
         User user = userRepository.findByUsername(username.toLowerCase()).orElseThrow(() -> new BadCredentialsException("username"));
+        if (!user.isActive()) throw new DisabledException("Email não confirmado");
+
         boolean matches = encoder.matches(password, user.getPassword());
         if (!matches) throw new BadCredentialsException("password");
 
@@ -147,8 +149,22 @@ public class SecurityServiceImpl implements SecurityService {
 
     @Override
     public void logout(String accessToken) {
-        Optional<Token> token = repository.findByAccessToken(accessToken);
-        token.ifPresent(repository::delete);
+        repository.findByAccessToken(accessToken).ifPresent(repository::delete);
+    }
+
+    @Override
+    public String generateChangePasswordToken(String email) {
+        User user = userRepository.findByEmail(email).orElseThrow(EntityNotFoundException::new);
+        try {
+            Algorithm algorithm = Algorithm.HMAC256(secret);
+            return JWT.create()
+                    .withIssuer("Microblog")
+                    .withSubject(email)
+                    .withExpiresAt(getExpirationTime("access"))
+                    .sign(algorithm);
+        } catch (JWTCreationException ex) {
+            throw new JWTCreationException("Error while creating token", ex);
+        }
     }
 
 }
