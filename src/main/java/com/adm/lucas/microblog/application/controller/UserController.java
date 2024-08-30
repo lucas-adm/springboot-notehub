@@ -1,5 +1,6 @@
 package com.adm.lucas.microblog.application.controller;
 
+import com.adm.lucas.microblog.adapter.producer.UserProducer;
 import com.adm.lucas.microblog.application.dto.request.user.*;
 import com.adm.lucas.microblog.application.dto.response.user.CreateUserRES;
 import com.adm.lucas.microblog.application.service.impl.UserServiceImpl;
@@ -27,6 +28,7 @@ public class UserController {
     private String domain;
 
     private final UserServiceImpl service;
+    private final UserProducer producer;
 
     private UUID getSubject(String bearerToken) {
         String idFromToken = JWT.decode(bearerToken.replace("Bearer ", "")).getSubject();
@@ -37,6 +39,7 @@ public class UserController {
     @Transactional
     public ResponseEntity<CreateUserRES> createUser(@Valid @RequestBody CreateUserREQ dto) {
         User user = service.create(dto.toUser());
+        producer.publishAccountActivationMessage(user);
         return ResponseEntity.status(HttpStatus.CREATED).body(new CreateUserRES(user));
     }
 
