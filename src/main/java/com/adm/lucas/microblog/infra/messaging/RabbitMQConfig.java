@@ -11,11 +11,19 @@ import org.springframework.context.annotation.Configuration;
 public class RabbitMQConfig {
 
     @Value("${broker.queue.activation.name}")
-    private String queue;
+    private String activation;
+
+    @Value("${broker.queue.recovery.name}")
+    private String recovery;
 
     @Bean
     public Queue activationQueue() {
-        return new Queue(queue, true);
+        return new Queue(activation, true);
+    }
+
+    @Bean
+    public Queue recoveryQueue() {
+        return new Queue(recovery, true);
     }
 
     @Bean

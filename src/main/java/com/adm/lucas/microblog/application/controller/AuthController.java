@@ -1,5 +1,6 @@
 package com.adm.lucas.microblog.application.controller;
 
+import com.adm.lucas.microblog.adapter.producer.MailProducer;
 import com.adm.lucas.microblog.application.dto.request.token.AuthREQ;
 import com.adm.lucas.microblog.application.dto.request.token.OAuth2GitHubREQ;
 import com.adm.lucas.microblog.application.dto.request.token.OAuth2GoogleREQ;
@@ -23,11 +24,13 @@ import java.util.UUID;
 public class AuthController {
 
     private final SecurityService service;
+    private final MailProducer producer;
 
     @PostMapping("/recover-password")
     public ResponseEntity<String> recoverPassword(@Valid @RequestBody RecoverPasswordREQ dto) {
         String jwt = service.generateChangePasswordToken(dto.email());
-        return ResponseEntity.status(HttpStatus.OK).body(jwt);
+        producer.publishAccountRecoveryMessage(dto.email(), jwt);
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 
     @PostMapping("/login")
