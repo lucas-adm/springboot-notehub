@@ -15,7 +15,7 @@ public record ActivationDTO(
 ) {
     public static String text(UUID id, String username) {
         try {
-            ClassPathResource resource = new ClassPathResource("templates/mail/activate.html");
+            ClassPathResource resource = new ClassPathResource("templates/mail/activation.html");
             String template = new String(resource.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
             return template.replace("{username}", username).replace("{id}", id.toString());
         } catch (IOException exception) {

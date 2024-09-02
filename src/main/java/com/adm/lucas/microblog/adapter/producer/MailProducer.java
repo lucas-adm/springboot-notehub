@@ -9,9 +9,9 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class UserProducer {
+public class MailProducer {
 
-    @Value("${broker.queue.email.name}")
+    @Value("${broker.queue.activation.name}")
     private String routingKey;
 
     private final RabbitTemplate rabbitTemplate;

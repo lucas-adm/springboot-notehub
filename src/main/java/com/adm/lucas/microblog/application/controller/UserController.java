@@ -1,6 +1,6 @@
 package com.adm.lucas.microblog.application.controller;
 
-import com.adm.lucas.microblog.adapter.producer.UserProducer;
+import com.adm.lucas.microblog.adapter.producer.MailProducer;
 import com.adm.lucas.microblog.application.dto.request.user.*;
 import com.adm.lucas.microblog.application.dto.response.user.CreateUserRES;
 import com.adm.lucas.microblog.application.service.impl.UserServiceImpl;
@@ -28,7 +28,7 @@ public class UserController {
     private String domain;
 
     private final UserServiceImpl service;
-    private final UserProducer producer;
+    private final MailProducer producer;
 
     private UUID getSubject(String bearerToken) {
         String idFromToken = JWT.decode(bearerToken.replace("Bearer ", "")).getSubject();
@@ -47,7 +47,7 @@ public class UserController {
     @Transactional
     public ResponseEntity<Void> activeUser(@PathVariable("id") UUID id) {
         service.active(id);
-        return ResponseEntity.status(HttpStatus.FOUND).location(URI.create(String.format("%s/swagger-ui.html", domain))).build();
+        return ResponseEntity.status(HttpStatus.FOUND).location(URI.create(String.format("%s/greetings", domain))).build();
     }
 
     @PatchMapping("/profile/change-visibility")
