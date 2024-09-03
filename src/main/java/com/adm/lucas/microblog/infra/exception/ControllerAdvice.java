@@ -12,7 +12,6 @@ import org.springframework.security.authentication.DisabledException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.util.ArrayList;
@@ -20,13 +19,6 @@ import java.util.List;
 
 @RestControllerAdvice
 public class ControllerAdvice {
-
-    private List<FieldError> errors = new ArrayList<>();
-
-    @ModelAttribute
-    private void clearList() {
-        errors.clear();
-    }
 
     private record CustomResponse(String field, String message) {
         public CustomResponse(FieldError error) {
@@ -36,12 +28,14 @@ public class ControllerAdvice {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     private ResponseEntity<List<CustomResponse>> handleMethdArgumentNotValidException(MethodArgumentNotValidException ex) {
-        errors = ex.getFieldErrors();
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors.stream().map(CustomResponse::new).toList());
+        List<FieldError> errors = ex.getFieldErrors();
+        List<CustomResponse> response = errors.stream().map(CustomResponse::new).toList();
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
     }
 
     @ExceptionHandler(DataIntegrityViolationException.class)
     private ResponseEntity<List<CustomResponse>> handleDataIntegrityViolationException(DataIntegrityViolationException ex) {
+        List<FieldError> errors = new ArrayList<>();
         switch (ex.getMessage()) {
             case "both":
                 errors.add(new FieldError("user", "email", "Email já existe."));
@@ -54,7 +48,8 @@ public class ControllerAdvice {
                 errors.add(new FieldError("user", "username", "Nome já existe."));
                 break;
         }
-        return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(errors.stream().map(CustomResponse::new).toList());
+        List<CustomResponse> response = errors.stream().map(CustomResponse::new).toList();
+        return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(response);
     }
 
     @ExceptionHandler(EntityNotFoundException.class)
@@ -64,6 +59,7 @@ public class ControllerAdvice {
 
     @ExceptionHandler(BadCredentialsException.class)
     private ResponseEntity<List<CustomResponse>> handleBadCredentialsException(BadCredentialsException ex) {
+        List<FieldError> errors = new ArrayList<>();
         return switch (ex.getMessage()) {
             case "username" -> {
                 errors.add(new FieldError("user", "username", "Nome não existe."));
@@ -78,25 +74,29 @@ public class ControllerAdvice {
     }
 
     @ExceptionHandler(DisabledException.class)
-    private ResponseEntity<List<CustomResponse>> handlerDisabledException(DisabledException ex) {
+    private ResponseEntity<List<CustomResponse>> handleDisabledException(DisabledException ex) {
+        List<FieldError> errors = new ArrayList<>();
         errors.add(new FieldError("user", "username", ex.getMessage()));
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(errors.stream().map(CustomResponse::new).toList());
     }
 
     @ExceptionHandler(JWTCreationException.class)
     private ResponseEntity<List<CustomResponse>> handleJWTCreationException(JWTCreationException ex) {
+        List<FieldError> errors = new ArrayList<>();
         errors.add(new FieldError("token", "token", ex.getMessage()));
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errors.stream().map(CustomResponse::new).toList());
     }
 
     @ExceptionHandler(JWTDecodeException.class)
     private ResponseEntity<List<CustomResponse>> handleJWTDecodeException(JWTDecodeException ex) {
+        List<FieldError> errors = new ArrayList<>();
         errors.add(new FieldError("token", "oauth2_token", ex.getMessage()));
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors.stream().map(CustomResponse::new).toList());
     }
 
     @ExceptionHandler(TokenExpiredException.class)
     private ResponseEntity<List<CustomResponse>> handleTokenExpiredException(TokenExpiredException ex) {
+        List<FieldError> errors = new ArrayList<>();
         errors.add(new FieldError("token", "refresh_token", ex.getMessage()));
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(errors.stream().map(CustomResponse::new).toList());
     }
