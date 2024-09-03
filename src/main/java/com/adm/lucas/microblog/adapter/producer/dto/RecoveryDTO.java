@@ -10,21 +10,23 @@ public record RecoveryDTO(
         String subject,
         String text
 ) {
-    public static String text(String token) {
+    public static String text(String client, String token) {
         try {
-            ClassPathResource resource = new ClassPathResource("templates/mail/recovery.html");
+            ClassPathResource resource = new ClassPathResource("template/mail/recovery.html");
             String template = new String(resource.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
-            return template.replace("{token}", token);
+            return template
+                    .replace("{token}", token)
+                    .replace("{api.client.host}", client);
         } catch (IOException exception) {
             throw new ExceptionInInitializerError(exception);
         }
     }
 
-    public RecoveryDTO(String mailTo, String token) {
-        this(
+    public static RecoveryDTO of(String client, String mailTo, String token) {
+        return new RecoveryDTO(
                 mailTo,
                 "Recuperar conta",
-                text(token)
+                text(client, token)
         );
     }
 }

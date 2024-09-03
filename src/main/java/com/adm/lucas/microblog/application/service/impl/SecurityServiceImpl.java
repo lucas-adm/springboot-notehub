@@ -29,7 +29,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class SecurityServiceImpl implements SecurityService {
 
-    @Value("${api.security.token.secret}")
+    @Value("${api.server.security.token.secret}")
     private String secret;
 
     private final TokenRepository repository;

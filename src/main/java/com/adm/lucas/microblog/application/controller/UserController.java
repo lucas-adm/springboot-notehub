@@ -24,7 +24,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class UserController {
 
-    @Value("${frontend.host}")
+    @Value("${api.client.host}")
     private String domain;
 
     private final UserServiceImpl service;

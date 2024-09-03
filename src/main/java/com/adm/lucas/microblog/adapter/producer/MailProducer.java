@@ -18,15 +18,21 @@ public class MailProducer {
     @Value("${broker.queue.recovery.name}")
     private String recoveryRoutingKey;
 
+    @Value("${api.server.host}")
+    private String server;
+
+    @Value("${api.client.host}")
+    private String client;
+
     private final RabbitTemplate rabbitTemplate;
 
     public void publishAccountActivationMessage(User user) {
-        var message = new ActivationDTO(user);
+        var message = new ActivationDTO(server, client, user);
         rabbitTemplate.convertAndSend("", activationRoutingKey, message);
     }
 
     public void publishAccountRecoveryMessage(String mailTo, String token) {
-        var message = new RecoveryDTO(mailTo, token);
+        var message = RecoveryDTO.of(client, mailTo, token);
         rabbitTemplate.convertAndSend("", recoveryRoutingKey, message);
     }
 

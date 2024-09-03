@@ -8,7 +8,7 @@ import org.springframework.web.servlet.view.RedirectView;
 @RestController
 public class BaseController {
 
-    @Value("${api.host}")
+    @Value("${api.server.host}")
     private String host;
 
     @GetMapping

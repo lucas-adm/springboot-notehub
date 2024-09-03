@@ -13,22 +13,26 @@ public record ActivationDTO(
         String subject,
         String text
 ) {
-    public static String text(UUID id, String username) {
+    public static String text(String server, String client, UUID id, String username) {
         try {
-            ClassPathResource resource = new ClassPathResource("templates/mail/activation.html");
+            ClassPathResource resource = new ClassPathResource("template/mail/activation.html");
             String template = new String(resource.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
-            return template.replace("{username}", username).replace("{id}", id.toString());
+            return template
+                    .replace("{api.server.host}", server)
+                    .replace("{api.client.host}", client)
+                    .replace("{id}", id.toString())
+                    .replace("{username}", username);
         } catch (IOException exception) {
             throw new ExceptionInInitializerError(exception);
         }
     }
 
-    public ActivationDTO(User user) {
+    public ActivationDTO(String server, String client, User user) {
         this(
                 user.getId(),
                 user.getEmail(),
                 "Microblog",
-                text(user.getId(), user.getUsername())
+                text(server, client, user.getId(), user.getUsername())
         );
     }
 }

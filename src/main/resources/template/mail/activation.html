@@ -5,11 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ativação de Conta</title>
 </head>
-<body style="background-color: #020617; margin: 0; padding: 16px 16px 0 16px; display: flex; align-items: center; justify-content: center; min-height: 100svh; font-family: Arial, sans-serif;">
-<table style="background-color: #f8fafc; padding: 16px; border-radius: 8px; max-width: 555px; width: 100%; text-align: center;">
+<body style="background-color: #020617; margin: 0; padding: 0 16px; display: flex; align-items: center; justify-content: center; min-height: 100svh; font-family: Arial, sans-serif;">
+<table style="background-color: #f8fafc; padding: 16px; margin: 56px 0 32px 0; border-radius: 8px; max-width: 555px; width: 100%; text-align: center;">
     <tr>
         <td>
-            <a href="http://localhost:8080">
+            <a href="{api.client.host}">
                 <img src="https://i.imgur.com/PzgTpTz.png" alt="Logo" style="width: 111px; height: 111px; margin-top: -60px; border-radius: 50%; filter: drop-shadow(0 -30px 25px #c026d3);">
             </a>
             <h3 style="color: #c026d3;"><i>"Prometeu entregou o fogo à humanidade; agora, é sua missão mantê-lo aceso."</i></h3>
@@ -18,7 +18,7 @@
             <p style="margin-bottom: 24px; color: #000;">Para ativá-la, basta clicar no botão abaixo. A comunidade conta com a sua contribuição!</p>
             <blockquote style="margin-bottom: 24px; color: #7B7D7D;"><i>"Instrua o homem sábio, e ele será ainda mais sábio; ensine o homem justo, e ele aumentará o seu saber."</i> - <strong>Provérbios 9:9</strong></blockquote>
             <div style="margin-bottom: 24px;">
-                <a href="http://localhost:8080/api/v1/users/active/{id}" style="text-decoration: none; background-color: #c026d3; padding: 11px 22px; color: #fff; border-radius: 6px 12px; box-shadow: 0px 4px 8px 0px rgba(89, 0, 255, 0.5);">Ativar Conta</a>
+                <a href="{api.server.host}/api/v1/users/active/{id}" style="text-decoration: none; background-color: #c026d3; padding: 11px 22px; color: #fff; border-radius: 6px 12px; box-shadow: 0px 4px 8px 0px rgba(89, 0, 255, 0.5);">Ativar Conta</a>
             </div>
             <p style="color: #7B7D7D;">Caso você não tenha feito o cadastro, não se preocupe. Esta conta permanecerá desativada e será excluída do nosso banco de dados 7 dias após o envio desta mensagem, caso não seja ativada.</p>
             <p style="color: #000;">Atenciosamente, um não seguidor de Mamom.</p>
