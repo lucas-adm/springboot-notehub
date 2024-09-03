@@ -3,12 +3,14 @@ package com.adm.lucas.microblog.infra.security;
 import com.adm.lucas.microblog.application.service.SecurityService;
 import com.adm.lucas.microblog.domain.model.User;
 import com.adm.lucas.microblog.domain.repository.UserRepository;
+import com.auth0.jwt.exceptions.JWTVerificationException;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -25,6 +27,13 @@ public class SecurityFilter extends OncePerRequestFilter {
 
     @Autowired
     private UserRepository repository;
+
+    private void throwFilterException(HttpServletResponse response, String field, String message) throws IOException {
+        response.setStatus(HttpStatus.FORBIDDEN.value());
+        response.setCharacterEncoding("UTF-8");
+        String json = String.format("{\"field\": \"%s\", \"message\": \"%s\"}", field, message);
+        response.getWriter().write(json);
+    }
 
     private String getToken(HttpServletRequest request) {
         String header = request.getHeader("Authorization");
@@ -50,8 +59,12 @@ public class SecurityFilter extends OncePerRequestFilter {
                     var authentication = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
                     SecurityContextHolder.getContext().setAuthentication(authentication);
                 } catch (EntityNotFoundException exception) {
-                    throw new EntityNotFoundException();
+                    throwFilterException(response, "user", "Usuário não encontrado.");
+                    return;
                 }
+            } catch (JWTVerificationException exception) {
+                throwFilterException(response, "token", exception.getMessage());
+                return;
             }
         }
         filterChain.doFilter(request, response);

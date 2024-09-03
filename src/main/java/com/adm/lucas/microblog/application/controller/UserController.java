@@ -108,7 +108,7 @@ public class UserController {
 
     @PatchMapping("/reset-password")
     @Transactional
-    public ResponseEntity<Void> patchPassword(@RequestParam String token, @Valid @RequestBody ChangePasswordREQ dto) {
+    public ResponseEntity<Void> patchPassword(@RequestHeader("Authorization") String token, @Valid @RequestBody ChangePasswordREQ dto) {
         String emailFromToken = JWT.decode(token.replace("Bearer ", "")).getSubject();
         service.changePassword(emailFromToken, dto.password());
         return ResponseEntity.status(HttpStatus.ACCEPTED).build();

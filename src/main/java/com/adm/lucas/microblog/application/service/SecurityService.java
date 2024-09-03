@@ -16,6 +16,8 @@ public interface SecurityService {
 
     String generateToken(User user);
 
+    String generateChangePasswordToken(String email);
+
     String validateToken(String accessToken);
 
     Token auth(String username, String password) throws BadCredentialsException;
@@ -29,7 +31,5 @@ public interface SecurityService {
     Token recreateToken(UUID refreshToken) throws TokenExpiredException;
 
     void logout(String accessToken);
-
-    String generateChangePasswordToken(String email);
 
 }

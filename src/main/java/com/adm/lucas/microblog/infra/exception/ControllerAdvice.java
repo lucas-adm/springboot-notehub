@@ -1,13 +1,12 @@
 package com.adm.lucas.microblog.infra.exception;
 
+import com.auth0.jwt.exceptions.JWTCreationException;
 import com.auth0.jwt.exceptions.JWTDecodeException;
-import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.exceptions.TokenExpiredException;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.validation.FieldError;
@@ -84,29 +83,22 @@ public class ControllerAdvice {
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(errors.stream().map(CustomResponse::new).toList());
     }
 
-    @ExceptionHandler(AccessDeniedException.class)
-    private ResponseEntity<List<CustomResponse>> handleAccessDeniedException(AccessDeniedException ex) {
-        errors.add(new FieldError("user", "accessToken", "Não autorizado."));
+    @ExceptionHandler(JWTCreationException.class)
+    private ResponseEntity<List<CustomResponse>> handleJWTCreationException(JWTCreationException ex) {
+        errors.add(new FieldError("token", "token", ex.getMessage()));
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errors.stream().map(CustomResponse::new).toList());
     }
 
-    // Not working
-    @ExceptionHandler(JWTVerificationException.class)
-    private ResponseEntity<List<CustomResponse>> handleJWTVerificationException(JWTVerificationException ex) {
-        errors.add(new FieldError("token", "accessToken", ex.getMessage()));
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(errors.stream().map(CustomResponse::new).toList());
+    @ExceptionHandler(JWTDecodeException.class)
+    private ResponseEntity<List<CustomResponse>> handleJWTDecodeException(JWTDecodeException ex) {
+        errors.add(new FieldError("token", "oauth2_token", ex.getMessage()));
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors.stream().map(CustomResponse::new).toList());
     }
 
     @ExceptionHandler(TokenExpiredException.class)
     private ResponseEntity<List<CustomResponse>> handleTokenExpiredException(TokenExpiredException ex) {
-        errors.add(new FieldError("token", "refreshToken", ex.getMessage()));
+        errors.add(new FieldError("token", "refresh_token", ex.getMessage()));
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(errors.stream().map(CustomResponse::new).toList());
-    }
-
-    @ExceptionHandler(JWTDecodeException.class)
-    private ResponseEntity<List<CustomResponse>> handleJWTDecodedException(JWTDecodeException ex) {
-        errors.add(new FieldError("token", "oAuth2Token", ex.getMessage()));
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors.stream().map(CustomResponse::new).toList());
     }
 
 }

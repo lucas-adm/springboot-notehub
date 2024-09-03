@@ -54,8 +54,23 @@ public class SecurityServiceImpl implements SecurityService {
                     .withSubject(String.valueOf(user.getId()))
                     .withExpiresAt(getExpirationTime("access"))
                     .sign(algorithm);
-        } catch (JWTCreationException ex) {
-            throw new JWTCreationException("Error while creating token", ex);
+        } catch (JWTCreationException exception) {
+            throw new JWTCreationException("👀", exception);
+        }
+    }
+
+    @Override
+    public String generateChangePasswordToken(String email) {
+        userRepository.findByEmail(email).orElseThrow(EntityNotFoundException::new);
+        try {
+            Algorithm algorithm = Algorithm.HMAC256(secret);
+            return JWT.create()
+                    .withIssuer("Microblog")
+                    .withSubject(email)
+                    .withExpiresAt(getExpirationTime("access"))
+                    .sign(algorithm);
+        } catch (JWTCreationException exception) {
+            throw new JWTCreationException("👀", exception);
         }
     }
 
@@ -69,7 +84,7 @@ public class SecurityServiceImpl implements SecurityService {
                     .verify(accessToken)
                     .getSubject();
         } catch (JWTVerificationException ex) {
-            throw new JWTVerificationException("Error while validating token: ", ex);
+            throw new JWTVerificationException("Token inválido.", ex);
         }
     }
 
@@ -150,21 +165,6 @@ public class SecurityServiceImpl implements SecurityService {
     @Override
     public void logout(String accessToken) {
         repository.findByAccessToken(accessToken).ifPresent(repository::delete);
-    }
-
-    @Override
-    public String generateChangePasswordToken(String email) {
-        User user = userRepository.findByEmail(email).orElseThrow(EntityNotFoundException::new);
-        try {
-            Algorithm algorithm = Algorithm.HMAC256(secret);
-            return JWT.create()
-                    .withIssuer("Microblog")
-                    .withSubject(email)
-                    .withExpiresAt(getExpirationTime("access"))
-                    .sign(algorithm);
-        } catch (JWTCreationException ex) {
-            throw new JWTCreationException("Error while creating token", ex);
-        }
     }
 
 }
