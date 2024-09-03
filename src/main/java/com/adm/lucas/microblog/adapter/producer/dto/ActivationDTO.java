@@ -1,6 +1,6 @@
 package com.adm.lucas.microblog.adapter.producer.dto;
 
-import com.adm.lucas.microblog.domain.model.User;
+import com.adm.lucas.microblog.domain.user.User;
 import org.springframework.core.io.ClassPathResource;
 
 import java.io.IOException;

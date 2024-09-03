@@ -1,6 +1,6 @@
-package com.adm.lucas.microblog.application.service;
+package com.adm.lucas.microblog.domain.history;
 
-import com.adm.lucas.microblog.domain.model.User;
+import com.adm.lucas.microblog.domain.user.User;
 import org.springframework.stereotype.Service;
 
 @Service

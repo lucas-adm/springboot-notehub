@@ -1,7 +1,6 @@
-package com.adm.lucas.microblog.application.service;
+package com.adm.lucas.microblog.domain.token;
 
-import com.adm.lucas.microblog.domain.model.Token;
-import com.adm.lucas.microblog.domain.model.User;
+import com.adm.lucas.microblog.domain.user.User;
 import com.auth0.jwt.exceptions.TokenExpiredException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Service;
@@ -10,7 +9,7 @@ import java.time.Instant;
 import java.util.UUID;
 
 @Service
-public interface SecurityService {
+public interface TokenService {
 
     Instant getExpirationTime(String tokenType);
 

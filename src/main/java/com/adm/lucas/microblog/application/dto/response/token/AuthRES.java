@@ -1,7 +1,7 @@
 package com.adm.lucas.microblog.application.dto.response.token;
 
 import com.adm.lucas.microblog.application.dto.response.user.DetailUserRES;
-import com.adm.lucas.microblog.domain.model.Token;
+import com.adm.lucas.microblog.domain.token.Token;
 
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;

@@ -1,8 +1,8 @@
 package com.adm.lucas.microblog.infra.security;
 
-import com.adm.lucas.microblog.application.service.SecurityService;
-import com.adm.lucas.microblog.domain.model.User;
-import com.adm.lucas.microblog.domain.repository.UserRepository;
+import com.adm.lucas.microblog.domain.token.TokenService;
+import com.adm.lucas.microblog.domain.user.User;
+import com.adm.lucas.microblog.domain.user.UserRepository;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.FilterChain;
@@ -23,7 +23,7 @@ import java.util.UUID;
 public class SecurityFilter extends OncePerRequestFilter {
 
     @Autowired
-    private SecurityService service;
+    private TokenService service;
 
     @Autowired
     private UserRepository repository;

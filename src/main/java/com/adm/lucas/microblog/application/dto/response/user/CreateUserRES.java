@@ -1,6 +1,6 @@
 package com.adm.lucas.microblog.application.dto.response.user;
 
-import com.adm.lucas.microblog.domain.model.User;
+import com.adm.lucas.microblog.domain.user.User;
 
 import java.util.UUID;
 

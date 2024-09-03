@@ -1,6 +1,5 @@
-package com.adm.lucas.microblog.application.service;
+package com.adm.lucas.microblog.domain.user;
 
-import com.adm.lucas.microblog.domain.model.User;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;

@@ -6,7 +6,7 @@ import com.adm.lucas.microblog.application.dto.request.token.OAuth2GitHubREQ;
 import com.adm.lucas.microblog.application.dto.request.token.OAuth2GoogleREQ;
 import com.adm.lucas.microblog.application.dto.request.token.RecoverPasswordREQ;
 import com.adm.lucas.microblog.application.dto.response.token.AuthRES;
-import com.adm.lucas.microblog.application.service.SecurityService;
+import com.adm.lucas.microblog.domain.token.TokenService;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +23,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class AuthController {
 
-    private final SecurityService service;
+    private final TokenService service;
     private final MailProducer producer;
 
     @PostMapping("/recover-password")

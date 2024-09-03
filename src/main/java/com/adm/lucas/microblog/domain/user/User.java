@@ -1,5 +1,7 @@
-package com.adm.lucas.microblog.domain.model;
+package com.adm.lucas.microblog.domain.user;
 
+import com.adm.lucas.microblog.domain.token.Token;
+import com.adm.lucas.microblog.domain.history.UserHistory;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;

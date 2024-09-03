@@ -2,7 +2,7 @@ package com.adm.lucas.microblog.adapter.producer;
 
 import com.adm.lucas.microblog.adapter.producer.dto.ActivationDTO;
 import com.adm.lucas.microblog.adapter.producer.dto.RecoveryDTO;
-import com.adm.lucas.microblog.domain.model.User;
+import com.adm.lucas.microblog.domain.user.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Value;

@@ -1,9 +1,9 @@
-package com.adm.lucas.microblog.application.service.impl;
+package com.adm.lucas.microblog.application.implementation;
 
-import com.adm.lucas.microblog.application.service.UserHistoryService;
-import com.adm.lucas.microblog.application.service.UserService;
-import com.adm.lucas.microblog.domain.model.User;
-import com.adm.lucas.microblog.domain.repository.UserRepository;
+import com.adm.lucas.microblog.domain.history.UserHistoryService;
+import com.adm.lucas.microblog.domain.user.UserService;
+import com.adm.lucas.microblog.domain.user.User;
+import com.adm.lucas.microblog.domain.user.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;

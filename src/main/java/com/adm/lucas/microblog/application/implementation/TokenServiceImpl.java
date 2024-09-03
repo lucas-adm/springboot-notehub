@@ -1,10 +1,10 @@
-package com.adm.lucas.microblog.application.service.impl;
+package com.adm.lucas.microblog.application.implementation;
 
-import com.adm.lucas.microblog.application.service.SecurityService;
-import com.adm.lucas.microblog.domain.model.Token;
-import com.adm.lucas.microblog.domain.model.User;
-import com.adm.lucas.microblog.domain.repository.TokenRepository;
-import com.adm.lucas.microblog.domain.repository.UserRepository;
+import com.adm.lucas.microblog.domain.token.TokenService;
+import com.adm.lucas.microblog.domain.token.Token;
+import com.adm.lucas.microblog.domain.user.User;
+import com.adm.lucas.microblog.domain.token.TokenRepository;
+import com.adm.lucas.microblog.domain.user.UserRepository;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTCreationException;
@@ -27,7 +27,7 @@ import java.util.UUID;
 
 @Component
 @RequiredArgsConstructor
-public class SecurityServiceImpl implements SecurityService {
+public class TokenServiceImpl implements TokenService {
 
     @Value("${api.server.security.token.secret}")
     private String secret;
