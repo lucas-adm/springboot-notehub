@@ -23,6 +23,7 @@ public record AuthRES(
                 token.getExpiresAt().atZone(ZoneId.of("America/Sao_Paulo")).format(DateTimeFormatter.ofPattern("d/MM/yy HH:mm", Locale.of("pt-BR"))),
                 new DetailUserRES(
                         token.getUser().getId(),
+                        token.getUser().getCreatedAt().atZone(ZoneId.of("America/Sao_Paulo")).format(DateTimeFormatter.ofPattern("d/MM/yy HH:mm", Locale.of("pt-BR"))),
                         token.getUser().getEmail(),
                         token.getUser().getUsername(),
                         token.getUser().getDisplayName(),

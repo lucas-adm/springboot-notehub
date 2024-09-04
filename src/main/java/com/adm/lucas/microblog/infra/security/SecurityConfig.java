@@ -31,7 +31,7 @@ public class SecurityConfig {
                     req.requestMatchers("/v3/api-docs/**", "/swagger-ui.html", "/swagger-ui/**").permitAll();
                     req.requestMatchers(HttpMethod.GET, "/", "/docs").permitAll();
                     req.requestMatchers(HttpMethod.POST, "/api/v1/users/register", "/api/v1/auth/**").permitAll();
-                    req.requestMatchers(HttpMethod.GET, "/api/v1/users/active/{id}", "/api/v1/auth/refresh").permitAll();
+                    req.requestMatchers(HttpMethod.GET, "/api/v1/users", "/api/v1/users/**", "/api/v1/auth/refresh").permitAll();
                     req.anyRequest().hasAnyRole("BASIC");
                 })
                 .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)

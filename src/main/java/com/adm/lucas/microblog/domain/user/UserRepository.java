@@ -1,5 +1,7 @@
 package com.adm.lucas.microblog.domain.user;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -12,5 +14,9 @@ public interface UserRepository extends JpaRepository<User, UUID> {
     Optional<User> findByEmail(String email);
 
     Optional<User> findByUsername(String username);
+
+    Page<User> findAllByActiveTrue(Pageable pageable);
+
+    Page<User> findByUsernameContainingIgnoreCaseAndActiveTrueOrDisplayNameContainingIgnoreCaseAndActiveTrue(Pageable pageable, String username, String displayName);
 
 }

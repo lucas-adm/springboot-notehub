@@ -1,15 +1,18 @@
 package com.adm.lucas.microblog.application.implementation;
 
 import com.adm.lucas.microblog.domain.history.UserHistoryService;
-import com.adm.lucas.microblog.domain.user.UserService;
 import com.adm.lucas.microblog.domain.user.User;
 import com.adm.lucas.microblog.domain.user.UserRepository;
+import com.adm.lucas.microblog.domain.user.UserService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -36,6 +39,10 @@ public class UserServiceImpl implements UserService {
 
     private void validateUsername(String username) {
         if (repository.findByUsername(username).isPresent()) throw new DataIntegrityViolationException("username");
+    }
+
+    private void validateActiveField(boolean active) {
+        if (!active) throw new EntityNotFoundException();
     }
 
     @Override
@@ -101,6 +108,30 @@ public class UserServiceImpl implements UserService {
     public void delete(UUID idFromToken) {
         User user = repository.findById(idFromToken).orElseThrow(EntityNotFoundException::new);
         repository.delete(user);
+    }
+
+    @Override
+    public Page<User> getAllActiveUsers(Pageable pageable) {
+        return repository.findAllByActiveTrue(pageable);
+    }
+
+    @Override
+    public Page<User> findUser(Pageable pageable, String username, String displayName) {
+        return repository.findByUsernameContainingIgnoreCaseAndActiveTrueOrDisplayNameContainingIgnoreCaseAndActiveTrue(pageable, username, displayName);
+    }
+
+    @Override
+    public User getUser(String username) {
+        User user = repository.findByUsername(username).orElseThrow(EntityNotFoundException::new);
+        validateActiveField(user.isActive());
+        return user;
+    }
+
+    @Override
+    public List<String> getUserDisplayNameHistory(UUID id) {
+        User user = repository.findById(id).orElseThrow(EntityNotFoundException::new);
+        validateActiveField(user.isActive());
+        return historian.getLastFiveUserDisplayName(user);
     }
 
 }

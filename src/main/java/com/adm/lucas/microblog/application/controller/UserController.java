@@ -3,6 +3,8 @@ package com.adm.lucas.microblog.application.controller;
 import com.adm.lucas.microblog.adapter.producer.MailProducer;
 import com.adm.lucas.microblog.application.dto.request.user.*;
 import com.adm.lucas.microblog.application.dto.response.user.CreateUserRES;
+import com.adm.lucas.microblog.application.dto.response.user.DetailUserRES;
+import com.adm.lucas.microblog.application.dto.response.page.PageRES;
 import com.adm.lucas.microblog.application.implementation.UserServiceImpl;
 import com.adm.lucas.microblog.domain.user.User;
 import com.auth0.jwt.JWT;
@@ -11,11 +13,15 @@ import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -120,6 +126,30 @@ public class UserController {
         UUID idFromToken = getSubject(accessToken);
         service.delete(idFromToken);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+
+    @GetMapping
+    public ResponseEntity<PageRES<DetailUserRES>> getUsers(@PageableDefault(page = 0, size = 10, sort = {"createdAt"}, direction = Sort.Direction.ASC) Pageable pageable) {
+        PageRES<DetailUserRES> page = new PageRES<>(service.getAllActiveUsers(pageable).map(DetailUserRES::new));
+        return ResponseEntity.status(HttpStatus.OK).body(page);
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<PageRES<DetailUserRES>> searchUser(@PageableDefault(page = 0, size = 10, sort = {"createdAt"}, direction = Sort.Direction.ASC) Pageable pageable,
+                                                             @RequestParam String name) {
+        PageRES<DetailUserRES> page = new PageRES<>(service.findUser(pageable, name, name).map(DetailUserRES::new));
+        return ResponseEntity.status(HttpStatus.OK).body(page);
+    }
+
+    @GetMapping("/{username}")
+    public ResponseEntity<DetailUserRES> getUser(@PathVariable("username") String username) {
+        User user = service.getUser(username);
+        return ResponseEntity.status(HttpStatus.OK).body(new DetailUserRES(user));
+    }
+
+    @GetMapping("/{id}/display-names")
+    public ResponseEntity<List<String>> getUserDisplayNameHistory(@PathVariable("id") UUID id) {
+        return ResponseEntity.status(HttpStatus.OK).body(service.getUserDisplayNameHistory(id));
     }
 
 }
