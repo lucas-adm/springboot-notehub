@@ -6,13 +6,16 @@ import com.adm.lucas.microblog.domain.user.UserRepository;
 import com.adm.lucas.microblog.domain.user.UserService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
+import java.net.UnknownHostException;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -25,8 +28,12 @@ public class UserServiceImpl implements UserService {
     private final UserHistoryService historian;
     private final PasswordEncoder encoder;
 
+    @SneakyThrows
     private <T> void changeField(UUID idFromToken, String field, Function<User, T> getter, Consumer<User> setter) {
         User user = repository.findById(idFromToken).orElseThrow(EntityNotFoundException::new);
+        if (!Objects.equals(user.getHost(), "Microblog") && (Objects.equals(field, "email") | Objects.equals(field, "password"))) {
+            throw new UnknownHostException("Host não autorizado.");
+        }
         T oldValue = getter.apply(user);
         setter.accept(user);
         repository.save(user);

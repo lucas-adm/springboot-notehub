@@ -14,6 +14,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -98,6 +99,13 @@ public class ControllerAdvice {
     private ResponseEntity<List<CustomResponse>> handleTokenExpiredException(TokenExpiredException ex) {
         List<FieldError> errors = new ArrayList<>();
         errors.add(new FieldError("token", "refresh_token", ex.getMessage()));
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(errors.stream().map(CustomResponse::new).toList());
+    }
+
+    @ExceptionHandler(UnknownHostException.class)
+    private ResponseEntity<List<CustomResponse>> handleUnknownHostException(UnknownHostException ex) {
+        List<FieldError> errors = new ArrayList<>();
+        errors.add(new FieldError("user", "host", ex.getMessage()));
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(errors.stream().map(CustomResponse::new).toList());
     }
 
