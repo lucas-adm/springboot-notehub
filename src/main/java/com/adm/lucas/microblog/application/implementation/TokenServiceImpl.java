@@ -1,9 +1,9 @@
 package com.adm.lucas.microblog.application.implementation;
 
-import com.adm.lucas.microblog.domain.token.TokenService;
 import com.adm.lucas.microblog.domain.token.Token;
-import com.adm.lucas.microblog.domain.user.User;
 import com.adm.lucas.microblog.domain.token.TokenRepository;
+import com.adm.lucas.microblog.domain.token.TokenService;
+import com.adm.lucas.microblog.domain.user.User;
 import com.adm.lucas.microblog.domain.user.UserRepository;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
@@ -14,15 +14,19 @@ import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
+import java.net.UnknownHostException;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 @Component
@@ -88,6 +92,11 @@ public class TokenServiceImpl implements TokenService {
         }
     }
 
+    private void deleteAndFlush(Token token) {
+        repository.delete(token);
+        repository.flush();
+    }
+
     @Override
     public Token auth(String username, String password) throws BadCredentialsException {
         User user = userRepository.findByUsername(username.toLowerCase()).orElseThrow(() -> new BadCredentialsException("username"));
@@ -140,12 +149,6 @@ public class TokenServiceImpl implements TokenService {
     }
 
     @Override
-    public void deleteAndFlush(Token token) {
-        repository.delete(token);
-        repository.flush();
-    }
-
-    @Override
     public Token recreateToken(UUID refreshToken) throws TokenExpiredException {
         Token token = repository.findById(refreshToken).orElseThrow(EntityNotFoundException::new);
 
@@ -165,6 +168,12 @@ public class TokenServiceImpl implements TokenService {
     @Override
     public void logout(String accessToken) {
         repository.findByAccessToken(accessToken).ifPresent(repository::delete);
+    }
+
+    @Override
+    public void cleanExpiredTokens() {
+        List<Token> expiredTokens = repository.findExpiredTokens(Instant.now());
+        repository.deleteAll(expiredTokens);
     }
 
 }

@@ -40,4 +40,6 @@ public interface UserService {
 
     List<String> getUserDisplayNameHistory(UUID id);
 
+    void cleanUsersWithExpiredActivationTime();
+
 }

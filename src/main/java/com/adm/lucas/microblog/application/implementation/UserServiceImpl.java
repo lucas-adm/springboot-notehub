@@ -14,6 +14,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.net.UnknownHostException;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -139,6 +141,13 @@ public class UserServiceImpl implements UserService {
         User user = repository.findById(id).orElseThrow(EntityNotFoundException::new);
         validateActiveField(user.isActive());
         return historian.getLastFiveUserDisplayName(user);
+    }
+
+    @Override
+    public void cleanUsersWithExpiredActivationTime() {
+        Instant nowMinus7Days = Instant.now().minus(7, ChronoUnit.DAYS);
+        List<User> usersWithExpiredActivationTime = repository.findUsersWithExpiredActivationTime(nowMinus7Days);
+        repository.deleteAll(usersWithExpiredActivationTime);
     }
 
 }

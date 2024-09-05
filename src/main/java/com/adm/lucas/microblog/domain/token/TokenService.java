@@ -25,10 +25,10 @@ public interface TokenService {
 
     Token authWithGitHubAcc(Integer id, String login, String avatar_url);
 
-    void deleteAndFlush(Token token);
-
     Token recreateToken(UUID refreshToken) throws TokenExpiredException;
 
     void logout(String accessToken);
+
+    void cleanExpiredTokens();
 
 }
