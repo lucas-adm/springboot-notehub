@@ -11,6 +11,7 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -32,6 +33,13 @@ public class ControllerAdvice {
         List<FieldError> errors = ex.getFieldErrors();
         List<CustomResponse> response = errors.stream().map(CustomResponse::new).toList();
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+    }
+
+    @ExceptionHandler(MissingServletRequestParameterException.class)
+    private ResponseEntity<List<CustomResponse>> handleMissingServletRequestParameterException(MissingServletRequestParameterException ex) {
+        List<FieldError> errors = new ArrayList<>();
+        errors.add(new FieldError("parameter", "parameter", ex.getMessage()));
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors.stream().map(CustomResponse::new).toList());
     }
 
     @ExceptionHandler(DataIntegrityViolationException.class)
