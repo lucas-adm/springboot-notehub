@@ -3,6 +3,8 @@ package com.adm.lucas.microblog.domain.user;
 import com.adm.lucas.microblog.domain.history.UserHistory;
 import com.adm.lucas.microblog.domain.note.Note;
 import com.adm.lucas.microblog.domain.token.Token;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -20,7 +22,7 @@ import java.util.*;
 @Table(name = "users")
 @NoArgsConstructor
 @Data
-@ToString(exclude = "notes")
+@JsonIgnoreProperties({"token", "history", "notes"})
 public class User implements UserDetails {
 
     @Id

@@ -1,10 +1,10 @@
 package com.adm.lucas.microblog.domain.tag;
 
 import com.adm.lucas.microblog.domain.note.Note;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,7 +14,7 @@ import java.util.UUID;
 @Table(name = "tags")
 @NoArgsConstructor
 @Data
-@ToString(exclude = {"id", "notes"})
+@JsonIgnoreProperties({"id", "notes"})
 public class Tag {
 
     @Id

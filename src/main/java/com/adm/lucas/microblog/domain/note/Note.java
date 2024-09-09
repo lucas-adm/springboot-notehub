@@ -27,6 +27,8 @@ public class Note {
 
     private Instant createdAt = Instant.now();
 
+    private String title;
+
     @Column(columnDefinition = "TEXT")
     private String markdown;
 
@@ -34,18 +36,19 @@ public class Note {
 
     private boolean closed;
 
-    private boolean visible;
+    private boolean hidden;
 
-    @ManyToMany(cascade = CascadeType.PERSIST)
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.REFRESH, CascadeType.MERGE})
     @JoinTable(name = "note_tags", joinColumns = @JoinColumn(name = "note_id"), inverseJoinColumns = @JoinColumn(name = "tag_id"))
     private List<Tag> tags = new ArrayList<>();
 
-    public Note(User user, String markdown, boolean closed, boolean visible, List<String> tags) {
+    public Note(User user, String title, String markdown, boolean closed, boolean hidden, List<Tag> tags) {
         this.user = user;
+        this.title = title;
         this.markdown = markdown;
         this.closed = closed;
-        this.visible = visible;
-        if (tags != null) this.tags = tags.stream().map(Tag::new).toList();
+        this.hidden = hidden;
+        if (tags != null) this.tags = tags;
     }
 
 }
