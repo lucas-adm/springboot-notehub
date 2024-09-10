@@ -23,7 +23,7 @@ public record CreateNoteRES(
     public CreateNoteRES(Note note) {
         this(
                 note.getId(),
-                note.getCreatedAt().atZone(ZoneId.of("America/Sao_Paulo")).format(DateTimeFormatter.ofPattern("d/MM/yy HH:mm", Locale.of("pt-BR"))),
+                note.getCreatedAt().atZone(ZoneId.of("America/Sao_Paulo")).format(DateTimeFormatter.ofPattern("d/M/yy HH:mm", Locale.of("pt-BR"))),
                 note.isModified(),
                 note.isClosed(),
                 note.isHidden(),
