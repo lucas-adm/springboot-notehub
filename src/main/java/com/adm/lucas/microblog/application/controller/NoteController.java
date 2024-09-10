@@ -1,5 +1,6 @@
 package com.adm.lucas.microblog.application.controller;
 
+import com.adm.lucas.microblog.application.dto.request.note.ChangeTagsREQ;
 import com.adm.lucas.microblog.application.dto.request.note.CreateNoteREQ;
 import com.adm.lucas.microblog.application.dto.response.note.CreateNoteRES;
 import com.adm.lucas.microblog.domain.note.Note;
@@ -32,6 +33,14 @@ public class NoteController {
         UUID idFromToken = getSubject(accessToken);
         Note note = service.create(service.mapToNote(idFromToken, dto));
         return ResponseEntity.status(HttpStatus.CREATED).body(new CreateNoteRES(note));
+    }
+
+    @PatchMapping("/{id}/change-tags")
+    @Transactional
+    public ResponseEntity<Void> changeNoteTags(@RequestHeader("Authorization") String accessToken, @PathVariable("id") UUID idFromPath, @Valid @RequestBody ChangeTagsREQ dto) {
+        UUID idFromToken = getSubject(accessToken);
+        service.changeTags(idFromToken, idFromPath, dto.tags());
+        return ResponseEntity.status(HttpStatus.ACCEPTED).build();
     }
 
     @DeleteMapping("/{id}/delete")

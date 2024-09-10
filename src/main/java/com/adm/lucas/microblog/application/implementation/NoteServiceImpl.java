@@ -13,9 +13,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
@@ -45,13 +47,23 @@ public class NoteServiceImpl implements NoteService {
     @Override
     public Note mapToNote(UUID idFromToken, CreateNoteREQ req) {
         User user = userRepository.findById(idFromToken).orElseThrow(EntityNotFoundException::new);
-        List<Tag> tags = req.tags().stream().map(tag -> tagRepository.findByName(tag).orElseGet(() -> new Tag(tag))).toList();
+        List<Tag> tags = req.tags().stream().map(tag -> tagRepository.findByName(tag).orElseGet(() -> new Tag(tag.toLowerCase()))).toList();
         return new Note(user, req.title(), req.markdown(), req.closed(), req.hidden(), tags);
     }
 
     @Override
     public Note create(Note note) {
         return repository.save(note);
+    }
+
+    @Override
+    public void changeTags(UUID idFromToken, UUID idFromPath, List<String> tags) {
+        validateAccess(idFromToken, idFromPath);
+        Note note = repository.findById(idFromPath).orElseThrow(EntityNotFoundException::new);
+        List<String> names = note.getTags().stream().map(Tag::getName).toList();
+        note.setTags(tags.stream().map(tag -> tagRepository.findByName(tag).orElseGet(() -> new Tag(tag.toLowerCase()))).collect(Collectors.toCollection(ArrayList::new)));
+        repository.saveAndFlush(note);
+        removeOrphanTags(names);
     }
 
     @Override
