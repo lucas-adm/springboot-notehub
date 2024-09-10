@@ -7,6 +7,8 @@ import jakarta.persistence.EntityNotFoundException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.validation.FieldError;
@@ -39,6 +41,13 @@ public class ControllerAdvice {
     private ResponseEntity<List<CustomResponse>> handleMissingServletRequestParameterException(MissingServletRequestParameterException ex) {
         List<FieldError> errors = new ArrayList<>();
         errors.add(new FieldError("parameter", "parameter", ex.getMessage()));
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors.stream().map(CustomResponse::new).toList());
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    private ResponseEntity<List<CustomResponse>> handleHttpMessageNotReadableException(HttpMessageNotReadableException exception) {
+        List<FieldError> errors = new ArrayList<>();
+        errors.add(new FieldError("tag", "tags", "Não é uma lista."));
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors.stream().map(CustomResponse::new).toList());
     }
 
@@ -86,6 +95,13 @@ public class ControllerAdvice {
     private ResponseEntity<List<CustomResponse>> handleDisabledException(DisabledException ex) {
         List<FieldError> errors = new ArrayList<>();
         errors.add(new FieldError("user", "username", ex.getMessage()));
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(errors.stream().map(CustomResponse::new).toList());
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    private ResponseEntity<List<CustomResponse>> handleAccessDeniedException(AccessDeniedException ex) {
+        List<FieldError> errors = new ArrayList<>();
+        errors.add(new FieldError("authorization", "access_token", ex.getMessage()));
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(errors.stream().map(CustomResponse::new).toList());
     }
 

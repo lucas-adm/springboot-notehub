@@ -8,8 +8,10 @@ import java.util.UUID;
 @Service
 public interface NoteService {
 
-    Note map(UUID idFromToken, CreateNoteREQ req);
+    Note mapToNote(UUID idFromToken, CreateNoteREQ req);
 
     Note create(Note note);
+
+    void delete(UUID idFromToken, UUID idFromPath);
 
 }

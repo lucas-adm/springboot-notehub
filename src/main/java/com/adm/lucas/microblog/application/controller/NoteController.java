@@ -30,8 +30,16 @@ public class NoteController {
     @Transactional
     public ResponseEntity<CreateNoteRES> createNote(@RequestHeader("Authorization") String accessToken, @Valid @RequestBody CreateNoteREQ dto) {
         UUID idFromToken = getSubject(accessToken);
-        Note note = service.create(service.map(idFromToken, dto));
+        Note note = service.create(service.mapToNote(idFromToken, dto));
         return ResponseEntity.status(HttpStatus.CREATED).body(new CreateNoteRES(note));
+    }
+
+    @DeleteMapping("/{id}/delete")
+    @Transactional
+    public ResponseEntity<Void> deleteNote(@RequestHeader("Authorization") String accessToken, @PathVariable("id") UUID idFromPath) {
+        UUID idFromToken = getSubject(accessToken);
+        service.delete(idFromToken, idFromPath);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
 }

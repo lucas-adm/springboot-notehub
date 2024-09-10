@@ -10,9 +10,11 @@ import com.adm.lucas.microblog.domain.user.User;
 import com.adm.lucas.microblog.domain.user.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 @Component
@@ -23,8 +25,25 @@ public class NoteServiceImpl implements NoteService {
     private final TagRepository tagRepository;
     private final NoteRepository repository;
 
+    private void validateAccess(UUID userId, UUID noteId) {
+        Note note = repository.findById(noteId).orElseThrow(EntityNotFoundException::new);
+        if (!Objects.equals(userId, note.getUser().getId())) throw new AccessDeniedException("Usuário sem permissão.");
+    }
+
+    private void deleteNoteAndFlush(Note note) {
+        repository.delete(note);
+        repository.flush();
+    }
+
+    private void removeOrphanTags(List<String> names) {
+        List<Tag> tags = tagRepository.findAllByNameIn(names);
+        for (Tag tag : tags) {
+            if (tag.getNotes().isEmpty()) tagRepository.delete(tag);
+        }
+    }
+
     @Override
-    public Note map(UUID idFromToken, CreateNoteREQ req) {
+    public Note mapToNote(UUID idFromToken, CreateNoteREQ req) {
         User user = userRepository.findById(idFromToken).orElseThrow(EntityNotFoundException::new);
         List<Tag> tags = req.tags().stream().map(tag -> tagRepository.findByName(tag).orElseGet(() -> new Tag(tag))).toList();
         return new Note(user, req.title(), req.markdown(), req.closed(), req.hidden(), tags);
@@ -33,6 +52,15 @@ public class NoteServiceImpl implements NoteService {
     @Override
     public Note create(Note note) {
         return repository.save(note);
+    }
+
+    @Override
+    public void delete(UUID idFromToken, UUID idFromPath) {
+        validateAccess(idFromToken, idFromPath);
+        Note note = repository.findById(idFromPath).orElseThrow(EntityNotFoundException::new);
+        List<String> names = note.getTags().stream().map(Tag::getName).toList();
+        deleteNoteAndFlush(note);
+        removeOrphanTags(names);
     }
 
 }
