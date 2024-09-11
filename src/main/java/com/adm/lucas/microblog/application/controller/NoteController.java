@@ -1,7 +1,6 @@
 package com.adm.lucas.microblog.application.controller;
 
-import com.adm.lucas.microblog.application.dto.request.note.ChangeTagsREQ;
-import com.adm.lucas.microblog.application.dto.request.note.CreateNoteREQ;
+import com.adm.lucas.microblog.application.dto.request.note.*;
 import com.adm.lucas.microblog.application.dto.response.note.CreateNoteRES;
 import com.adm.lucas.microblog.domain.note.Note;
 import com.adm.lucas.microblog.domain.note.NoteService;
@@ -33,6 +32,46 @@ public class NoteController {
         UUID idFromToken = getSubject(accessToken);
         Note note = service.create(service.mapToNote(idFromToken, dto));
         return ResponseEntity.status(HttpStatus.CREATED).body(new CreateNoteRES(note));
+    }
+
+    @PutMapping("/{id}/edit-note")
+    @Transactional
+    public ResponseEntity<Void> editNote(@RequestHeader("Authorization") String accessToken, @PathVariable("id") UUID idFromPath, @Valid @RequestBody EditNoteREQ dto) {
+        UUID idFromToken = getSubject(accessToken);
+        service.edit(idFromToken, idFromPath, dto.title(), dto.tags(), dto.closed(), dto.hidden());
+        return ResponseEntity.status(HttpStatus.ACCEPTED).build();
+    }
+
+    @PatchMapping("/{id}/change-title")
+    @Transactional
+    public ResponseEntity<Void> changeNoteTitle(@RequestHeader("Authorization") String accessToken, @PathVariable("id") UUID idFromPath, @Valid @RequestBody ChangeTitleREQ dto) {
+        UUID idFromToken = getSubject(accessToken);
+        service.changeTitle(idFromToken, idFromPath, dto.title());
+        return ResponseEntity.status(HttpStatus.ACCEPTED).build();
+    }
+
+    @PatchMapping("/{id}/change-markdown")
+    @Transactional
+    public ResponseEntity<Void> changeNoteMarkdown(@RequestHeader("Authorization") String accessToken, @PathVariable("id") UUID idFromPath, @Valid @RequestBody ChangeMarkdownReq dto) {
+        UUID idFromToken = getSubject(accessToken);
+        service.changeMarkdown(idFromToken, idFromPath, dto.markdown());
+        return ResponseEntity.status(HttpStatus.ACCEPTED).build();
+    }
+
+    @PatchMapping("/{id}/change-status")
+    @Transactional
+    public ResponseEntity<Void> changeNoteStatus(@RequestHeader("Authorization") String accessToken, @PathVariable("id") UUID idFromPath) {
+        UUID idFromToken = getSubject(accessToken);
+        service.changeClosed(idFromToken, idFromPath);
+        return ResponseEntity.status(HttpStatus.ACCEPTED).build();
+    }
+
+    @PatchMapping("/{id}/change-visibility")
+    @Transactional
+    public ResponseEntity<Void> changeNoteVisibility(@RequestHeader("Authorization") String accessToken, @PathVariable("id") UUID idFromPath) {
+        UUID idFromToken = getSubject(accessToken);
+        service.changeHidden(idFromToken, idFromPath);
+        return ResponseEntity.status(HttpStatus.ACCEPTED).build();
     }
 
     @PatchMapping("/{id}/change-tags")

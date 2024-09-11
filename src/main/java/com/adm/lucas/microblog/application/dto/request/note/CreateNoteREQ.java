@@ -26,13 +26,13 @@ public record CreateNoteREQ(
 
         boolean hidden,
 
-        @Size(max = 12, message = "Capacidade máxima excedida.")
+        @Size(max = 12, message = "Capacidade máxima excedida")
         List<
+                @NotBlank(message = "Não pode ser vazio")
                 @Pattern(
-                        regexp = "^(?!.*[\\u00A0\\u2007\\u202F]).*$",
-                        message = "👀"
+                        regexp = "^(?!.*[\\p{Zs}\\u00A0\\u2007\\u202F]).*$",
+                        message = "Não use espaços"
                 )
-                @NotBlank(message = "A tag não pode ser vazia.")
                 @Size(min = 2, max = 20, message = "Tamanho inválido")
                         String> tags
 ) {

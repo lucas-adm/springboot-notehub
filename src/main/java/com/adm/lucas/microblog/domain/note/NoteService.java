@@ -13,6 +13,16 @@ public interface NoteService {
 
     Note create(Note note);
 
+    void edit(UUID idFromToken, UUID idFromPath, String title, List<String> tags, boolean closed, boolean hidden);
+
+    void changeTitle(UUID idFromToken, UUID idFromPath, String title);
+
+    void changeMarkdown(UUID idFromToken, UUID idFromPath, String markdown);
+
+    void changeClosed(UUID idFromToken, UUID idFromPath);
+
+    void changeHidden(UUID idFromToken, UUID idFromPath);
+
     void changeTags(UUID idFromToken, UUID idFromPath, List<String> tags);
 
     void delete(UUID idFromToken, UUID idFromPath);
