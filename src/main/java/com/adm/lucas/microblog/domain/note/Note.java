@@ -37,6 +37,8 @@ public class Note {
 
     private boolean modified = false;
 
+    private Instant modifiedAt;
+
     private boolean closed;
 
     private boolean hidden;
