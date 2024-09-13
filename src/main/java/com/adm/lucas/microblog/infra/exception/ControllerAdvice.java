@@ -16,6 +16,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.HandlerMethodValidationException;
 
 import java.net.UnknownHostException;
 import java.util.ArrayList;
@@ -41,6 +42,13 @@ public class ControllerAdvice {
     private ResponseEntity<List<CustomResponse>> handleMissingServletRequestParameterException(MissingServletRequestParameterException ex) {
         List<FieldError> errors = new ArrayList<>();
         errors.add(new FieldError("parameter", "parameter", ex.getMessage()));
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors.stream().map(CustomResponse::new).toList());
+    }
+
+    @ExceptionHandler(HandlerMethodValidationException.class)
+    private ResponseEntity<List<CustomResponse>> handleHandlerMethodValidationException(HandlerMethodValidationException ex) {
+        List<FieldError> errors = new ArrayList<>();
+        errors.add(new FieldError("parameter", "parameter", "Parâmetro 'q' vazio."));
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors.stream().map(CustomResponse::new).toList());
     }
 

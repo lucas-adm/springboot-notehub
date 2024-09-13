@@ -10,6 +10,8 @@ import com.adm.lucas.microblog.domain.user.User;
 import com.adm.lucas.microblog.domain.user.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Component;
 
@@ -117,6 +119,53 @@ public class NoteServiceImpl implements NoteService {
         List<String> oldTagNames = note.getTags().stream().map(Tag::getName).toList();
         deleteNoteAndFlush(note);
         removeOrphanTags(oldTagNames);
+    }
+
+    @Override
+    public List<String> getAllTags() {
+        return tagRepository.findAll().stream().map(Tag::getName).toList();
+    }
+
+    @Override
+    public List<String> getAllUserTags(UUID idFromToken) {
+        return tagRepository.findAllByNotesUserId(idFromToken).stream().map(Tag::getName).toList();
+    }
+
+    @Override
+    public Page<Note> findPublicNotes(Pageable pageable, String q) {
+        return repository.findAllByTitleContainingIgnoreCaseAndHiddenFalseOrTagsNameContainingIgnoreCaseAndHiddenFalse(pageable, q, q);
+    }
+
+    @Override
+    public Page<Note> findPrivateNotes(Pageable pageable, UUID idFromToken, String q) {
+        return repository.findAllByUserIdAndTitleContainingIgnoreCaseOrUserIdAndTagsNameContainingIgnoreCase(pageable, idFromToken, q, idFromToken, q);
+    }
+
+    @Override
+    public Page<Note> findPublicNotesByTag(Pageable pageable, String tag) {
+        return repository.findAllByTagsNameContainingIgnoreCaseAndHiddenFalse(pageable, tag);
+    }
+
+    @Override
+    public Page<Note> findPrivateNotesByTag(Pageable pageable, UUID idFromToken, String tag) {
+        return repository.findAllByUserIdAndTagsNameContainingIgnoreCase(pageable, idFromToken, tag);
+    }
+
+    @Override
+    public Note getPublicNote(UUID idFromPath) {
+        return repository.findByIdAndHiddenFalse(idFromPath).orElseThrow(EntityNotFoundException::new);
+    }
+
+    @Override
+    public Note getPrivateNote(UUID idFromToken, UUID idFromPath) {
+        Note note = repository.findById(idFromPath).orElseThrow(EntityNotFoundException::new);
+        validateAccess(idFromToken, note);
+        return note;
+    }
+
+    @Override
+    public Page<Note> getAllUserNotes(Pageable pageable, UUID idFromToken) {
+        return repository.findAllByUserId(pageable, idFromToken);
     }
 
 }

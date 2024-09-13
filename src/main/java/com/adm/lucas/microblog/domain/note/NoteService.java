@@ -1,6 +1,8 @@
 package com.adm.lucas.microblog.domain.note;
 
 import com.adm.lucas.microblog.application.dto.request.note.CreateNoteREQ;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -26,5 +28,23 @@ public interface NoteService {
     void changeTags(UUID idFromToken, UUID idFromPath, List<String> tags);
 
     void delete(UUID idFromToken, UUID idFromPath);
+
+    List<String> getAllTags();
+
+    List<String> getAllUserTags(UUID idFromToken);
+
+    Page<Note> findPublicNotes(Pageable pageable, String q);
+
+    Page<Note> findPrivateNotes(Pageable pageable, UUID idFromToken, String q);
+
+    Page<Note> findPublicNotesByTag(Pageable pageable, String tag);
+
+    Page<Note> findPrivateNotesByTag(Pageable pageable, UUID idFromToken, String tag);
+
+    Note getPublicNote(UUID idFromPath);
+
+    Note getPrivateNote(UUID idFromToken, UUID idFromPath);
+
+    Page<Note> getAllUserNotes(Pageable pageable, UUID idFromToken);
 
 }
