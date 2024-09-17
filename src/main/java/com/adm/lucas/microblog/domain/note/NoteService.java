@@ -45,6 +45,8 @@ public interface NoteService {
 
     Note getPrivateNote(UUID idFromToken, UUID idFromPath);
 
-    Page<Note> getAllUserNotes(Pageable pageable, UUID idFromToken);
+    Page<Note> getAllUserNotesByUsername(Pageable pageable, String username);
+
+    Page<Note> getAllUserNotesById(Pageable pageable, UUID idFromToken);
 
 }

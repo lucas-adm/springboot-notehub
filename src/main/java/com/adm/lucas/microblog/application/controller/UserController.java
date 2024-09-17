@@ -237,8 +237,8 @@ public class UserController {
     })
     @GetMapping("/search")
     public ResponseEntity<PageRES<DetailUserRES>> searchUser(@ParameterObject @PageableDefault(page = 0, size = 10, sort = {"createdAt"}, direction = Sort.Direction.ASC) Pageable pageable,
-                                                             @RequestParam String name) {
-        PageRES<DetailUserRES> page = new PageRES<>(service.findUser(pageable, name, name).map(DetailUserRES::new));
+                                                             @RequestParam String q) {
+        PageRES<DetailUserRES> page = new PageRES<>(service.findUser(pageable, q).map(DetailUserRES::new));
         return ResponseEntity.status(HttpStatus.OK).body(page);
     }
 

@@ -21,7 +21,18 @@ public interface UserRepository extends JpaRepository<User, UUID> {
 
     Page<User> findAllByActiveTrue(Pageable pageable);
 
-    Page<User> findByUsernameContainingIgnoreCaseAndActiveTrueOrDisplayNameContainingIgnoreCaseAndActiveTrue(Pageable pageable, String username, String displayName);
+    @Query("""
+            SELECT u
+            FROM User u
+            WHERE (
+                LOWER(u.username) LIKE LOWER(CONCAT('%', :q, '%'))
+                OR
+                LOWER(u.displayName) LIKE LOWER(CONCAT('%', :q, '%'))
+            )
+            AND u.active = true
+            """
+    )
+    Page<User> findAllActiveUsersByUsernameOrDisplayName(Pageable pageable, @Param("q") String q);
 
     @Query("SELECT u FROM User u WHERE u.createdAt < :nowMinus7Days AND u.active = false")
     List<User> findUsersWithExpiredActivationTime(@Param("nowMinus7Days") Instant nowMinus7Days);

@@ -35,10 +35,6 @@ public class NoteController {
         return UUID.fromString(idFromToken);
     }
 
-    private boolean isQueryParameterValid(String q) {
-        return (q != null && !q.trim().isEmpty());
-    }
-
     @PostMapping("/new-note")
     @Transactional
     public ResponseEntity<CreateNoteRES> createNote(@RequestHeader("Authorization") String accessToken, @Valid @RequestBody CreateNoteREQ dto) {
@@ -109,7 +105,7 @@ public class NoteController {
         return ResponseEntity.status(HttpStatus.OK).body(tags);
     }
 
-    @GetMapping("/personal/tags")
+    @GetMapping("/private/tags")
     public ResponseEntity<List<String>> getAllUserTags(@RequestHeader("Authorization") String accessToken) {
         UUID idFromToken = getSubject(accessToken);
         List<String> tags = service.getAllUserTags(idFromToken);
@@ -123,7 +119,7 @@ public class NoteController {
         return ResponseEntity.status(HttpStatus.OK).body(new PageRES<>(page));
     }
 
-    @GetMapping("/search/personal")
+    @GetMapping("/private/search")
     public ResponseEntity<PageRES<LowDetailNoteRES>> searchPrivateNotes(@RequestHeader("Authorization") String accessToken,
                                                                         @PageableDefault(page = 0, size = 10, sort = {"createdAt"}, direction = Sort.Direction.DESC)
                                                                         Pageable pageable,
@@ -140,7 +136,7 @@ public class NoteController {
         return ResponseEntity.status(HttpStatus.OK).body(new PageRES<>(page));
     }
 
-    @GetMapping("/search/personal/tag")
+    @GetMapping("/private/search/tag")
     public ResponseEntity<PageRES<LowDetailNoteRES>> searchPrivateNotesByTag(@RequestHeader("Authorization") String accessToken,
                                                                              @PageableDefault(page = 0, size = 10, sort = {"createdAt"}, direction = Sort.Direction.DESC) Pageable pageable,
                                                                              @NotBlank @RequestParam String q) {
@@ -155,18 +151,25 @@ public class NoteController {
         return ResponseEntity.status(HttpStatus.OK).body(new DetailNoteRES(note));
     }
 
-    @GetMapping("/personal/{id}")
+    @GetMapping("/private/{id}")
     public ResponseEntity<DetailNoteRES> getPrivateNote(@RequestHeader("Authorization") String accessToken, @PathVariable("id") UUID idFromPath) {
         UUID idFromToken = getSubject(accessToken);
         Note note = service.getPrivateNote(idFromToken, idFromPath);
         return ResponseEntity.status(HttpStatus.OK).body(new DetailNoteRES(note));
     }
 
-    @GetMapping("/personal")
-    public ResponseEntity<PageRES<LowDetailNoteRES>> getAllUserNotes(@RequestHeader("Authorization") String accessToken,
-                                                                     @PageableDefault(page = 0, size = 10, sort = {"modifiedAt"}, direction = Sort.Direction.DESC) Pageable pageable) {
+    @GetMapping("/user/{username}")
+    public ResponseEntity<PageRES<LowDetailNoteRES>> getAllUserNotesByUsername(@PathVariable("username") String username,
+                                                                               @PageableDefault(page = 0, size = 10, sort = {"modifiedAt"}, direction = Sort.Direction.DESC) Pageable pageable) {
+        Page<LowDetailNoteRES> page = service.getAllUserNotesByUsername(pageable, username).map(LowDetailNoteRES::new);
+        return ResponseEntity.status(HttpStatus.OK).body(new PageRES<>(page));
+    }
+
+    @GetMapping("/private")
+    public ResponseEntity<PageRES<LowDetailNoteRES>> getAllUserNotesById(@RequestHeader("Authorization") String accessToken,
+                                                                         @PageableDefault(page = 0, size = 10, sort = {"modifiedAt"}, direction = Sort.Direction.DESC) Pageable pageable) {
         UUID idFromToken = getSubject(accessToken);
-        Page<LowDetailNoteRES> page = service.getAllUserNotes(pageable, idFromToken).map(LowDetailNoteRES::new);
+        Page<LowDetailNoteRES> page = service.getAllUserNotesById(pageable, idFromToken).map(LowDetailNoteRES::new);
         return ResponseEntity.status(HttpStatus.OK).body(new PageRES<>(page));
     }
 

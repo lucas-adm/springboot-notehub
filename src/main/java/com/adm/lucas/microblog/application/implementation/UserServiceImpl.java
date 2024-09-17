@@ -125,8 +125,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Page<User> findUser(Pageable pageable, String username, String displayName) {
-        return repository.findByUsernameContainingIgnoreCaseAndActiveTrueOrDisplayNameContainingIgnoreCaseAndActiveTrue(pageable, username, displayName);
+    public Page<User> findUser(Pageable pageable, String q) {
+        return repository.findAllActiveUsersByUsernameOrDisplayName(pageable, q);
     }
 
     @Override

@@ -133,17 +133,17 @@ public class NoteServiceImpl implements NoteService {
 
     @Override
     public Page<Note> findPublicNotes(Pageable pageable, String q) {
-        return repository.findAllByTitleContainingIgnoreCaseAndHiddenFalseOrTagsNameContainingIgnoreCaseAndHiddenFalse(pageable, q, q);
+        return repository.findAllNotHiddenByTitleOrTagName(pageable, q);
     }
 
     @Override
     public Page<Note> findPrivateNotes(Pageable pageable, UUID idFromToken, String q) {
-        return repository.findAllByUserIdAndTitleContainingIgnoreCaseOrUserIdAndTagsNameContainingIgnoreCase(pageable, idFromToken, q, idFromToken, q);
+        return repository.findAllCurrentUserNotesByTitleOrTagName(pageable, idFromToken, q);
     }
 
     @Override
     public Page<Note> findPublicNotesByTag(Pageable pageable, String tag) {
-        return repository.findAllByTagsNameContainingIgnoreCaseAndHiddenFalse(pageable, tag);
+        return repository.findAllByHiddenFalseAndTagsNameContainingIgnoreCase(pageable, tag);
     }
 
     @Override
@@ -153,7 +153,7 @@ public class NoteServiceImpl implements NoteService {
 
     @Override
     public Note getPublicNote(UUID idFromPath) {
-        return repository.findByIdAndHiddenFalse(idFromPath).orElseThrow(EntityNotFoundException::new);
+        return repository.findByHiddenFalseAndId(idFromPath).orElseThrow(EntityNotFoundException::new);
     }
 
     @Override
@@ -164,7 +164,12 @@ public class NoteServiceImpl implements NoteService {
     }
 
     @Override
-    public Page<Note> getAllUserNotes(Pageable pageable, UUID idFromToken) {
+    public Page<Note> getAllUserNotesByUsername(Pageable pageable, String username) {
+        return repository.findAllByUserProfilePrivateFalseAndUserUsername(pageable, username.toLowerCase());
+    }
+
+    @Override
+    public Page<Note> getAllUserNotesById(Pageable pageable, UUID idFromToken) {
         return repository.findAllByUserId(pageable, idFromToken);
     }
 

@@ -32,7 +32,7 @@ public class SecurityConfig {
                     req.requestMatchers(HttpMethod.GET, "/", "/docs").permitAll();
                     req.requestMatchers(HttpMethod.POST, "/api/v1/users/register", "/api/v1/auth/**").permitAll();
                     req.requestMatchers(HttpMethod.GET, "/api/v1/users", "/api/v1/users/**", "/api/v1/auth/refresh", "/api/v1/notes", "/api/v1/notes/**").permitAll();
-                    req.requestMatchers(HttpMethod.GET, "/api/v1/notes/personal", "/api/v1/notes/personal/**").hasRole("BASIC");
+                    req.requestMatchers(HttpMethod.GET, "/api/v1/notes/private", "/api/v1/notes/private/**").hasRole("BASIC");
                     req.anyRequest().hasRole("BASIC");
                 })
                 .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)

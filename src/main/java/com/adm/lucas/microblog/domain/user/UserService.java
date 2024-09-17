@@ -34,7 +34,7 @@ public interface UserService {
 
     Page<User> getAllActiveUsers(Pageable pageable);
 
-    Page<User> findUser(Pageable pageable, String username, String displayName);
+    Page<User> findUser(Pageable pageable, String q);
 
     User getUser(String username);
 
