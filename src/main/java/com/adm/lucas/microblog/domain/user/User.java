@@ -1,14 +1,13 @@
 package com.adm.lucas.microblog.domain.user;
 
+import com.adm.lucas.microblog.domain.comment.Comment;
 import com.adm.lucas.microblog.domain.history.UserHistory;
 import com.adm.lucas.microblog.domain.note.Note;
 import com.adm.lucas.microblog.domain.token.Token;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -16,7 +15,10 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.UUID;
 
 @Entity
 @Table(name = "users")
@@ -67,6 +69,9 @@ public class User implements UserDetails {
 
     @OneToMany(mappedBy = "user")
     private List<Note> notes = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", orphanRemoval = true, cascade = CascadeType.ALL)
+    private List<Comment> comments = new ArrayList<>();
 
     public User(String email, String username, String displayName, String avatar, String password) {
         this.host = "Microblog";

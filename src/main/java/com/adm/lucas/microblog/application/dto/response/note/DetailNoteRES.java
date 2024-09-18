@@ -19,7 +19,8 @@ public record DetailNoteRES(
         boolean modified,
         boolean closed,
         boolean hidden,
-        String markdown
+        String markdown,
+        int comments
 ) {
     public DetailNoteRES(Note note) {
         this(
@@ -31,7 +32,8 @@ public record DetailNoteRES(
                 note.isModified(),
                 note.isClosed(),
                 note.isHidden(),
-                note.getMarkdown()
+                note.getMarkdown(),
+                note.getComments().size()
         );
     }
 }
