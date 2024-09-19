@@ -1,5 +1,6 @@
 package com.adm.lucas.microblog.domain.user;
 
+import com.adm.lucas.microblog.domain.answer.Answer;
 import com.adm.lucas.microblog.domain.comment.Comment;
 import com.adm.lucas.microblog.domain.history.UserHistory;
 import com.adm.lucas.microblog.domain.note.Note;
@@ -72,6 +73,9 @@ public class User implements UserDetails {
 
     @OneToMany(mappedBy = "user", orphanRemoval = true, cascade = CascadeType.ALL)
     private List<Comment> comments = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", orphanRemoval = true, cascade = CascadeType.ALL)
+    private List<Answer> answers = new ArrayList<>();
 
     public User(String email, String username, String displayName, String avatar, String password) {
         this.host = "Microblog";

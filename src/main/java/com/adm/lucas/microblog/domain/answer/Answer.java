@@ -1,7 +1,6 @@
-package com.adm.lucas.microblog.domain.comment;
+package com.adm.lucas.microblog.domain.answer;
 
-import com.adm.lucas.microblog.domain.answer.Answer;
-import com.adm.lucas.microblog.domain.note.Note;
+import com.adm.lucas.microblog.domain.comment.Comment;
 import com.adm.lucas.microblog.domain.user.User;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
@@ -12,17 +11,15 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 @Entity
-@Table(name = "comments")
+@Table(name = "answers")
 @NoArgsConstructor
 @Data
-@JsonIgnoreProperties({"user", "note"})
-@ToString(exclude = {"user", "note"})
-public class Comment {
+@JsonIgnoreProperties({"user", "comment"})
+@ToString(exclude = {"user", "comment"})
+public class Answer {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -33,9 +30,9 @@ public class Comment {
     @OnDelete(action = OnDeleteAction.SET_NULL)
     private User user;
 
-    @JoinColumn(name = "note_id")
+    @JoinColumn(name = "comment_id")
     @ManyToOne
-    private Note note;
+    private Comment comment;
 
     private Instant createdAt = Instant.now();
 
@@ -45,12 +42,9 @@ public class Comment {
 
     private boolean modified = false;
 
-    @OneToMany(mappedBy = "comment", orphanRemoval = true, fetch = FetchType.EAGER)
-    private List<Answer> answers = new ArrayList<>();
-
-    public Comment(User user, Note note, String text) {
+    public Answer(User user, Comment comment, String text) {
         this.user = user;
-        this.note = note;
+        this.comment = comment;
         this.text = text;
     }
 

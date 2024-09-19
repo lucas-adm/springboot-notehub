@@ -13,7 +13,8 @@ public record DetailCommentRES(
         String created_at,
         String text,
         boolean modified,
-        DetailUserRES user
+        DetailUserRES user,
+        int answers
 ) {
     public DetailCommentRES(Comment comment) {
         this(
@@ -21,7 +22,8 @@ public record DetailCommentRES(
                 comment.getCreatedAt().atZone(ZoneId.of("America/Sao_Paulo")).format(DateTimeFormatter.ofPattern("d/M/yy HH:mm", Locale.of("pt-BR"))),
                 comment.getText(),
                 comment.isModified(),
-                new DetailUserRES(comment.getUser())
+                new DetailUserRES(comment.getUser()),
+                comment.getAnswers().size()
         );
     }
 }
