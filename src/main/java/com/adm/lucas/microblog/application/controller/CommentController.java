@@ -50,7 +50,7 @@ public class CommentController {
             @ApiResponse(responseCode = "404", description = "Note note found.", content = @Content(examples = {})),
             @ApiResponse(responseCode = "500", description = "Internal server error.", content = @Content(examples = {}))
     })
-    @PostMapping("/{id}/new-comment")
+    @PostMapping("/{id}/comments/new")
     @Transactional
     public ResponseEntity<CreateCommentRES> createComment(
             @Parameter(hidden = true) @RequestHeader("Authorization") String accessToken,
@@ -70,7 +70,7 @@ public class CommentController {
             @ApiResponse(responseCode = "404", description = "Comment note found."),
             @ApiResponse(responseCode = "500", description = "Internal server error.", content = @Content(examples = {}))
     })
-    @PatchMapping("/comment/{id}/edit-comment")
+    @PatchMapping("/comments/{id}/edit")
     @Transactional
     public ResponseEntity<Void> editComment(
             @Parameter(hidden = true) @RequestHeader("Authorization") String accessToken,
@@ -89,7 +89,7 @@ public class CommentController {
             @ApiResponse(responseCode = "404", description = "Comment not found.", content = @Content(examples = {})),
             @ApiResponse(responseCode = "500", description = "Internal server error.", content = @Content(examples = {}))
     })
-    @DeleteMapping("/comment/{id}")
+    @DeleteMapping("/comments/{id}/delete")
     @Transactional
     public ResponseEntity<Void> deleteComment(
             @Parameter(hidden = true) @RequestHeader("Authorization") String accessToken,

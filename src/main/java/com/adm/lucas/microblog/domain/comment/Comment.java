@@ -36,9 +36,9 @@ public class Comment {
 
     private Instant createdAt = Instant.now();
 
-    private Instant updatedAt;
-
     private String text;
+
+    private Instant modifiedAt;
 
     private boolean modified = false;
 

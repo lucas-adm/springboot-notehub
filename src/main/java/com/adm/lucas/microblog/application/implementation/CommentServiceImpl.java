@@ -51,7 +51,7 @@ public class CommentServiceImpl implements CommentService {
         validateAccess(idFromToken, comment);
         comment.setText(text);
         comment.setModified(true);
-        comment.setUpdatedAt(Instant.now());
+        comment.setModifiedAt(Instant.now());
         repository.save(comment);
     }
 
