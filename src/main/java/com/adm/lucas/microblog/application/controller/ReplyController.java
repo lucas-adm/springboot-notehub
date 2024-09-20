@@ -1,11 +1,11 @@
 package com.adm.lucas.microblog.application.controller;
 
-import com.adm.lucas.microblog.application.dto.request.answer.CreateAnswerREQ;
-import com.adm.lucas.microblog.application.dto.response.answer.CreateAnswerRES;
-import com.adm.lucas.microblog.application.dto.response.answer.DetailAnswerRES;
+import com.adm.lucas.microblog.application.dto.request.reply.CreateReplyREQ;
+import com.adm.lucas.microblog.application.dto.response.reply.CreateReplyRES;
+import com.adm.lucas.microblog.application.dto.response.reply.DetailReplayRES;
 import com.adm.lucas.microblog.application.dto.response.page.PageRES;
-import com.adm.lucas.microblog.domain.answer.Answer;
-import com.adm.lucas.microblog.domain.answer.AnswerService;
+import com.adm.lucas.microblog.domain.reply.Reply;
+import com.adm.lucas.microblog.domain.reply.ReplyService;
 import com.auth0.jwt.JWT;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
@@ -23,42 +23,42 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/v1/notes/comments")
 @RequiredArgsConstructor
-public class AnswerController {
+public class ReplyController {
 
-    private final AnswerService service;
+    private final ReplyService service;
 
     private UUID getSubject(String bearerToken) {
         String idFromToken = JWT.decode(bearerToken.replace("Bearer ", "")).getSubject();
         return UUID.fromString(idFromToken);
     }
 
-    @PostMapping("/{id}/answers/new")
+    @PostMapping("/{id}/replies/new")
     @Transactional
-    public ResponseEntity<CreateAnswerRES> createAnswer(
+    public ResponseEntity<CreateReplyRES> createReply(
             @RequestHeader("Authorization") String accessToken,
             @PathVariable("id") UUID idFromPath,
-            @RequestBody @Valid CreateAnswerREQ dto
+            @RequestBody @Valid CreateReplyREQ dto
     ) {
         UUID idFromToken = getSubject(accessToken);
-        Answer answer = service.create(service.mapToAnswer(idFromToken, idFromPath, dto));
-        return ResponseEntity.status(HttpStatus.CREATED).body(new CreateAnswerRES(answer));
+        Reply reply = service.create(service.mapToReply(idFromToken, idFromPath, dto));
+        return ResponseEntity.status(HttpStatus.CREATED).body(new CreateReplyRES(reply));
     }
 
-    @PatchMapping("/answers/{id}/edit")
+    @PatchMapping("/replies/{id}/edit")
     @Transactional
-    public ResponseEntity<Void> editAnswer(
+    public ResponseEntity<Void> editReply(
             @RequestHeader("Authorization") String accessToken,
             @PathVariable("id") UUID idFromPath,
-            @RequestBody @Valid CreateAnswerREQ dto
+            @RequestBody @Valid CreateReplyREQ dto
     ) {
         UUID idFromToken = getSubject(accessToken);
         service.edit(idFromToken, idFromPath, dto.text());
         return ResponseEntity.status(HttpStatus.ACCEPTED).build();
     }
 
-    @DeleteMapping("/answers/{id}/delete")
+    @DeleteMapping("/replies/{id}/delete")
     @Transactional
-    public ResponseEntity<Void> deleteAnswer(
+    public ResponseEntity<Void> deleteReply(
             @RequestHeader("Authorization") String accessToken,
             @PathVariable("id") UUID idFromPath
     ) {
@@ -67,12 +67,12 @@ public class AnswerController {
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
-    @GetMapping("/{id}/answers")
-    public ResponseEntity<PageRES<DetailAnswerRES>> getAnswers(
+    @GetMapping("/{id}/replies")
+    public ResponseEntity<PageRES<DetailReplayRES>> getReplies(
             @PageableDefault(page = 0, size = 10, sort = {"createdAt"}, direction = Sort.Direction.DESC) Pageable pageable,
             @PathVariable("id") UUID idFromPath
     ) {
-        Page<DetailAnswerRES> page = service.getAnswers(pageable, idFromPath).map(DetailAnswerRES::new);
+        Page<DetailReplayRES> page = service.getReplies(pageable, idFromPath).map(DetailReplayRES::new);
         return ResponseEntity.status(HttpStatus.OK).body(new PageRES<>(page));
     }
 

@@ -1,4 +1,4 @@
-package com.adm.lucas.microblog.domain.answer;
+package com.adm.lucas.microblog.domain.reply;
 
 import com.adm.lucas.microblog.domain.comment.Comment;
 import com.adm.lucas.microblog.domain.user.User;
@@ -14,12 +14,12 @@ import java.time.Instant;
 import java.util.UUID;
 
 @Entity
-@Table(name = "answers")
+@Table(name = "replies")
 @NoArgsConstructor
 @Data
 @JsonIgnoreProperties({"user", "comment"})
 @ToString(exclude = {"user", "comment"})
-public class Answer {
+public class Reply {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -42,7 +42,7 @@ public class Answer {
 
     private boolean modified = false;
 
-    public Answer(User user, Comment comment, String text) {
+    public Reply(User user, Comment comment, String text) {
         this.user = user;
         this.comment = comment;
         this.text = text;

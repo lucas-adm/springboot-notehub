@@ -3,9 +3,11 @@ package com.adm.lucas.microblog.domain.note;
 import com.adm.lucas.microblog.domain.comment.Comment;
 import com.adm.lucas.microblog.domain.tag.Tag;
 import com.adm.lucas.microblog.domain.user.User;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
@@ -18,6 +20,8 @@ import java.util.UUID;
 @Table(name = "notes")
 @NoArgsConstructor
 @Data
+@JsonIgnoreProperties({"user", "tags", "comments"})
+@ToString(exclude = {"user", "tags", "comments"})
 public class Note {
 
     @Id

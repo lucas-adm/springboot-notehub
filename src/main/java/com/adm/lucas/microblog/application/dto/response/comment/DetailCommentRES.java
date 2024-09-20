@@ -23,7 +23,7 @@ public record DetailCommentRES(
                 comment.getText(),
                 comment.isModified(),
                 new DetailUserRES(comment.getUser()),
-                comment.getAnswers().size()
+                comment.getReplies().size()
         );
     }
 }

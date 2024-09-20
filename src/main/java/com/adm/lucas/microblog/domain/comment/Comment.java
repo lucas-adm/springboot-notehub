@@ -1,6 +1,6 @@
 package com.adm.lucas.microblog.domain.comment;
 
-import com.adm.lucas.microblog.domain.answer.Answer;
+import com.adm.lucas.microblog.domain.reply.Reply;
 import com.adm.lucas.microblog.domain.note.Note;
 import com.adm.lucas.microblog.domain.user.User;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -20,8 +20,8 @@ import java.util.UUID;
 @Table(name = "comments")
 @NoArgsConstructor
 @Data
-@JsonIgnoreProperties({"user", "note"})
-@ToString(exclude = {"user", "note"})
+@JsonIgnoreProperties({"user", "note", "replies"})
+@ToString(exclude = {"user", "note", "replies"})
 public class Comment {
 
     @Id
@@ -46,7 +46,7 @@ public class Comment {
     private boolean modified = false;
 
     @OneToMany(mappedBy = "comment", orphanRemoval = true, fetch = FetchType.EAGER)
-    private List<Answer> answers = new ArrayList<>();
+    private List<Reply> replies = new ArrayList<>();
 
     public Comment(User user, Note note, String text) {
         this.user = user;

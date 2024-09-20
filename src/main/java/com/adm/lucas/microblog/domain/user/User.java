@@ -1,6 +1,6 @@
 package com.adm.lucas.microblog.domain.user;
 
-import com.adm.lucas.microblog.domain.answer.Answer;
+import com.adm.lucas.microblog.domain.reply.Reply;
 import com.adm.lucas.microblog.domain.comment.Comment;
 import com.adm.lucas.microblog.domain.history.UserHistory;
 import com.adm.lucas.microblog.domain.note.Note;
@@ -9,6 +9,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -25,7 +26,8 @@ import java.util.UUID;
 @Table(name = "users")
 @NoArgsConstructor
 @Data
-@JsonIgnoreProperties({"token", "history", "notes"})
+@JsonIgnoreProperties({"token", "history", "notes", "comments", "replies"})
+@ToString(exclude = {"token", "history", "notes", "comments", "replies"})
 public class User implements UserDetails {
 
     @Id
@@ -75,7 +77,7 @@ public class User implements UserDetails {
     private List<Comment> comments = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", orphanRemoval = true, cascade = CascadeType.ALL)
-    private List<Answer> answers = new ArrayList<>();
+    private List<Reply> replies = new ArrayList<>();
 
     public User(String email, String username, String displayName, String avatar, String password) {
         this.host = "Microblog";
