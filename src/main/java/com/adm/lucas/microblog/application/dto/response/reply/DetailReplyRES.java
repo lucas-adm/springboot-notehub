@@ -8,20 +8,22 @@ import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 import java.util.UUID;
 
-public record DetailReplayRES(
+public record DetailReplyRES(
         UUID id,
         String created_at,
         String text,
         boolean modified,
+        String toUser,
         DetailUserRES user
 ) {
-    public DetailReplayRES(Reply reply) {
+    public DetailReplyRES(Reply reply) {
         this(
                 reply.getId(),
                 reply.getCreatedAt().atZone(ZoneId.of("America/Sao_Paulo")).format(DateTimeFormatter.ofPattern("d/M/yy HH:mm", Locale.of("pt-BR"))),
                 reply.getText(),
                 reply.isModified(),
-                new DetailUserRES(reply.getUser())
+                reply.getToUser(),
+                reply.getUser() != null ? new DetailUserRES(reply.getUser()) : null
         );
     }
 }

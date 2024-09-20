@@ -2,7 +2,7 @@ package com.adm.lucas.microblog.application.controller;
 
 import com.adm.lucas.microblog.application.dto.request.reply.CreateReplyREQ;
 import com.adm.lucas.microblog.application.dto.response.reply.CreateReplyRES;
-import com.adm.lucas.microblog.application.dto.response.reply.DetailReplayRES;
+import com.adm.lucas.microblog.application.dto.response.reply.DetailReplyRES;
 import com.adm.lucas.microblog.application.dto.response.page.PageRES;
 import com.adm.lucas.microblog.domain.reply.Reply;
 import com.adm.lucas.microblog.domain.reply.ReplyService;
@@ -44,6 +44,18 @@ public class ReplyController {
         return ResponseEntity.status(HttpStatus.CREATED).body(new CreateReplyRES(reply));
     }
 
+    @PostMapping("/replies/{id}/new")
+    @Transactional
+    public ResponseEntity<CreateReplyRES> createSelfReferenceReply(
+            @RequestHeader("Authorization") String accessToken,
+            @PathVariable("id") UUID idFromPath,
+            @RequestBody @Valid CreateReplyREQ dto
+    ) {
+        UUID idFromToken = getSubject(accessToken);
+        Reply reply = service.create(service.mapToSelfReference(idFromToken, idFromPath, dto));
+        return ResponseEntity.status(HttpStatus.CREATED).body(new CreateReplyRES(reply));
+    }
+
     @PatchMapping("/replies/{id}/edit")
     @Transactional
     public ResponseEntity<Void> editReply(
@@ -68,11 +80,11 @@ public class ReplyController {
     }
 
     @GetMapping("/{id}/replies")
-    public ResponseEntity<PageRES<DetailReplayRES>> getReplies(
+    public ResponseEntity<PageRES<DetailReplyRES>> getReplies(
             @PageableDefault(page = 0, size = 10, sort = {"createdAt"}, direction = Sort.Direction.DESC) Pageable pageable,
             @PathVariable("id") UUID idFromPath
     ) {
-        Page<DetailReplayRES> page = service.getReplies(pageable, idFromPath).map(DetailReplayRES::new);
+        Page<DetailReplyRES> page = service.getReplies(pageable, idFromPath).map(DetailReplyRES::new);
         return ResponseEntity.status(HttpStatus.OK).body(new PageRES<>(page));
     }
 

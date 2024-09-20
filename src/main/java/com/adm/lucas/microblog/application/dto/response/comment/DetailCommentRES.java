@@ -14,7 +14,7 @@ public record DetailCommentRES(
         String text,
         boolean modified,
         DetailUserRES user,
-        int answers
+        int replies
 ) {
     public DetailCommentRES(Comment comment) {
         this(
@@ -22,7 +22,7 @@ public record DetailCommentRES(
                 comment.getCreatedAt().atZone(ZoneId.of("America/Sao_Paulo")).format(DateTimeFormatter.ofPattern("d/M/yy HH:mm", Locale.of("pt-BR"))),
                 comment.getText(),
                 comment.isModified(),
-                new DetailUserRES(comment.getUser()),
+                comment.getUser() != null ? new DetailUserRES(comment.getUser()) : null,
                 comment.getReplies().size()
         );
     }

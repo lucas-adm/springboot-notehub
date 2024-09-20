@@ -73,10 +73,10 @@ public class User implements UserDetails {
     @OneToMany(mappedBy = "user")
     private List<Note> notes = new ArrayList<>();
 
-    @OneToMany(mappedBy = "user", orphanRemoval = true, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "user")
     private List<Comment> comments = new ArrayList<>();
 
-    @OneToMany(mappedBy = "user", orphanRemoval = true, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "user")
     private List<Reply> replies = new ArrayList<>();
 
     public User(String email, String username, String displayName, String avatar, String password) {

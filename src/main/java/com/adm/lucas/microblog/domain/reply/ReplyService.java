@@ -12,6 +12,8 @@ public interface ReplyService {
 
     Reply mapToReply(UUID idFromToken, UUID commentIdFromPath, CreateReplyREQ req);
 
+    Reply mapToSelfReference(UUID idFromToken, UUID replyIdFromPath, CreateReplyREQ req);
+
     Reply create(Reply reply);
 
     void edit(UUID idFromToken, UUID idFromPath, String text);

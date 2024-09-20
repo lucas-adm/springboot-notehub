@@ -25,7 +25,7 @@ public record LowDetailNoteRES(
                 note.getId(),
                 note.getTitle(),
                 note.getTags().stream().map(Tag::getName).toList(),
-                new DetailUserRES(note.getUser()),
+                note.getUser() != null ? new DetailUserRES(note.getUser()) : null,
                 note.getCreatedAt().atZone(ZoneId.of("America/Sao_Paulo")).format(DateTimeFormatter.ofPattern("d/M/yy HH:mm", Locale.of("pt-BR"))),
                 note.isModified(),
                 note.isClosed(),

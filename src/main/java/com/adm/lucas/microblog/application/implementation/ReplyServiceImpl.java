@@ -1,11 +1,11 @@
 package com.adm.lucas.microblog.application.implementation;
 
 import com.adm.lucas.microblog.application.dto.request.reply.CreateReplyREQ;
+import com.adm.lucas.microblog.domain.comment.Comment;
+import com.adm.lucas.microblog.domain.comment.CommentRepository;
 import com.adm.lucas.microblog.domain.reply.Reply;
 import com.adm.lucas.microblog.domain.reply.ReplyRepository;
 import com.adm.lucas.microblog.domain.reply.ReplyService;
-import com.adm.lucas.microblog.domain.comment.Comment;
-import com.adm.lucas.microblog.domain.comment.CommentRepository;
 import com.adm.lucas.microblog.domain.user.User;
 import com.adm.lucas.microblog.domain.user.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -38,6 +38,14 @@ public class ReplyServiceImpl implements ReplyService {
         User user = userRepository.findById(idFromToken).orElseThrow(EntityNotFoundException::new);
         Comment comment = commentRepository.findById(commentIdFromPath).orElseThrow(EntityNotFoundException::new);
         return new Reply(user, comment, req.text());
+    }
+
+    @Override
+    public Reply mapToSelfReference(UUID idFromToken, UUID replyIdFromPath, CreateReplyREQ req) {
+        User user = userRepository.findById(idFromToken).orElseThrow(EntityNotFoundException::new);
+        Reply reply = repository.findById(replyIdFromPath).orElseThrow(EntityNotFoundException::new);
+        Comment comment = reply.getComment();
+        return new Reply(user, comment, reply, req.text());
     }
 
     @Override
