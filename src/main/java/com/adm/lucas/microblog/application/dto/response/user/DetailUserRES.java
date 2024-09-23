@@ -14,7 +14,8 @@ public record DetailUserRES(
         String banner,
         String message,
         boolean sponsor,
-        Long score
+        int followers,
+        int following
 ) {
     public DetailUserRES(User user) {
         this(
@@ -25,7 +26,8 @@ public record DetailUserRES(
                 user.getBanner(),
                 user.getMessage(),
                 user.isSponsor(),
-                user.getScore()
+                user.getFollowers().size(),
+                user.getFollowing().size()
         );
     }
 }

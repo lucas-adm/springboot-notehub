@@ -33,7 +33,9 @@ public record AuthRES(
                         token.getUser().getHost(),
                         token.getUser().isProfilePrivate(),
                         token.getUser().isSponsor(),
-                        token.getUser().getScore()
+                        token.getUser().getScore(),
+                        token.getUser().getFollowers().size(),
+                        token.getUser().getFollowing().size()
                 )
         );
     }

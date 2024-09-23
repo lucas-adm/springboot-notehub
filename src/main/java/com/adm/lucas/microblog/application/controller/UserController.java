@@ -202,6 +202,28 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.ACCEPTED).build();
     }
 
+    @PostMapping("/{username}/follow")
+    @Transactional
+    public ResponseEntity<Void> followUser(
+            @Parameter(hidden = true) @RequestHeader("Authorization") String accessToken,
+            @PathVariable("username") String userToFollow
+    ) {
+        UUID idFromToken = getSubject(accessToken);
+        service.follow(idFromToken, userToFollow);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    @DeleteMapping("/{username}/unfollow")
+    @Transactional
+    public ResponseEntity<Void> unfollowUser(
+            @Parameter(hidden = true) @RequestHeader("Authorization") String accessToken,
+            @PathVariable("username") String userToFollow
+    ) {
+        UUID idFromToken = getSubject(accessToken);
+        service.unfollow(idFromToken, userToFollow);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+
     @Operation(summary = "Delete user account", description = "Deletes the user's account.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "User account deleted successfully."),

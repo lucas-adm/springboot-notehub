@@ -30,6 +30,10 @@ public interface UserService {
 
     void changePassword(String email, String password);
 
+    void follow(UUID idFromToken, String username);
+
+    void unfollow(UUID idFromToken, String username);
+
     void delete(UUID idFromToken);
 
     Page<User> getAllActiveUsers(Pageable pageable);

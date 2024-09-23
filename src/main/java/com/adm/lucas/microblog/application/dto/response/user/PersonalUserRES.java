@@ -14,6 +14,8 @@ public record PersonalUserRES(
         String host,
         boolean profile_private,
         boolean sponsor,
-        Long score
+        Long score,
+        int followers,
+        int following
 ) {
 }

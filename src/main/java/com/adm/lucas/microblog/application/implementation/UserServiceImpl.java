@@ -114,6 +114,26 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public void follow(UUID idFromToken, String username) {
+        User follower = repository.findById(idFromToken).orElseThrow(EntityNotFoundException::new);
+        User following = repository.findByUsername(username).orElseThrow(EntityNotFoundException::new);
+        follower.getFollowing().add(following);
+        following.getFollowers().add(follower);
+        repository.save(follower);
+        repository.save(following);
+    }
+
+    @Override
+    public void unfollow(UUID idFromToken, String username) {
+        User follower = repository.findById(idFromToken).orElseThrow(EntityNotFoundException::new);
+        User following = repository.findByUsername(username).orElseThrow(EntityNotFoundException::new);
+        follower.getFollowing().remove(following);
+        following.getFollowers().remove(follower);
+        repository.save(follower);
+        repository.save(following);
+    }
+
+    @Override
     public void delete(UUID idFromToken) {
         User user = repository.findById(idFromToken).orElseThrow(EntityNotFoundException::new);
         repository.delete(user);
