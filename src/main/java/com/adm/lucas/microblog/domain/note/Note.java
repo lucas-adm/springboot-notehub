@@ -1,6 +1,7 @@
 package com.adm.lucas.microblog.domain.note;
 
 import com.adm.lucas.microblog.domain.comment.Comment;
+import com.adm.lucas.microblog.domain.flame.Flame;
 import com.adm.lucas.microblog.domain.tag.Tag;
 import com.adm.lucas.microblog.domain.user.User;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -54,6 +55,9 @@ public class Note {
 
     @OneToMany(mappedBy = "note", orphanRemoval = true, fetch = FetchType.EAGER)
     private List<Comment> comments = new ArrayList<>();
+
+    @OneToMany(mappedBy = "note", orphanRemoval = true, fetch = FetchType.EAGER)
+    private List<Flame> flames = new ArrayList<>();
 
     public Note(User user, String title, String markdown, boolean closed, boolean hidden, List<Tag> tags) {
         this.user = user;

@@ -20,7 +20,8 @@ public record DetailNoteRES(
         boolean closed,
         boolean hidden,
         String markdown,
-        int comments
+        int comments,
+        int flames
 ) {
     public DetailNoteRES(Note note) {
         this(
@@ -33,7 +34,8 @@ public record DetailNoteRES(
                 note.isClosed(),
                 note.isHidden(),
                 note.getMarkdown(),
-                note.getComments().size()
+                note.getComments().size(),
+                note.getFlames().size()
         );
     }
 }

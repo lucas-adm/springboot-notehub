@@ -1,5 +1,6 @@
 package com.adm.lucas.microblog.domain.user;
 
+import com.adm.lucas.microblog.domain.flame.Flame;
 import com.adm.lucas.microblog.domain.reply.Reply;
 import com.adm.lucas.microblog.domain.comment.Comment;
 import com.adm.lucas.microblog.domain.history.UserHistory;
@@ -78,6 +79,9 @@ public class User implements UserDetails {
 
     @OneToMany(mappedBy = "user")
     private List<Reply> replies = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", orphanRemoval = true)
+    private List<Flame> flames = new ArrayList<>();
 
     public User(String email, String username, String displayName, String avatar, String password) {
         this.host = "Microblog";

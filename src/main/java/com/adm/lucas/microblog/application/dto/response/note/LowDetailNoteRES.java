@@ -18,7 +18,8 @@ public record LowDetailNoteRES(
         String created_at,
         boolean modified,
         boolean closed,
-        int comments
+        int comments,
+        int flames
 ) {
     public LowDetailNoteRES(Note note) {
         this(
@@ -29,7 +30,8 @@ public record LowDetailNoteRES(
                 note.getCreatedAt().atZone(ZoneId.of("America/Sao_Paulo")).format(DateTimeFormatter.ofPattern("d/M/yy HH:mm", Locale.of("pt-BR"))),
                 note.isModified(),
                 note.isClosed(),
-                note.getComments().size()
+                note.getComments().size(),
+                note.getFlames().size()
         );
     }
 }
