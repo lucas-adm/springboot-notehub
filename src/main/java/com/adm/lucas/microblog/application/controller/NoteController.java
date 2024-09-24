@@ -219,7 +219,9 @@ public class NoteController {
             @ApiResponse(responseCode = "500", description = "Internal server error.", content = @Content(examples = {}))
     })
     @GetMapping("/private/tags")
-    public ResponseEntity<List<String>> getAllUserTags(@Parameter(hidden = true) @RequestHeader("Authorization") String accessToken) {
+    public ResponseEntity<List<String>> getAllUserTags(
+            @Parameter(hidden = true) @RequestHeader("Authorization") String accessToken
+    ) {
         UUID idFromToken = getSubject(accessToken);
         List<String> tags = service.getAllUserTags(idFromToken);
         return ResponseEntity.status(HttpStatus.OK).body(tags);
@@ -299,7 +301,9 @@ public class NoteController {
             @ApiResponse(responseCode = "500", description = "Internal server error.", content = @Content(examples = {}))
     })
     @GetMapping("/{id}")
-    public ResponseEntity<DetailNoteRES> getPublicNote(@PathVariable("id") UUID idFromPath) {
+    public ResponseEntity<DetailNoteRES> getPublicNote(
+            @PathVariable("id") UUID idFromPath
+    ) {
         Note note = service.getPublicNote(idFromPath);
         return ResponseEntity.status(HttpStatus.OK).body(new DetailNoteRES(note));
     }
@@ -329,8 +333,8 @@ public class NoteController {
     })
     @GetMapping("/user/{username}")
     public ResponseEntity<PageRES<LowDetailNoteRES>> getAllUserNotesByUsername(
-            @PathVariable("username") String username,
-            @ParameterObject @PageableDefault(page = 0, size = 10, sort = {"modifiedAt"}, direction = Sort.Direction.DESC) Pageable pageable
+            @ParameterObject @PageableDefault(page = 0, size = 10, sort = {"modifiedAt"}, direction = Sort.Direction.DESC) Pageable pageable,
+            @PathVariable("username") String username
     ) {
         Page<LowDetailNoteRES> page = service.getAllUserNotesByUsername(pageable, username).map(LowDetailNoteRES::new);
         return ResponseEntity.status(HttpStatus.OK).body(new PageRES<>(page));

@@ -60,7 +60,9 @@ public class UserController {
     })
     @PostMapping("/register")
     @Transactional
-    public ResponseEntity<CreateUserRES> createUser(@Valid @RequestBody CreateUserREQ dto) {
+    public ResponseEntity<CreateUserRES> createUser(
+            @Valid @RequestBody CreateUserREQ dto
+    ) {
         User user = service.create(dto.toUser());
         producer.publishAccountActivationMessage(user);
         return ResponseEntity.status(HttpStatus.CREATED).body(new CreateUserRES(user));
@@ -69,7 +71,9 @@ public class UserController {
     @Hidden
     @GetMapping("/active/{id}")
     @Transactional
-    public ResponseEntity<Void> activeUser(@PathVariable("id") UUID id) {
+    public ResponseEntity<Void> activeUser(
+            @PathVariable("id") UUID id
+    ) {
         service.active(id);
         return ResponseEntity.status(HttpStatus.FOUND).location(URI.create(String.format("%s/greetings", domain))).build();
     }
@@ -83,7 +87,9 @@ public class UserController {
     })
     @PatchMapping("/profile/change-visibility")
     @Transactional
-    public ResponseEntity<Void> changeProfileVisibility(@Parameter(hidden = true) @RequestHeader("Authorization") String accessToken) {
+    public ResponseEntity<Void> changeProfileVisibility(
+            @Parameter(hidden = true) @RequestHeader("Authorization") String accessToken
+    ) {
         UUID idFromToken = getSubject(accessToken);
         service.changeProfileVisibility(idFromToken);
         return ResponseEntity.status(HttpStatus.OK).build();
@@ -100,7 +106,10 @@ public class UserController {
     })
     @PatchMapping("/email")
     @Transactional
-    public ResponseEntity<Void> patchEmail(@Parameter(hidden = true) @RequestHeader("Authorization") String accessToken, @Valid @RequestBody ChangeEmailREQ dto) {
+    public ResponseEntity<Void> patchEmail(
+            @Parameter(hidden = true) @RequestHeader("Authorization") String accessToken,
+            @Valid @RequestBody ChangeEmailREQ dto
+    ) {
         UUID idFromToken = getSubject(accessToken);
         service.changeEmail(idFromToken, dto.email());
         return ResponseEntity.status(HttpStatus.ACCEPTED).build();
@@ -117,7 +126,10 @@ public class UserController {
     })
     @PatchMapping("/username")
     @Transactional
-    public ResponseEntity<Void> patchUsername(@Parameter(hidden = true) @RequestHeader("Authorization") String accessToken, @Valid @RequestBody ChangeUsernameREQ dto) {
+    public ResponseEntity<Void> patchUsername(
+            @Parameter(hidden = true) @RequestHeader("Authorization") String accessToken,
+            @Valid @RequestBody ChangeUsernameREQ dto
+    ) {
         UUID idFromToken = getSubject(accessToken);
         service.changeUsername(idFromToken, dto.username());
         return ResponseEntity.status(HttpStatus.ACCEPTED).build();
@@ -133,7 +145,10 @@ public class UserController {
     })
     @PatchMapping("/display-name")
     @Transactional
-    public ResponseEntity<Void> patchDisplayName(@Parameter(hidden = true) @RequestHeader("Authorization") String accessToken, @Valid @RequestBody ChangeDisplayNameREQ dto) {
+    public ResponseEntity<Void> patchDisplayName(
+            @Parameter(hidden = true) @RequestHeader("Authorization") String accessToken,
+            @Valid @RequestBody ChangeDisplayNameREQ dto
+    ) {
         UUID idFromToken = getSubject(accessToken);
         service.changeDisplayName(idFromToken, dto.displayName());
         return ResponseEntity.status(HttpStatus.ACCEPTED).build();
@@ -149,7 +164,10 @@ public class UserController {
     })
     @PatchMapping("/profile/change-picture")
     @Transactional
-    public ResponseEntity<Void> patchAvatar(@Parameter(hidden = true) @RequestHeader("Authorization") String accessToken, @Valid @RequestBody ChangeAvatarREQ dto) {
+    public ResponseEntity<Void> patchAvatar(
+            @Parameter(hidden = true) @RequestHeader("Authorization") String accessToken,
+            @Valid @RequestBody ChangeAvatarREQ dto
+    ) {
         UUID idFromToken = getSubject(accessToken);
         service.changeAvatar(idFromToken, dto.avatar());
         return ResponseEntity.status(HttpStatus.ACCEPTED).build();
@@ -165,7 +183,10 @@ public class UserController {
     })
     @PatchMapping("/profile/change-banner")
     @Transactional
-    public ResponseEntity<Void> patchBanner(@Parameter(hidden = true) @RequestHeader("Authorization") String accessToken, @Valid @RequestBody ChangeBannerREQ dto) {
+    public ResponseEntity<Void> patchBanner(
+            @Parameter(hidden = true) @RequestHeader("Authorization") String accessToken,
+            @Valid @RequestBody ChangeBannerREQ dto
+    ) {
         UUID idFromToken = getSubject(accessToken);
         service.changeBanner(idFromToken, dto.banner());
         return ResponseEntity.status(HttpStatus.ACCEPTED).build();
@@ -181,7 +202,10 @@ public class UserController {
     })
     @PatchMapping("/message")
     @Transactional
-    public ResponseEntity<Void> patchMessage(@Parameter(hidden = true) @RequestHeader("Authorization") String accessToken, @Valid @RequestBody ChangeMessageREQ dto) {
+    public ResponseEntity<Void> patchMessage(
+            @Parameter(hidden = true) @RequestHeader("Authorization") String accessToken,
+            @Valid @RequestBody ChangeMessageREQ dto
+    ) {
         UUID idFromToken = getSubject(accessToken);
         service.changeMessage(idFromToken, dto.message());
         return ResponseEntity.status(HttpStatus.ACCEPTED).build();
@@ -197,7 +221,10 @@ public class UserController {
     })
     @PatchMapping("/reset-password")
     @Transactional
-    public ResponseEntity<Void> patchPassword(@Parameter(hidden = true) @RequestHeader("Authorization") String token, @Valid @RequestBody ChangePasswordREQ dto) {
+    public ResponseEntity<Void> patchPassword(
+            @Parameter(hidden = true) @RequestHeader("Authorization") String token,
+            @Valid @RequestBody ChangePasswordREQ dto
+    ) {
         String emailFromToken = JWT.decode(token.replace("Bearer ", "")).getSubject();
         service.changePassword(emailFromToken, dto.password());
         return ResponseEntity.status(HttpStatus.ACCEPTED).build();
@@ -248,7 +275,9 @@ public class UserController {
     })
     @DeleteMapping("/delete")
     @Transactional
-    public ResponseEntity<Void> deleteUser(@Parameter(hidden = true) @RequestHeader("Authorization") String accessToken) {
+    public ResponseEntity<Void> deleteUser(
+            @Parameter(hidden = true) @RequestHeader("Authorization") String accessToken
+    ) {
         UUID idFromToken = getSubject(accessToken);
         service.delete(idFromToken);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
@@ -261,7 +290,9 @@ public class UserController {
             @ApiResponse(responseCode = "500", description = "Internal server error.", content = @Content(examples = {}))
     })
     @GetMapping
-    public ResponseEntity<PageRES<DetailUserRES>> getUsers(@ParameterObject @PageableDefault(page = 0, size = 10, sort = {"createdAt"}, direction = Sort.Direction.ASC) Pageable pageable) {
+    public ResponseEntity<PageRES<DetailUserRES>> getUsers(
+            @ParameterObject @PageableDefault(page = 0, size = 10, sort = {"createdAt"}, direction = Sort.Direction.ASC) Pageable pageable
+    ) {
         PageRES<DetailUserRES> page = new PageRES<>(service.getAllActiveUsers(pageable).map(DetailUserRES::new));
         return ResponseEntity.status(HttpStatus.OK).body(page);
     }
@@ -273,8 +304,10 @@ public class UserController {
             @ApiResponse(responseCode = "500", description = "Internal server error.", content = @Content(examples = {}))
     })
     @GetMapping("/search")
-    public ResponseEntity<PageRES<DetailUserRES>> searchUser(@ParameterObject @PageableDefault(page = 0, size = 10, sort = {"createdAt"}, direction = Sort.Direction.ASC) Pageable pageable,
-                                                             @RequestParam String q) {
+    public ResponseEntity<PageRES<DetailUserRES>> searchUser(
+            @ParameterObject @PageableDefault(page = 0, size = 10, sort = {"createdAt"}, direction = Sort.Direction.ASC) Pageable pageable,
+            @RequestParam String q
+    ) {
         PageRES<DetailUserRES> page = new PageRES<>(service.findUser(pageable, q).map(DetailUserRES::new));
         return ResponseEntity.status(HttpStatus.OK).body(page);
     }
@@ -286,7 +319,9 @@ public class UserController {
             @ApiResponse(responseCode = "500", description = "Internal server error.", content = @Content(examples = {}))
     })
     @GetMapping("/{username}")
-    public ResponseEntity<DetailUserRES> getUser(@PathVariable("username") String username) {
+    public ResponseEntity<DetailUserRES> getUser(
+            @PathVariable("username") String username
+    ) {
         User user = service.getUser(username);
         return ResponseEntity.status(HttpStatus.OK).body(new DetailUserRES(user));
     }
@@ -348,7 +383,9 @@ public class UserController {
             @ApiResponse(responseCode = "500", description = "Internal server error.", content = @Content(examples = {}))
     })
     @GetMapping("/{id}/display-names")
-    public ResponseEntity<List<String>> getUserDisplayNameHistory(@PathVariable("id") UUID id) {
+    public ResponseEntity<List<String>> getUserDisplayNameHistory(
+            @PathVariable("id") UUID id
+    ) {
         return ResponseEntity.status(HttpStatus.OK).body(service.getUserDisplayNameHistory(id));
     }
 

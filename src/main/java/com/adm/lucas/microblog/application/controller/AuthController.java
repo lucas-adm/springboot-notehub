@@ -34,7 +34,6 @@ public class AuthController {
     private final TokenService service;
     private final MailProducer producer;
 
-
     @Operation(summary = "Recover password", description = "Generates a token for password recovery and sends it via email.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Recovery email sent successfully."),
@@ -43,7 +42,9 @@ public class AuthController {
             @ApiResponse(responseCode = "500", description = "Internal server error.", content = @Content(examples = {}))
     })
     @PostMapping("/recover-password")
-    public ResponseEntity<String> recoverPassword(@Valid @RequestBody RecoverPasswordREQ dto) {
+    public ResponseEntity<String> recoverPassword(
+            @Valid @RequestBody RecoverPasswordREQ dto
+    ) {
         String jwt = service.generateChangePasswordToken(dto.email());
         producer.publishAccountRecoveryMessage(dto.email(), jwt);
         return ResponseEntity.status(HttpStatus.OK).build();
@@ -59,7 +60,9 @@ public class AuthController {
     })
     @PostMapping("/login")
     @Transactional
-    public ResponseEntity<AuthRES> loginUser(@Valid @RequestBody AuthREQ dto) {
+    public ResponseEntity<AuthRES> loginUser(
+            @Valid @RequestBody AuthREQ dto
+    ) {
         AuthRES token = new AuthRES(service.auth(dto.username(), dto.password()));
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(token);
     }
@@ -72,7 +75,9 @@ public class AuthController {
     })
     @PostMapping("/login/oauth2/google")
     @Transactional
-    public ResponseEntity<AuthRES> loginGoogleUser(@Valid @RequestBody OAuth2GoogleREQ dto) {
+    public ResponseEntity<AuthRES> loginGoogleUser(
+            @Valid @RequestBody OAuth2GoogleREQ dto
+    ) {
         AuthRES token = new AuthRES(service.authWithGoogleAcc(dto.jwt()));
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(token);
     }
@@ -85,7 +90,9 @@ public class AuthController {
     })
     @PostMapping("/login/oauth2/github")
     @Transactional
-    public ResponseEntity<AuthRES> loginGitHubUser(@Valid @RequestBody OAuth2GitHubREQ dto) {
+    public ResponseEntity<AuthRES> loginGitHubUser(
+            @Valid @RequestBody OAuth2GitHubREQ dto
+    ) {
         AuthRES token = new AuthRES(service.authWithGitHubAcc(dto.id(), dto.login(), dto.avatar_url()));
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(token);
     }
@@ -99,7 +106,9 @@ public class AuthController {
     })
     @GetMapping("/refresh")
     @Transactional
-    public ResponseEntity<AuthRES> refreshToken(@RequestParam("token") UUID refreshToken) {
+    public ResponseEntity<AuthRES> refreshToken(
+            @RequestParam("token") UUID refreshToken
+    ) {
         AuthRES token = new AuthRES(service.recreateToken(refreshToken));
         return ResponseEntity.status(HttpStatus.CREATED).body(token);
     }
@@ -113,7 +122,9 @@ public class AuthController {
     })
     @DeleteMapping("/logout")
     @Transactional
-    public ResponseEntity<Void> logoutUser(@Parameter(hidden = true) @RequestHeader("Authorization") String bearerToken) {
+    public ResponseEntity<Void> logoutUser(
+            @Parameter(hidden = true) @RequestHeader("Authorization") String bearerToken
+    ) {
         String accessToken = bearerToken.replace("Bearer ", "");
         service.logout(accessToken);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
