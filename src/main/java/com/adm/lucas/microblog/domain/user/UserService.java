@@ -42,6 +42,10 @@ public interface UserService {
 
     User getUser(String username);
 
+    Page<User> getUserFollowing(Pageable pageable, UUID idFromToken, String username);
+
+    Page<User> getUserFollowers(Pageable pageable, UUID idFromToken, String username);
+
     List<String> getUserDisplayNameHistory(UUID id);
 
     void cleanUsersWithExpiredActivationTime();

@@ -37,4 +37,6 @@ public interface UserRepository extends JpaRepository<User, UUID> {
     @Query("SELECT u FROM User u WHERE u.createdAt < :nowMinus7Days AND u.active = false")
     List<User> findUsersWithExpiredActivationTime(@Param("nowMinus7Days") Instant nowMinus7Days);
 
+    Page<User> findAllByIdIn(Pageable pageable, List<UUID> ids);
+
 }

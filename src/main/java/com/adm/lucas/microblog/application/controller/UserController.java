@@ -21,6 +21,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -202,6 +203,13 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.ACCEPTED).build();
     }
 
+    @Operation(summary = "Follow a user.", description = "Allows the requesting user to follow the specified user.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "User followed successfully."),
+            @ApiResponse(responseCode = "403", description = "Invalid token.", content = @Content(examples = {})),
+            @ApiResponse(responseCode = "404", description = "User not found", content = @Content(examples = {})),
+            @ApiResponse(responseCode = "500", description = "Internal server error.", content = @Content(examples = {}))
+    })
     @PostMapping("/{username}/follow")
     @Transactional
     public ResponseEntity<Void> followUser(
@@ -213,6 +221,13 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
+    @Operation(summary = "Unfollow a user.", description = "Allows the requesting user to unfollow the specified user.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "User unfollowed successfully."),
+            @ApiResponse(responseCode = "403", description = "Invalid token.", content = @Content(examples = {})),
+            @ApiResponse(responseCode = "404", description = "User not found", content = @Content(examples = {})),
+            @ApiResponse(responseCode = "500", description = "Internal server error.", content = @Content(examples = {}))
+    })
     @DeleteMapping("/{username}/unfollow")
     @Transactional
     public ResponseEntity<Void> unfollowUser(
@@ -274,6 +289,56 @@ public class UserController {
     public ResponseEntity<DetailUserRES> getUser(@PathVariable("username") String username) {
         User user = service.getUser(username);
         return ResponseEntity.status(HttpStatus.OK).body(new DetailUserRES(user));
+    }
+
+    @Operation(
+            summary = "Fetches a paginated list of users that the specified user is following.",
+            description = """
+                    Retrieves a page of users a specified user is following,
+                    The requesting user must have permission to view the requested user's following list
+                    (for private accounts, the requested user must follow the requesting user)."""
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Following users page retrieved successfully."),
+            @ApiResponse(responseCode = "400", description = "Invalid pageable criteria.", content = @Content(examples = {})),
+            @ApiResponse(responseCode = "403", description = "Access denied due to invalid token or insufficient permissions.", content = @Content(examples = {})),
+            @ApiResponse(responseCode = "404", description = "User not found.", content = @Content(examples = {})),
+            @ApiResponse(responseCode = "500", description = "Internal server error.", content = @Content(examples = {}))
+    })
+    @GetMapping("/{username}/following")
+    public ResponseEntity<PageRES<DetailUserRES>> getFollowing(
+            @Parameter(hidden = true) @RequestHeader("Authorization") String accessToken,
+            @ParameterObject @PageableDefault(page = 0, size = 10, sort = {"displayName"}, direction = Sort.Direction.ASC) Pageable pageable,
+            @PathVariable("username") String username
+    ) {
+        UUID idFromToken = getSubject(accessToken);
+        Page<DetailUserRES> page = service.getUserFollowing(pageable, idFromToken, username).map(DetailUserRES::new);
+        return ResponseEntity.status(HttpStatus.OK).body(new PageRES<>(page));
+    }
+
+    @Operation(
+            summary = "Fetches a paginated list of users that are following the specified user.",
+            description = """
+                    Retrieve a page of users following a specified user.
+                    The requesting user must have permission to view the requested user's followers list
+                    (for private accounts, the requested user must follow the requesting user)."""
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Followers page retrieved successfully."),
+            @ApiResponse(responseCode = "400", description = "Invalid pageable criteria.", content = @Content(examples = {})),
+            @ApiResponse(responseCode = "403", description = "Access denied due to invalid token or insufficient permissions.", content = @Content(examples = {})),
+            @ApiResponse(responseCode = "404", description = "User not found.", content = @Content(examples = {})),
+            @ApiResponse(responseCode = "500", description = "Internal server error.", content = @Content(examples = {}))
+    })
+    @GetMapping("/{username}/followers")
+    public ResponseEntity<PageRES<DetailUserRES>> getFollowers(
+            @Parameter(hidden = true) @RequestHeader("Authorization") String accessToken,
+            @ParameterObject @PageableDefault(page = 0, size = 10, sort = {"displayName"}, direction = Sort.Direction.ASC) Pageable pageable,
+            @PathVariable("username") String username
+    ) {
+        UUID idFromToken = getSubject(accessToken);
+        Page<DetailUserRES> page = service.getUserFollowers(pageable, idFromToken, username).map(DetailUserRES::new);
+        return ResponseEntity.status(HttpStatus.OK).body(new PageRES<>(page));
     }
 
     @Operation(summary = "Get user display name history", description = "Retrieves the history of display names for a user by their ID.")

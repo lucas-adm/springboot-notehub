@@ -10,6 +10,7 @@ import lombok.SneakyThrows;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
@@ -18,6 +19,7 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -52,6 +54,23 @@ public class UserServiceImpl implements UserService {
 
     private void validateActiveField(boolean active) {
         if (!active) throw new EntityNotFoundException();
+    }
+
+    private void validateFollower(User requesting, User requested) {
+        if (requested.isProfilePrivate()
+                && !Objects.equals(requesting.getUsername(), requested.getUsername())
+                && !requested.getFollowing().contains(requesting)
+        ) {
+            throw new AccessDeniedException("Usuário não te segue.");
+        }
+    }
+
+    private Page<User> getUserConnections(Pageable pageable, UUID userRequestingId, String userRequestedUsername, Function<User, Set<User>> getter) {
+        User requesting = repository.findById(userRequestingId).orElseThrow(EntityNotFoundException::new);
+        User requested = repository.findByUsername(userRequestedUsername).orElseThrow(EntityNotFoundException::new);
+        validateFollower(requesting, requested);
+        List<UUID> ids = getter.apply(requested).stream().map(User::getId).toList();
+        return repository.findAllByIdIn(pageable, ids);
     }
 
     @Override
@@ -154,6 +173,16 @@ public class UserServiceImpl implements UserService {
         User user = repository.findByUsername(username).orElseThrow(EntityNotFoundException::new);
         validateActiveField(user.isActive());
         return user;
+    }
+
+    @Override
+    public Page<User> getUserFollowing(Pageable pageable, UUID idFromToken, String username) {
+        return getUserConnections(pageable, idFromToken, username, User::getFollowing);
+    }
+
+    @Override
+    public Page<User> getUserFollowers(Pageable pageable, UUID idFromToken, String username) {
+        return getUserConnections(pageable, idFromToken, username, User::getFollowers);
     }
 
     @Override
