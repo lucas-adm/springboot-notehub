@@ -12,7 +12,9 @@ public interface UserService {
 
     User create(User user);
 
-    void active(UUID idFromToken);
+    String generateActivationToken(User user);
+
+    void activate(UUID idFromToken);
 
     void changeProfileVisibility(UUID idFromToken);
 

@@ -6,7 +6,10 @@ import com.adm.lucas.microblog.application.dto.response.page.PageRES;
 import com.adm.lucas.microblog.application.dto.response.user.CreateUserRES;
 import com.adm.lucas.microblog.application.dto.response.user.DetailUserRES;
 import com.adm.lucas.microblog.application.implementation.UserServiceImpl;
+import com.adm.lucas.microblog.domain.token.Token;
+import com.adm.lucas.microblog.domain.token.TokenService;
 import com.adm.lucas.microblog.domain.user.User;
+import com.adm.lucas.microblog.domain.user.UserService;
 import com.auth0.jwt.JWT;
 import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
@@ -41,9 +44,9 @@ import java.util.UUID;
 public class UserController {
 
     @Value("${api.client.host}")
-    private String domain;
+    private String client;
 
-    private final UserServiceImpl service;
+    private final UserService service;
     private final MailProducer producer;
 
     private UUID getSubject(String bearerToken) {
@@ -64,18 +67,20 @@ public class UserController {
             @Valid @RequestBody CreateUserREQ dto
     ) {
         User user = service.create(dto.toUser());
-        producer.publishAccountActivationMessage(user);
+        String jwt = service.generateActivationToken(user);
+        producer.publishAccountActivationMessage(jwt, user);
         return ResponseEntity.status(HttpStatus.CREATED).body(new CreateUserRES(user));
     }
 
     @Hidden
-    @GetMapping("/active/{id}")
+    @GetMapping("/activate")
     @Transactional
     public ResponseEntity<Void> activeUser(
-            @PathVariable("id") UUID id
+            @Parameter(hidden = true) @RequestHeader("Authorization") String accessToken
     ) {
-        service.active(id);
-        return ResponseEntity.status(HttpStatus.FOUND).location(URI.create(String.format("%s/greetings", domain))).build();
+        UUID idFromToken = getSubject(accessToken);
+        service.activate(idFromToken);
+        return ResponseEntity.status(HttpStatus.FOUND).location(URI.create(String.format("%s/greetings", client))).build();
     }
 
     @Operation(summary = "Change profile visibility", description = "Changes the visibility of the user's profile.")

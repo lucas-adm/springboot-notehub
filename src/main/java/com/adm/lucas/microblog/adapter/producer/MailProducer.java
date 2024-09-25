@@ -18,16 +18,13 @@ public class MailProducer {
     @Value("${broker.queue.recovery.name}")
     private String recoveryRoutingKey;
 
-    @Value("${api.server.host}")
-    private String server;
-
     @Value("${api.client.host}")
     private String client;
 
     private final RabbitTemplate rabbitTemplate;
 
-    public void publishAccountActivationMessage(User user) {
-        var message = new ActivationDTO(server, client, user);
+    public void publishAccountActivationMessage(String jwt, User user) {
+        var message = new ActivationDTO(client, jwt, user);
         rabbitTemplate.convertAndSend("", activationRoutingKey, message);
     }
 

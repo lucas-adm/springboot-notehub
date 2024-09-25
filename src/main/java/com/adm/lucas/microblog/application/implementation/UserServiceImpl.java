@@ -1,6 +1,7 @@
 package com.adm.lucas.microblog.application.implementation;
 
 import com.adm.lucas.microblog.domain.history.UserHistoryService;
+import com.adm.lucas.microblog.domain.token.TokenService;
 import com.adm.lucas.microblog.domain.user.User;
 import com.adm.lucas.microblog.domain.user.UserRepository;
 import com.adm.lucas.microblog.domain.user.UserService;
@@ -30,6 +31,7 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository repository;
     private final UserHistoryService historian;
+    private final TokenService tokenService;
     private final PasswordEncoder encoder;
 
     @SneakyThrows
@@ -85,7 +87,12 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void active(UUID idFromToken) {
+    public String generateActivationToken(User user) {
+        return tokenService.generateToken(user);
+    }
+
+    @Override
+    public void activate(UUID idFromToken) {
         changeField(idFromToken, "active", User::isActive, user -> user.setActive(true));
     }
 
