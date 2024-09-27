@@ -1,6 +1,8 @@
 package com.adm.lucas.microblog.application.implementation;
 
+import com.adm.lucas.microblog.application.dto.notification.MessageNotification;
 import com.adm.lucas.microblog.domain.history.UserHistoryService;
+import com.adm.lucas.microblog.domain.notification.NotificationService;
 import com.adm.lucas.microblog.domain.token.TokenService;
 import com.adm.lucas.microblog.domain.user.User;
 import com.adm.lucas.microblog.domain.user.UserRepository;
@@ -31,6 +33,7 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository repository;
     private final UserHistoryService historian;
+    private final NotificationService notifier;
     private final TokenService tokenService;
     private final PasswordEncoder encoder;
 
@@ -143,10 +146,14 @@ public class UserServiceImpl implements UserService {
     public void follow(UUID idFromToken, String username) {
         User follower = repository.findById(idFromToken).orElseThrow(EntityNotFoundException::new);
         User following = repository.findByUsername(username).orElseThrow(EntityNotFoundException::new);
+        if(Objects.equals(follower.getId(), following.getId())) {
+            return;
+        }
         follower.getFollowing().add(following);
         following.getFollowers().add(follower);
         repository.save(follower);
         repository.save(following);
+        notifier.notify(following, follower, MessageNotification.of(follower));
     }
 
     @Override
@@ -162,6 +169,8 @@ public class UserServiceImpl implements UserService {
     @Override
     public void delete(UUID idFromToken) {
         User user = repository.findById(idFromToken).orElseThrow(EntityNotFoundException::new);
+        user.getFollowing().forEach(following -> following.getFollowers().remove(user));
+        user.getFollowers().forEach(follower -> follower.getFollowing().remove(user));
         repository.delete(user);
     }
 

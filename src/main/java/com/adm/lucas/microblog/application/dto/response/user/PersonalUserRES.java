@@ -16,6 +16,7 @@ public record PersonalUserRES(
         boolean sponsor,
         Long score,
         int followers,
-        int following
+        int following,
+        long notifications
 ) {
 }
