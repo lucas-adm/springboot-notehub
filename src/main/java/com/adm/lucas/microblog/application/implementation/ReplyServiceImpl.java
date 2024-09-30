@@ -1,8 +1,10 @@
 package com.adm.lucas.microblog.application.implementation;
 
+import com.adm.lucas.microblog.application.dto.notification.MessageNotification;
 import com.adm.lucas.microblog.application.dto.request.reply.CreateReplyREQ;
 import com.adm.lucas.microblog.domain.comment.Comment;
 import com.adm.lucas.microblog.domain.comment.CommentRepository;
+import com.adm.lucas.microblog.domain.notification.NotificationService;
 import com.adm.lucas.microblog.domain.reply.Reply;
 import com.adm.lucas.microblog.domain.reply.ReplyRepository;
 import com.adm.lucas.microblog.domain.reply.ReplyService;
@@ -26,6 +28,7 @@ public class ReplyServiceImpl implements ReplyService {
     private final UserRepository userRepository;
     private final CommentRepository commentRepository;
     private final ReplyRepository repository;
+    private final NotificationService notifier;
 
     private void validateAccess(UUID idFromToken, Reply reply) {
         if (!Objects.equals(idFromToken, reply.getUser().getId())) {
@@ -50,7 +53,10 @@ public class ReplyServiceImpl implements ReplyService {
 
     @Override
     public Reply create(Reply reply) {
-        return repository.save(reply);
+        repository.save(reply);
+        if (reply.getToUser() == null) notifier.notify(reply.getComment().getUser(), reply.getUser(), MessageNotification.of(reply));
+        if (reply.getToUser() != null) notifier.notify(reply.getToReply().getUser(), reply.getUser(), MessageNotification.of(reply));
+        return reply;
     }
 
     @Override

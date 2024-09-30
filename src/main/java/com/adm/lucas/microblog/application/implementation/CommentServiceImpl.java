@@ -1,11 +1,13 @@
 package com.adm.lucas.microblog.application.implementation;
 
+import com.adm.lucas.microblog.application.dto.notification.MessageNotification;
 import com.adm.lucas.microblog.application.dto.request.comment.CreateCommentREQ;
 import com.adm.lucas.microblog.domain.comment.Comment;
 import com.adm.lucas.microblog.domain.comment.CommentRepository;
 import com.adm.lucas.microblog.domain.comment.CommentService;
 import com.adm.lucas.microblog.domain.note.Note;
 import com.adm.lucas.microblog.domain.note.NoteRepository;
+import com.adm.lucas.microblog.domain.notification.NotificationService;
 import com.adm.lucas.microblog.domain.user.User;
 import com.adm.lucas.microblog.domain.user.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -26,6 +28,7 @@ public class CommentServiceImpl implements CommentService {
     private final UserRepository userRepository;
     private final NoteRepository noteRepository;
     private final CommentRepository repository;
+    private final NotificationService notifier;
 
     private void validateAccess(UUID idFromToken, Comment comment) {
         if (!Objects.equals(idFromToken, comment.getUser().getId())) {
@@ -42,7 +45,9 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public Comment create(Comment comment) {
-        return repository.save(comment);
+        repository.save(comment);
+        notifier.notify(comment.getNote().getUser(), comment.getUser(), MessageNotification.of(comment));
+        return comment;
     }
 
     @Override

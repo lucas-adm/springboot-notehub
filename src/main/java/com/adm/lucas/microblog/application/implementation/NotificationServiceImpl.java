@@ -11,6 +11,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
+import java.util.Objects;
 import java.util.UUID;
 
 @Component
@@ -21,6 +22,7 @@ public class NotificationServiceImpl implements NotificationService {
 
     @Override
     public void notify(User toUser, User user, MessageNotification message) {
+        if (Objects.equals(toUser.getId(), user.getId())) return;
         repository.save(new Notification(toUser, user, message.info()));
     }
 
