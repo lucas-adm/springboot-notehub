@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 import java.time.Instant;
+import java.util.Map;
 import java.util.UUID;
 
 @Entity
@@ -34,9 +35,11 @@ public class Notification {
 
     private boolean read = false;
 
-    private String info;
+    //    @Column(columnDefinition = "JSON") // PostgreSQL
+    @Convert(converter = NotificationFieldInfoConverter.class) // H2
+    private Map<String, Object> info;
 
-    public Notification(User user, User fromUser, String info) {
+    public Notification(User user, User fromUser, Map<String, Object> info) {
         this.user = user;
         this.fromUser = fromUser;
         this.info = info;

@@ -6,6 +6,7 @@ import com.adm.lucas.microblog.domain.notification.Notification;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
+import java.util.Map;
 import java.util.UUID;
 
 public record DetailNotificationRES(
@@ -13,7 +14,7 @@ public record DetailNotificationRES(
         boolean read,
         String created_at,
         DetailUserRES from_user,
-        String info
+        Map<String, Object> info
 ) {
     public DetailNotificationRES(Notification notification) {
         this(
