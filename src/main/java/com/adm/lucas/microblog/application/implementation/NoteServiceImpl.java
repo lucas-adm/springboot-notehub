@@ -173,4 +173,11 @@ public class NoteServiceImpl implements NoteService {
         return repository.findAllByUserId(pageable, idFromToken);
     }
 
+    @Override
+    public Page<Note> getNotesFromFollowedUsers(Pageable pageable, UUID idFromToken) {
+        User user = userRepository.findById(idFromToken).orElseThrow(EntityNotFoundException::new);
+        List<UUID> ids = user.getFollowing().stream().map(User::getId).toList();
+        return repository.findAllByHiddenFalseAndUserIdIn(pageable, ids);
+    }
+
 }

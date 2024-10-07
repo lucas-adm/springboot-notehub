@@ -49,4 +49,6 @@ public interface NoteService {
 
     Page<Note> getAllUserNotesById(Pageable pageable, UUID idFromToken);
 
+    Page<Note> getNotesFromFollowedUsers(Pageable pageable, UUID idFromToken);
+
 }
