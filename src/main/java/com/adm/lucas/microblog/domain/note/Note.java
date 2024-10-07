@@ -7,22 +7,22 @@ import com.adm.lucas.microblog.domain.user.User;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @Entity
 @Table(name = "notes")
 @NoArgsConstructor
 @Data
-@JsonIgnoreProperties({"user", "tags", "comments"})
-@ToString(exclude = {"user", "tags", "comments"})
+@JsonIgnoreProperties({"user", "tags", "comments", "flames"})
+@ToString(exclude = {"user", "tags", "comments", "flames"})
+@EqualsAndHashCode(exclude = {"user", "tags", "comments", "flames"})
 public class Note {
 
     @Id
@@ -57,7 +57,7 @@ public class Note {
     private List<Comment> comments = new ArrayList<>();
 
     @OneToMany(mappedBy = "note", orphanRemoval = true, fetch = FetchType.EAGER)
-    private List<Flame> flames = new ArrayList<>();
+    private Set<Flame> flames = new HashSet<>();
 
     public Note(User user, String title, String markdown, boolean closed, boolean hidden, List<Tag> tags) {
         this.user = user;

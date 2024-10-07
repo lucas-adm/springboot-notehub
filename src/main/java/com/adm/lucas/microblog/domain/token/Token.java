@@ -1,9 +1,12 @@
 package com.adm.lucas.microblog.domain.token;
 
 import com.adm.lucas.microblog.domain.user.User;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -14,6 +17,9 @@ import java.util.UUID;
 @Table(name = "tokens")
 @NoArgsConstructor
 @Data
+@JsonIgnoreProperties({"user"})
+@ToString(exclude = {"user"})
+@EqualsAndHashCode(exclude = {"user"})
 public class Token {
 
     @Id

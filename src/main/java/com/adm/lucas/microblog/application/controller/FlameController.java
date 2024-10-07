@@ -37,6 +37,7 @@ public class FlameController {
             @ApiResponse(responseCode = "201", description = "Flame created successfully."),
             @ApiResponse(responseCode = "403", description = "Invalid token.", content = @Content(examples = {})),
             @ApiResponse(responseCode = "404", description = "Note note found.", content = @Content(examples = {})),
+            @ApiResponse(responseCode = "409", description = "Only one flame per note."),
             @ApiResponse(responseCode = "500", description = "Internal server error.", content = @Content(examples = {}))
     })
     @PostMapping("/{id}")
@@ -63,7 +64,8 @@ public class FlameController {
             @Parameter(hidden = true) @RequestHeader("Authorization") String accessToken,
             @PathVariable("id") UUID idFromPath
     ) {
-        service.deflame(idFromPath);
+        UUID idFromToken = getSubject(accessToken);
+        service.deflame(idFromToken, idFromPath);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 

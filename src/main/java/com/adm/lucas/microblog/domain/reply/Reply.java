@@ -5,6 +5,7 @@ import com.adm.lucas.microblog.domain.user.User;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import org.hibernate.annotations.OnDelete;
@@ -21,6 +22,7 @@ import java.util.UUID;
 @Data
 @JsonIgnoreProperties({"user", "comment", "toReply"})
 @ToString(exclude = {"user", "comment", "toReply"})
+@EqualsAndHashCode(exclude = {"replies"})
 public class Reply {
 
     @Id

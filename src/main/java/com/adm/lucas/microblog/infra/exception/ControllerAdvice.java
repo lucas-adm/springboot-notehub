@@ -3,6 +3,7 @@ package com.adm.lucas.microblog.infra.exception;
 import com.auth0.jwt.exceptions.JWTCreationException;
 import com.auth0.jwt.exceptions.JWTDecodeException;
 import com.auth0.jwt.exceptions.TokenExpiredException;
+import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
@@ -81,6 +82,11 @@ public class ControllerAdvice {
     @ExceptionHandler(EntityNotFoundException.class)
     private ResponseEntity<HttpStatus> handleEntityNotFoundException(EntityNotFoundException ex) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+    }
+
+    @ExceptionHandler(EntityExistsException.class)
+    private ResponseEntity<HttpStatus> handleEntityExistsException(EntityExistsException ex) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).build();
     }
 
     @ExceptionHandler(BadCredentialsException.class)

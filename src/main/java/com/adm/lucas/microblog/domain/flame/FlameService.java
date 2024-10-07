@@ -10,7 +10,7 @@ public interface FlameService {
 
     void inflame(UUID userIdFromToken, UUID noteIdFromPath);
 
-    void deflame(UUID noteIdFromPath);
+    void deflame(UUID userIdFromToken, UUID noteIdFromPath);
 
     List<UUID> getUserInflamedNotes(UUID userIdFromToken);
 

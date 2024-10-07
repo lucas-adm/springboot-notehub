@@ -9,6 +9,7 @@ import com.adm.lucas.microblog.domain.note.NoteRepository;
 import com.adm.lucas.microblog.domain.notification.NotificationService;
 import com.adm.lucas.microblog.domain.user.User;
 import com.adm.lucas.microblog.domain.user.UserRepository;
+import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -29,13 +30,14 @@ public class FlameServiceImpl implements FlameService {
     public void inflame(UUID userIdFromToken, UUID noteIdFromPath) {
         User user = userRepository.findById(userIdFromToken).orElseThrow(EntityNotFoundException::new);
         Note note = noteRepository.findById(noteIdFromPath).orElseThrow(EntityNotFoundException::new);
+        if (repository.existsByUserAndNote(user, note)) throw new EntityExistsException();
         Flame flame = repository.save(new Flame(user, note));
         notifier.notify(note.getUser(), user, MessageNotification.of(flame));
     }
 
     @Override
-    public void deflame(UUID noteIdFromPath) {
-        Flame flame = repository.findByNoteId(noteIdFromPath).orElseThrow(EntityNotFoundException::new);
+    public void deflame(UUID userIdFromToken, UUID noteIdFromPath) {
+        Flame flame = repository.findByUserIdAndNoteId(userIdFromToken,noteIdFromPath).orElseThrow(EntityNotFoundException::new);
         repository.delete(flame);
     }
 

@@ -1,11 +1,11 @@
 package com.adm.lucas.microblog.domain.user;
 
-import com.adm.lucas.microblog.domain.flame.Flame;
-import com.adm.lucas.microblog.domain.notification.Notification;
-import com.adm.lucas.microblog.domain.reply.Reply;
 import com.adm.lucas.microblog.domain.comment.Comment;
+import com.adm.lucas.microblog.domain.flame.Flame;
 import com.adm.lucas.microblog.domain.history.UserHistory;
 import com.adm.lucas.microblog.domain.note.Note;
+import com.adm.lucas.microblog.domain.notification.Notification;
+import com.adm.lucas.microblog.domain.reply.Reply;
 import com.adm.lucas.microblog.domain.token.Token;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
@@ -13,9 +13,6 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
-import org.apache.commons.lang3.builder.HashCodeExclude;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -31,7 +28,7 @@ import java.util.*;
 @Data
 @JsonIgnoreProperties({"token", "history", "notes", "comments", "replies", "flames", "followers", "following", "notificationsToUser", "notificationsFromUser"})
 @ToString(exclude = {"token", "history", "notes", "comments", "replies", "flames", "followers", "following", "notificationsToUser", "notificationsFromUser"})
-@EqualsAndHashCode(exclude = {"token", "followers", "following"})
+@EqualsAndHashCode(exclude = {"token", "history", "notes", "comments", "replies", "flames", "followers", "following", "notificationsToUser", "notificationsFromUser"})
 public class User implements UserDetails {
 
     @Id
@@ -84,7 +81,7 @@ public class User implements UserDetails {
     private List<Reply> replies = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", orphanRemoval = true)
-    private List<Flame> flames = new ArrayList<>();
+    private Set<Flame> flames = new HashSet<>();
 
     @OneToMany(mappedBy = "user", orphanRemoval = true)
     private List<Notification> notificationsToUser = new ArrayList<>();
