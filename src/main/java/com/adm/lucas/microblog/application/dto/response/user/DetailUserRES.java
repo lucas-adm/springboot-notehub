@@ -13,9 +13,10 @@ public record DetailUserRES(
         String avatar,
         String banner,
         String message,
-        boolean sponsor,
         int followers,
-        int following
+        int following,
+        boolean profile_private,
+        boolean sponsor
 ) {
     public DetailUserRES(User user) {
         this(
@@ -25,9 +26,10 @@ public record DetailUserRES(
                 user.getAvatar(),
                 user.getBanner(),
                 user.getMessage(),
-                user.isSponsor(),
                 user.getFollowers().size(),
-                user.getFollowing().size()
+                user.getFollowing().size(),
+                user.isProfilePrivate(),
+                user.isSponsor()
         );
     }
 }

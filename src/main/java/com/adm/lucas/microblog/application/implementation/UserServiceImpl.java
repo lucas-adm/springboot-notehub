@@ -61,19 +61,20 @@ public class UserServiceImpl implements UserService {
         if (!active) throw new EntityNotFoundException();
     }
 
-    private void validateFollower(User requesting, User requested) {
+    private void validateBidirectionalFollowAccess(User requesting, User requested) {
         if (requested.isProfilePrivate()
                 && !Objects.equals(requesting.getUsername(), requested.getUsername())
                 && !requested.getFollowing().contains(requesting)
+                && !requesting.getFollowers().contains(requested)
         ) {
-            throw new AccessDeniedException("Usuário não te segue.");
+            throw new AccessDeniedException("Não há vínculo bidirecional entre os usuários.");
         }
     }
 
     private Page<User> getUserConnections(Pageable pageable, UUID userRequestingId, String userRequestedUsername, Function<User, Set<User>> getter) {
         User requesting = repository.findById(userRequestingId).orElseThrow(EntityNotFoundException::new);
         User requested = repository.findByUsername(userRequestedUsername).orElseThrow(EntityNotFoundException::new);
-        validateFollower(requesting, requested);
+        validateBidirectionalFollowAccess(requesting, requested);
         List<UUID> ids = getter.apply(requested).stream().map(User::getId).toList();
         return repository.findAllByIdIn(pageable, ids);
     }
