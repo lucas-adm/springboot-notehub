@@ -36,6 +36,10 @@ public class CommentServiceImpl implements CommentService {
         }
     }
 
+    private void assertNoteIsNotClosed(Comment comment) {
+        if (comment.getNote().isClosed()) throw new IllegalStateException("Nota fechada para novas interações.");
+    }
+
     @Override
     public Comment mapToComment(UUID idFromToken, UUID noteIdFromPath, CreateCommentREQ req) {
         User user = userRepository.findById(idFromToken).orElseThrow(EntityNotFoundException::new);
@@ -45,6 +49,7 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public Comment create(Comment comment) {
+        assertNoteIsNotClosed(comment);
         repository.save(comment);
         notifier.notify(comment.getNote().getUser(), comment.getUser(), MessageNotification.of(comment));
         return comment;
@@ -54,6 +59,7 @@ public class CommentServiceImpl implements CommentService {
     public void edit(UUID idFromToken, UUID idFromPath, String text) {
         Comment comment = repository.findById(idFromPath).orElseThrow(EntityNotFoundException::new);
         validateAccess(idFromToken, comment);
+        assertNoteIsNotClosed(comment);
         comment.setText(text);
         comment.setModified(true);
         comment.setModifiedAt(Instant.now());

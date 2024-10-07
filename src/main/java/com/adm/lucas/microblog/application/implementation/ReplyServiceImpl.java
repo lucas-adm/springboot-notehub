@@ -4,6 +4,7 @@ import com.adm.lucas.microblog.application.dto.notification.MessageNotification;
 import com.adm.lucas.microblog.application.dto.request.reply.CreateReplyREQ;
 import com.adm.lucas.microblog.domain.comment.Comment;
 import com.adm.lucas.microblog.domain.comment.CommentRepository;
+import com.adm.lucas.microblog.domain.note.Note;
 import com.adm.lucas.microblog.domain.notification.NotificationService;
 import com.adm.lucas.microblog.domain.reply.Reply;
 import com.adm.lucas.microblog.domain.reply.ReplyRepository;
@@ -36,6 +37,10 @@ public class ReplyServiceImpl implements ReplyService {
         }
     }
 
+    private void assertNoteIsNotClosed(Reply reply) {
+        if (reply.getComment().getNote().isClosed()) throw new IllegalStateException("Nota fechada para novas interações.");
+    }
+
     @Override
     public Reply mapToReply(UUID idFromToken, UUID commentIdFromPath, CreateReplyREQ req) {
         User user = userRepository.findById(idFromToken).orElseThrow(EntityNotFoundException::new);
@@ -53,6 +58,7 @@ public class ReplyServiceImpl implements ReplyService {
 
     @Override
     public Reply create(Reply reply) {
+        assertNoteIsNotClosed(reply);
         repository.save(reply);
         if (reply.getToUser() == null) notifier.notify(reply.getComment().getUser(), reply.getUser(), MessageNotification.of(reply));
         if (reply.getToUser() != null) notifier.notify(reply.getToReply().getUser(), reply.getUser(), MessageNotification.of(reply));
@@ -62,6 +68,7 @@ public class ReplyServiceImpl implements ReplyService {
     @Override
     public void edit(UUID idFromToken, UUID idFromPath, String text) {
         Reply reply = repository.findById(idFromPath).orElseThrow(EntityNotFoundException::new);
+        assertNoteIsNotClosed(reply);
         validateAccess(idFromToken, reply);
         reply.setText(text);
         reply.setModifiedAt(Instant.now());

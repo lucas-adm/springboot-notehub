@@ -119,6 +119,13 @@ public class ControllerAdvice {
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(errors.stream().map(CustomResponse::new).toList());
     }
 
+    @ExceptionHandler(IllegalStateException.class)
+    private ResponseEntity<List<CustomResponse>> handleIllegalStateException(IllegalStateException ex) {
+        List<FieldError> errors = new ArrayList<>();
+        errors.add(new FieldError("note", "closed", ex.getMessage()));
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(errors.stream().map(CustomResponse::new).toList());
+    }
+
     @ExceptionHandler(JWTCreationException.class)
     private ResponseEntity<List<CustomResponse>> handleJWTCreationException(JWTCreationException ex) {
         List<FieldError> errors = new ArrayList<>();

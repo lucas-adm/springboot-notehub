@@ -46,7 +46,7 @@ public class ReplyController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Reply registered successfully."),
             @ApiResponse(responseCode = "400", description = "Invalid input data.", content = @Content(mediaType = "application/json")),
-            @ApiResponse(responseCode = "403", description = "Invalid token.", content = @Content(examples = {})),
+            @ApiResponse(responseCode = "403", description = "Invalid token or Note is closed.", content = @Content(examples = {})),
             @ApiResponse(responseCode = "404", description = "Comment note found.", content = @Content(examples = {})),
             @ApiResponse(responseCode = "500", description = "Internal server error.", content = @Content(examples = {}))
     })
@@ -66,7 +66,7 @@ public class ReplyController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Reply registered successfully."),
             @ApiResponse(responseCode = "400", description = "Invalid input data.", content = @Content(mediaType = "application/json")),
-            @ApiResponse(responseCode = "403", description = "Invalid token.", content = @Content(examples = {})),
+            @ApiResponse(responseCode = "403", description = "Invalid token or Note is closed.", content = @Content(examples = {})),
             @ApiResponse(responseCode = "404", description = "Reply note found.", content = @Content(examples = {})),
             @ApiResponse(responseCode = "500", description = "Internal server error.", content = @Content(examples = {}))
     })
@@ -86,7 +86,7 @@ public class ReplyController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "202", description = "Reply text updated successfully."),
             @ApiResponse(responseCode = "400", description = "Invalid input data.", content = @Content(mediaType = "application/json")),
-            @ApiResponse(responseCode = "403", description = "Invalid token.", content = @Content(examples = {})),
+            @ApiResponse(responseCode = "403", description = "Invalid token or Note is closed.", content = @Content(examples = {})),
             @ApiResponse(responseCode = "404", description = "Reply note found."),
             @ApiResponse(responseCode = "500", description = "Internal server error.", content = @Content(examples = {}))
     })
