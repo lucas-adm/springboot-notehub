@@ -108,7 +108,7 @@ public class CommentController {
     })
     @GetMapping("/{id}/comments")
     public ResponseEntity<PageRES<DetailCommentRES>> getComments(
-            @ParameterObject @PageableDefault(page = 0, size = 10, sort = {"createdAt"}, direction = Sort.Direction.DESC) Pageable pageable,
+            @ParameterObject @PageableDefault(page = 0, size = 10, sort = {"repliesCount"}, direction = Sort.Direction.DESC) Pageable pageable,
             @PathVariable("id") UUID idFromPath
     ) {
         Page<DetailCommentRES> page = service.getComments(pageable, idFromPath).map(DetailCommentRES::new);

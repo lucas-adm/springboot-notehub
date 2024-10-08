@@ -296,7 +296,7 @@ public class UserController {
     })
     @GetMapping
     public ResponseEntity<PageRES<DetailUserRES>> getUsers(
-            @ParameterObject @PageableDefault(page = 0, size = 10, sort = {"createdAt"}, direction = Sort.Direction.ASC) Pageable pageable
+            @ParameterObject @PageableDefault(page = 0, size = 10, sort = {"followersCount"}, direction = Sort.Direction.ASC) Pageable pageable
     ) {
         PageRES<DetailUserRES> page = new PageRES<>(service.getAllActiveUsers(pageable).map(DetailUserRES::new));
         return ResponseEntity.status(HttpStatus.OK).body(page);
@@ -310,7 +310,7 @@ public class UserController {
     })
     @GetMapping("/search")
     public ResponseEntity<PageRES<DetailUserRES>> searchUser(
-            @ParameterObject @PageableDefault(page = 0, size = 10, sort = {"createdAt"}, direction = Sort.Direction.ASC) Pageable pageable,
+            @ParameterObject @PageableDefault(page = 0, size = 10, sort = {"followersCount"}, direction = Sort.Direction.ASC) Pageable pageable,
             @RequestParam String q
     ) {
         PageRES<DetailUserRES> page = new PageRES<>(service.findUser(pageable, q).map(DetailUserRES::new));
@@ -348,7 +348,7 @@ public class UserController {
     @GetMapping("/{username}/following")
     public ResponseEntity<PageRES<DetailUserRES>> getFollowing(
             @Parameter(hidden = true) @RequestHeader("Authorization") String accessToken,
-            @ParameterObject @PageableDefault(page = 0, size = 10, sort = {"displayName"}, direction = Sort.Direction.ASC) Pageable pageable,
+            @ParameterObject @PageableDefault(page = 0, size = 10, sort = {"followersCount"}, direction = Sort.Direction.ASC) Pageable pageable,
             @PathVariable("username") String username
     ) {
         UUID idFromToken = getSubject(accessToken);
@@ -373,7 +373,7 @@ public class UserController {
     @GetMapping("/{username}/followers")
     public ResponseEntity<PageRES<DetailUserRES>> getFollowers(
             @Parameter(hidden = true) @RequestHeader("Authorization") String accessToken,
-            @ParameterObject @PageableDefault(page = 0, size = 10, sort = {"displayName"}, direction = Sort.Direction.ASC) Pageable pageable,
+            @ParameterObject @PageableDefault(page = 0, size = 10, sort = {"followersCount"}, direction = Sort.Direction.ASC) Pageable pageable,
             @PathVariable("username") String username
     ) {
         UUID idFromToken = getSubject(accessToken);

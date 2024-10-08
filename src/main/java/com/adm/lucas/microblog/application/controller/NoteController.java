@@ -235,7 +235,7 @@ public class NoteController {
     })
     @GetMapping("/search")
     public ResponseEntity<PageRES<LowDetailNoteRES>> searchPublicNotes(
-            @ParameterObject @PageableDefault(page = 0, size = 10, sort = {"createdAt"}, direction = Sort.Direction.DESC) Pageable pageable,
+            @ParameterObject @PageableDefault(page = 0, size = 10, sort = {"flamesCount"}, direction = Sort.Direction.DESC) Pageable pageable,
             @NotBlank @RequestParam String q
     ) {
         Page<LowDetailNoteRES> page = service.findPublicNotes(pageable, q).map(LowDetailNoteRES::new);
@@ -269,7 +269,7 @@ public class NoteController {
     })
     @GetMapping("/search/tag")
     public ResponseEntity<PageRES<LowDetailNoteRES>> searchPublicNotesByTag(
-            @ParameterObject @PageableDefault(page = 0, size = 10, sort = {"createdAt"}, direction = Sort.Direction.DESC) Pageable pageable,
+            @ParameterObject @PageableDefault(page = 0, size = 10, sort = {"flamesCount"}, direction = Sort.Direction.DESC) Pageable pageable,
             @NotBlank @RequestParam String q
     ) {
         Page<LowDetailNoteRES> page = service.findPublicNotesByTag(pageable, q).map(LowDetailNoteRES::new);
@@ -333,7 +333,7 @@ public class NoteController {
     })
     @GetMapping("/user/{username}")
     public ResponseEntity<PageRES<LowDetailNoteRES>> getAllUserNotesByUsername(
-            @ParameterObject @PageableDefault(page = 0, size = 10, sort = {"modifiedAt"}, direction = Sort.Direction.DESC) Pageable pageable,
+            @ParameterObject @PageableDefault(page = 0, size = 10, sort = {"flamesCount"}, direction = Sort.Direction.DESC) Pageable pageable,
             @PathVariable("username") String username
     ) {
         Page<LowDetailNoteRES> page = service.getAllUserNotesByUsername(pageable, username).map(LowDetailNoteRES::new);
@@ -370,7 +370,7 @@ public class NoteController {
     @GetMapping("/private/following")
     public ResponseEntity<PageRES<LowDetailNoteRES>> getAllUserFollowingNotes(
             @Parameter(hidden = true) @RequestHeader("Authorization") String accessToken,
-            @ParameterObject @PageableDefault(page = 0, size = 10, sort = {"modifiedAt"}, direction = Sort.Direction.DESC) Pageable pageable
+            @ParameterObject @PageableDefault(page = 0, size = 10, sort = {"createdAt"}, direction = Sort.Direction.DESC) Pageable pageable
     ) {
         UUID idFromToken = getSubject(accessToken);
         Page<LowDetailNoteRES> page = service.getNotesFromFollowedUsers(pageable, idFromToken).map(LowDetailNoteRES::new);
