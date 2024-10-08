@@ -55,9 +55,11 @@ public class Note {
 
     @OneToMany(mappedBy = "note", orphanRemoval = true, fetch = FetchType.EAGER)
     private List<Comment> comments = new ArrayList<>();
+    private int commentsCount = 0;
 
     @OneToMany(mappedBy = "note", orphanRemoval = true, fetch = FetchType.EAGER)
     private Set<Flame> flames = new HashSet<>();
+    private int flamesCount = 0;
 
     public Note(User user, String title, String markdown, boolean closed, boolean hidden, List<Tag> tags) {
         this.user = user;

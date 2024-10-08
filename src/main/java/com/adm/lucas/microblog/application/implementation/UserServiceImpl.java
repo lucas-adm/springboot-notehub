@@ -61,6 +61,22 @@ public class UserServiceImpl implements UserService {
         if (!active) throw new EntityNotFoundException();
     }
 
+    private void updateFollowerAndFollowingCount(User follower, User following, boolean increment) {
+        if (increment) {
+            follower.getFollowing().add(following);
+            follower.setFollowingCount(follower.getFollowingCount() + 1);
+            following.getFollowers().add(follower);
+            following.setFollowersCount(following.getFollowersCount() + 1);
+        } else {
+            follower.getFollowing().remove(following);
+            follower.setFollowingCount(follower.getFollowingCount() - 1);
+            following.getFollowers().remove(follower);
+            following.setFollowersCount(following.getFollowersCount() - 1);
+        }
+        repository.save(follower);
+        repository.save(following);
+    }
+
     private void validateBidirectionalFollowAccess(User requesting, User requested) {
         if (requested.isProfilePrivate()
                 && !Objects.equals(requesting.getUsername(), requested.getUsername())
@@ -147,13 +163,10 @@ public class UserServiceImpl implements UserService {
     public void follow(UUID idFromToken, String username) {
         User follower = repository.findById(idFromToken).orElseThrow(EntityNotFoundException::new);
         User following = repository.findByUsername(username).orElseThrow(EntityNotFoundException::new);
-        if(Objects.equals(follower.getId(), following.getId())) {
+        if (Objects.equals(follower.getId(), following.getId())) {
             return;
         }
-        follower.getFollowing().add(following);
-        following.getFollowers().add(follower);
-        repository.save(follower);
-        repository.save(following);
+        updateFollowerAndFollowingCount(follower, following, true);
         notifier.notify(following, follower, MessageNotification.of(follower));
     }
 
@@ -161,10 +174,10 @@ public class UserServiceImpl implements UserService {
     public void unfollow(UUID idFromToken, String username) {
         User follower = repository.findById(idFromToken).orElseThrow(EntityNotFoundException::new);
         User following = repository.findByUsername(username).orElseThrow(EntityNotFoundException::new);
-        follower.getFollowing().remove(following);
-        following.getFollowers().remove(follower);
-        repository.save(follower);
-        repository.save(following);
+        if (Objects.equals(follower.getId(), following.getId())) {
+            return;
+        }
+        updateFollowerAndFollowingCount(follower, following, false);
     }
 
     @Override

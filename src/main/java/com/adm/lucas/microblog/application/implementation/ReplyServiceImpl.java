@@ -3,8 +3,8 @@ package com.adm.lucas.microblog.application.implementation;
 import com.adm.lucas.microblog.application.dto.notification.MessageNotification;
 import com.adm.lucas.microblog.application.dto.request.reply.CreateReplyREQ;
 import com.adm.lucas.microblog.domain.comment.Comment;
+import com.adm.lucas.microblog.domain.comment.CommentCounterService;
 import com.adm.lucas.microblog.domain.comment.CommentRepository;
-import com.adm.lucas.microblog.domain.note.Note;
 import com.adm.lucas.microblog.domain.notification.NotificationService;
 import com.adm.lucas.microblog.domain.reply.Reply;
 import com.adm.lucas.microblog.domain.reply.ReplyRepository;
@@ -30,6 +30,7 @@ public class ReplyServiceImpl implements ReplyService {
     private final CommentRepository commentRepository;
     private final ReplyRepository repository;
     private final NotificationService notifier;
+    private final CommentCounterService counter;
 
     private void validateAccess(UUID idFromToken, Reply reply) {
         if (!Objects.equals(idFromToken, reply.getUser().getId())) {
@@ -60,6 +61,7 @@ public class ReplyServiceImpl implements ReplyService {
     public Reply create(Reply reply) {
         assertNoteIsNotClosed(reply);
         repository.save(reply);
+        counter.updateRepliesCount(reply.getComment(), true);
         if (reply.getToUser() == null) notifier.notify(reply.getComment().getUser(), reply.getUser(), MessageNotification.of(reply));
         if (reply.getToUser() != null) notifier.notify(reply.getToReply().getUser(), reply.getUser(), MessageNotification.of(reply));
         return reply;
@@ -80,6 +82,7 @@ public class ReplyServiceImpl implements ReplyService {
     public void delete(UUID idFromToken, UUID idFromPath) {
         Reply reply = repository.findById(idFromPath).orElseThrow(EntityNotFoundException::new);
         validateAccess(idFromToken, reply);
+        counter.updateRepliesCount(reply.getComment(), false);
         repository.delete(reply);
     }
 

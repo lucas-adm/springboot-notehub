@@ -14,7 +14,7 @@ public record DetailCommentRES(
         String text,
         boolean modified,
         DetailUserRES user,
-        int replies
+        int replies_count
 ) {
     public DetailCommentRES(Comment comment) {
         this(
@@ -23,7 +23,7 @@ public record DetailCommentRES(
                 comment.getText(),
                 comment.isModified(),
                 comment.getUser() != null ? new DetailUserRES(comment.getUser()) : null,
-                comment.getReplies().size()
+                comment.getRepliesCount()
         );
     }
 }

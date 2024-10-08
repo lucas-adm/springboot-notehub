@@ -13,8 +13,8 @@ public record DetailUserRES(
         String avatar,
         String banner,
         String message,
-        int followers,
-        int following,
+        int followers_count,
+        int following_count,
         boolean profile_private,
         boolean sponsor
 ) {
@@ -26,8 +26,8 @@ public record DetailUserRES(
                 user.getAvatar(),
                 user.getBanner(),
                 user.getMessage(),
-                user.getFollowers().size(),
-                user.getFollowing().size(),
+                user.getFollowersCount(),
+                user.getFollowingCount(),
                 user.isProfilePrivate(),
                 user.isSponsor()
         );

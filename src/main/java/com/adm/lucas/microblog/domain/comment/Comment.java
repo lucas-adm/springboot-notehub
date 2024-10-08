@@ -49,6 +49,7 @@ public class Comment {
 
     @OneToMany(mappedBy = "comment", orphanRemoval = true, fetch = FetchType.EAGER)
     private List<Reply> replies = new ArrayList<>();
+    private int repliesCount = 0;
 
     public Comment(User user, Note note, String text) {
         this.user = user;

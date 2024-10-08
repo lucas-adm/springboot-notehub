@@ -15,8 +15,8 @@ public record PersonalUserRES(
         boolean profile_private,
         boolean sponsor,
         Long score,
-        int followers,
-        int following,
+        int followers_count,
+        int following_count,
         long notifications
 ) {
 }

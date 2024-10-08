@@ -6,6 +6,7 @@ import com.adm.lucas.microblog.domain.comment.Comment;
 import com.adm.lucas.microblog.domain.comment.CommentRepository;
 import com.adm.lucas.microblog.domain.comment.CommentService;
 import com.adm.lucas.microblog.domain.note.Note;
+import com.adm.lucas.microblog.domain.note.NoteCounterService;
 import com.adm.lucas.microblog.domain.note.NoteRepository;
 import com.adm.lucas.microblog.domain.notification.NotificationService;
 import com.adm.lucas.microblog.domain.user.User;
@@ -29,6 +30,7 @@ public class CommentServiceImpl implements CommentService {
     private final NoteRepository noteRepository;
     private final CommentRepository repository;
     private final NotificationService notifier;
+    private final NoteCounterService counter;
 
     private void validateAccess(UUID idFromToken, Comment comment) {
         if (!Objects.equals(idFromToken, comment.getUser().getId())) {
@@ -51,6 +53,7 @@ public class CommentServiceImpl implements CommentService {
     public Comment create(Comment comment) {
         assertNoteIsNotClosed(comment);
         repository.save(comment);
+        counter.updateCommentsCount(comment.getNote(), true);
         notifier.notify(comment.getNote().getUser(), comment.getUser(), MessageNotification.of(comment));
         return comment;
     }
@@ -71,6 +74,7 @@ public class CommentServiceImpl implements CommentService {
         Comment comment = repository.findById(idFromPath).orElseThrow(EntityNotFoundException::new);
         validateAccess(idFromToken, comment);
         repository.delete(comment);
+        counter.updateCommentsCount(comment.getNote(), false);
     }
 
     @Override
