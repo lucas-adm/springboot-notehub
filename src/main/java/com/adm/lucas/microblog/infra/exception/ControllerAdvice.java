@@ -6,6 +6,7 @@ import com.auth0.jwt.exceptions.TokenExpiredException;
 import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.mapping.PropertyReferenceException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -43,6 +44,13 @@ public class ControllerAdvice {
     private ResponseEntity<List<CustomResponse>> handleMissingServletRequestParameterException(MissingServletRequestParameterException ex) {
         List<FieldError> errors = new ArrayList<>();
         errors.add(new FieldError("parameter", "parameter", ex.getMessage()));
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors.stream().map(CustomResponse::new).toList());
+    }
+
+    @ExceptionHandler(PropertyReferenceException.class)
+    private ResponseEntity<List<CustomResponse>> handlePropertyReferenceException(PropertyReferenceException ex) {
+        List<FieldError> errors = new ArrayList<>();
+        errors.add(new FieldError("pageable", "criteria", ex.getMessage()));
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors.stream().map(CustomResponse::new).toList());
     }
 
