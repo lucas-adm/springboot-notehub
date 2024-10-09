@@ -26,9 +26,9 @@ import java.util.*;
 @Table(name = "users")
 @NoArgsConstructor
 @Data
-@JsonIgnoreProperties({"token", "history", "notes", "comments", "replies", "flames", "followers", "following", "notificationsToUser", "notificationsFromUser"})
-@ToString(exclude = {"token", "history", "notes", "comments", "replies", "flames", "followers", "following", "notificationsToUser", "notificationsFromUser"})
-@EqualsAndHashCode(exclude = {"token", "history", "notes", "comments", "replies", "flames", "followers", "following", "notificationsToUser", "notificationsFromUser"})
+@JsonIgnoreProperties({"history", "notes", "comments", "replies", "flames", "followers", "following", "notificationsToUser", "notificationsFromUser"})
+@ToString(exclude = {"history", "notes", "comments", "replies", "flames", "followers", "following", "notificationsToUser", "notificationsFromUser"})
+@EqualsAndHashCode(exclude = {"history", "notes", "comments", "replies", "flames", "followers", "following", "notificationsToUser", "notificationsFromUser"})
 public class User implements UserDetails {
 
     @Id
@@ -64,9 +64,6 @@ public class User implements UserDetails {
     private Instant createdAt = LocalDateTime.now().toInstant(ZoneOffset.of("-03:00"));
 
     private boolean active;
-
-    @OneToOne(mappedBy = "user", orphanRemoval = true)
-    private Token token;
 
     @OneToMany(mappedBy = "user")
     private List<UserHistory> history = new ArrayList<>();
