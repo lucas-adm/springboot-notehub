@@ -30,7 +30,7 @@ public class Note {
     private UUID id;
 
     @JoinColumn(name = "user_id")
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.SET_NULL)
     private User user;
 
@@ -49,15 +49,15 @@ public class Note {
 
     private boolean hidden;
 
-    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.REFRESH, CascadeType.MERGE}, fetch = FetchType.EAGER)
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.REFRESH, CascadeType.MERGE}, fetch = FetchType.LAZY)
     @JoinTable(name = "note_tags", joinColumns = @JoinColumn(name = "note_id"), inverseJoinColumns = @JoinColumn(name = "tag_id"))
     private List<Tag> tags = new ArrayList<>();
 
-    @OneToMany(mappedBy = "note", orphanRemoval = true, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "note", orphanRemoval = true, fetch = FetchType.LAZY)
     private List<Comment> comments = new ArrayList<>();
     private int commentsCount = 0;
 
-    @OneToMany(mappedBy = "note", orphanRemoval = true, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "note", orphanRemoval = true, fetch = FetchType.LAZY)
     private Set<Flame> flames = new HashSet<>();
     private int flamesCount = 0;
 

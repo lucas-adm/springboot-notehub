@@ -133,39 +133,39 @@ public class NoteServiceImpl implements NoteService {
 
     @Override
     public Page<Note> findPublicNotes(Pageable pageable, String q) {
-        return repository.findAllNotHiddenByTitleOrTagName(pageable, q);
+        return repository.searchPublicNotesByTitleOrTag(pageable, q);
     }
 
     @Override
     public Page<Note> findPrivateNotes(Pageable pageable, UUID idFromToken, String q) {
-        return repository.findAllCurrentUserNotesByTitleOrTagName(pageable, idFromToken, q);
+        return repository.searchPrivateNotesByTitleOrTag(pageable, idFromToken, q);
     }
 
     @Override
     public Page<Note> findPublicNotesByTag(Pageable pageable, String tag) {
-        return repository.findAllByHiddenFalseAndTagsNameContainingIgnoreCase(pageable, tag);
+        return repository.searchPublicNotesByTag(pageable, tag);
     }
 
     @Override
     public Page<Note> findPrivateNotesByTag(Pageable pageable, UUID idFromToken, String tag) {
-        return repository.findAllByUserIdAndTagsNameContainingIgnoreCase(pageable, idFromToken, tag);
+        return repository.searchPrivateNotesByTag(pageable, idFromToken, tag);
     }
 
     @Override
     public Note getPublicNote(UUID idFromPath) {
-        return repository.findByHiddenFalseAndId(idFromPath).orElseThrow(EntityNotFoundException::new);
+        return repository.findByIdAndHiddenFalseAndUserProfilePrivateFalse(idFromPath).orElseThrow(EntityNotFoundException::new);
     }
 
     @Override
     public Note getPrivateNote(UUID idFromToken, UUID idFromPath) {
-        Note note = repository.findById(idFromPath).orElseThrow(EntityNotFoundException::new);
+        Note note = repository.findByIdWithUserAndTags(idFromPath).orElseThrow(EntityNotFoundException::new);
         validateAccess(idFromToken, note);
         return note;
     }
 
     @Override
     public Page<Note> getAllUserNotesByUsername(Pageable pageable, String username) {
-        return repository.findAllByUserProfilePrivateFalseAndUserUsername(pageable, username.toLowerCase());
+        return repository.findAllByUserProfilePrivateFalseAndUserUsernameAndHiddenFalse(pageable, username.toLowerCase());
     }
 
     @Override
@@ -175,7 +175,7 @@ public class NoteServiceImpl implements NoteService {
 
     @Override
     public Page<Note> getNotesFromFollowedUsers(Pageable pageable, UUID idFromToken) {
-        User user = userRepository.findById(idFromToken).orElseThrow(EntityNotFoundException::new);
+        User user = userRepository.findByIdWithFollowing(idFromToken).orElseThrow(EntityNotFoundException::new);
         List<UUID> ids = user.getFollowing().stream().map(User::getId).toList();
         return repository.findAllByHiddenFalseAndUserIdIn(pageable, ids);
     }

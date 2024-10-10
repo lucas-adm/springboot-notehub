@@ -25,7 +25,7 @@ public class Tag {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @ManyToMany(mappedBy = "tags")
+    @ManyToMany(mappedBy = "tags", fetch = FetchType.LAZY)
     private List<Note> notes = new ArrayList<>();
 
     private String name;

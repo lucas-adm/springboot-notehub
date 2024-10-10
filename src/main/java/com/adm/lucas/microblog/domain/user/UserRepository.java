@@ -20,6 +20,10 @@ public interface UserRepository extends JpaRepository<User, UUID> {
 
     Optional<User> findByUsername(String username);
 
+    @EntityGraph(attributePaths = {"following"})
+    @Query("SELECT u FROM User u WHERE u.id = :id")
+    Optional<User> findByIdWithFollowing(@Param("id") UUID id);
+
     Page<User> findAllByActiveTrue(Pageable pageable);
 
     @Query("""
