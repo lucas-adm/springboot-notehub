@@ -2,6 +2,7 @@ package com.adm.lucas.microblog.domain.user;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -37,6 +38,7 @@ public interface UserRepository extends JpaRepository<User, UUID> {
     @Query("SELECT u FROM User u WHERE u.createdAt < :nowMinus7Days AND u.active = false")
     List<User> findUsersWithExpiredActivationTime(@Param("nowMinus7Days") Instant nowMinus7Days);
 
+    @EntityGraph(attributePaths = {"followers", "following"})
     Page<User> findAllByIdIn(Pageable pageable, List<UUID> ids);
 
 }

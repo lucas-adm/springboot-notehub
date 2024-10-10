@@ -346,6 +346,7 @@ public class UserController {
             @ApiResponse(responseCode = "500", description = "Internal server error.", content = @Content(examples = {}))
     })
     @GetMapping("/{username}/following")
+    @Transactional
     public ResponseEntity<PageRES<DetailUserRES>> getFollowing(
             @Parameter(hidden = true) @RequestHeader("Authorization") String accessToken,
             @ParameterObject @PageableDefault(page = 0, size = 10, sort = {"followersCount"}, direction = Sort.Direction.ASC) Pageable pageable,
@@ -371,6 +372,7 @@ public class UserController {
             @ApiResponse(responseCode = "500", description = "Internal server error.", content = @Content(examples = {}))
     })
     @GetMapping("/{username}/followers")
+    @Transactional
     public ResponseEntity<PageRES<DetailUserRES>> getFollowers(
             @Parameter(hidden = true) @RequestHeader("Authorization") String accessToken,
             @ParameterObject @PageableDefault(page = 0, size = 10, sort = {"followersCount"}, direction = Sort.Direction.ASC) Pageable pageable,
