@@ -45,10 +45,14 @@ public interface NoteService {
 
     Note getPrivateNote(UUID idFromToken, UUID idFromPath);
 
+    Note getPrivateFollowingUserNote(UUID idFromToken, UUID idFromPath);
+
     Page<Note> getAllUserNotesByUsername(Pageable pageable, String username);
 
     Page<Note> getAllUserNotesById(Pageable pageable, UUID idFromToken);
 
-    Page<Note> getNotesFromFollowedUsers(Pageable pageable, UUID idFromToken);
+    Page<Note> getAllFollowedUsersNotes(Pageable pageable, UUID idFromToken);
+
+    Page<Note> getAllFollowedUserNotes(Pageable pageable, UUID idFromToken, String username);
 
 }

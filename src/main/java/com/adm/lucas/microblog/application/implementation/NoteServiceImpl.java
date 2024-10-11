@@ -36,6 +36,15 @@ public class NoteServiceImpl implements NoteService {
         }
     }
 
+    private void validateBidirectionalFollowAccess(User requesting, User requested) {
+        if (!Objects.equals(requesting.getUsername(), requested.getUsername())
+                && !requested.getFollowing().contains(requesting)
+                && !requesting.getFollowers().contains(requested)
+        ) {
+            throw new AccessDeniedException("Não há vínculo bidirecional entre os usuários.");
+        }
+    }
+
     private void deleteNoteAndFlush(Note note) {
         repository.delete(note);
         repository.flush();
@@ -164,6 +173,15 @@ public class NoteServiceImpl implements NoteService {
     }
 
     @Override
+    public Note getPrivateFollowingUserNote(UUID idFromToken, UUID idFromPath) {
+        Note note = repository.findByIdAndHiddenFalseWithUserAndTags(idFromPath).orElseThrow(EntityNotFoundException::new);
+        User requesting = userRepository.findByIdWithFollowersAndFollowing(idFromToken).orElseThrow(EntityNotFoundException::new);
+        User requested = userRepository.findByIdWithFollowersAndFollowing(note.getUser().getId()).orElseThrow(EntityNotFoundException::new);
+        validateBidirectionalFollowAccess(requesting, requested);
+        return note;
+    }
+
+    @Override
     public Page<Note> getAllUserNotesByUsername(Pageable pageable, String username) {
         return repository.findAllByUserProfilePrivateFalseAndUserUsernameAndHiddenFalse(pageable, username.toLowerCase());
     }
@@ -174,10 +192,18 @@ public class NoteServiceImpl implements NoteService {
     }
 
     @Override
-    public Page<Note> getNotesFromFollowedUsers(Pageable pageable, UUID idFromToken) {
+    public Page<Note> getAllFollowedUsersNotes(Pageable pageable, UUID idFromToken) {
         User user = userRepository.findByIdWithFollowing(idFromToken).orElseThrow(EntityNotFoundException::new);
         List<UUID> ids = user.getFollowing().stream().map(User::getId).toList();
-        return repository.findAllByHiddenFalseAndUserIdIn(pageable, ids);
+        return repository.findAllByHiddenFalseAndUserProfilePrivateFalseAndUserIdIn(pageable, ids);
+    }
+
+    @Override
+    public Page<Note> getAllFollowedUserNotes(Pageable pageable, UUID idFromToken, String username) {
+        User requesting = userRepository.findByIdWithFollowersAndFollowing(idFromToken).orElseThrow(EntityNotFoundException::new);
+        User requested = userRepository.findByUsernameWithFollowersAndFollowing(username).orElseThrow(EntityNotFoundException::new);
+        validateBidirectionalFollowAccess(requesting, requested);
+        return repository.findAllByUserUsernameAndHiddenFalse(pageable, username);
     }
 
 }

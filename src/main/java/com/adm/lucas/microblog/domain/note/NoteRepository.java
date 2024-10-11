@@ -15,15 +15,19 @@ import java.util.UUID;
 @Repository
 public interface NoteRepository extends JpaRepository<Note, UUID> {
 
-    @EntityGraph(attributePaths = {"user", "tags"})
-    @Query("SELECT n FROM Note n WHERE n.id = :id")
+    @Query("SELECT n FROM Note n LEFT JOIN FETCH n.user LEFT JOIN FETCH n.tags WHERE n.id = :id")
     Optional<Note> findByIdWithUserAndTags(@Param("id") UUID id);
 
+    @Query("SELECT n FROM Note n LEFT JOIN FETCH n.user LEFT JOIN FETCH n.tags WHERE n.id = :id AND n.hidden = false")
+    Optional<Note> findByIdAndHiddenFalseWithUserAndTags(@Param("id") UUID id);
+
     @EntityGraph(attributePaths = {"user", "tags"})
+    Optional<Note> findByIdAndHiddenFalseAndUserProfilePrivateFalse(UUID id);
+
     @Query("""
             SELECT DISTINCT n FROM Note n
-            LEFT JOIN n.user u
-            LEFT JOIN n.tags t
+            LEFT JOIN FETCH n.user u
+            LEFT JOIN FETCH n.tags t
             WHERE u.profilePrivate = false
             AND n.hidden = false
             AND (
@@ -38,11 +42,10 @@ public interface NoteRepository extends JpaRepository<Note, UUID> {
             """)
     Page<Note> searchPublicNotesByTitleOrTag(Pageable pageable, @Param("q") String q);
 
-    @EntityGraph(attributePaths = {"user", "tags"})
     @Query("""
             SELECT DISTINCT n FROM Note n
-            LEFT JOIN n.user u
-            LEFT JOIN n.tags t
+            LEFT JOIN FETCH n.user u
+            LEFT JOIN FETCH n.tags t
             WHERE u.profilePrivate = false
             AND n.hidden = false
             AND (
@@ -55,11 +58,10 @@ public interface NoteRepository extends JpaRepository<Note, UUID> {
             """)
     Page<Note> searchPublicNotesByTag(Pageable pageable, String q);
 
-    @EntityGraph(attributePaths = {"user", "tags"})
     @Query("""
             SELECT DISTINCT n FROM Note n
-            LEFT JOIN n.user u
-            LEFT JOIN n.tags t
+            LEFT JOIN FETCH n.user u
+            LEFT JOIN FETCH n.tags t
             WHERE u.id = :id
             AND (
                 LOWER(n.title) LIKE LOWER(CONCAT('%', :q, '%'))
@@ -73,11 +75,10 @@ public interface NoteRepository extends JpaRepository<Note, UUID> {
             """)
     Page<Note> searchPrivateNotesByTitleOrTag(Pageable pageable, @Param("id") UUID id, @Param("q") String q);
 
-    @EntityGraph(attributePaths = {"user", "tags"})
     @Query("""
             SELECT DISTINCT n FROM Note n
-            LEFT JOIN n.user u
-            LEFT JOIN n.tags t
+            LEFT JOIN FETCH n.user u
+            LEFT JOIN FETCH n.tags t
             WHERE
             u.id = :id
             AND
@@ -90,15 +91,15 @@ public interface NoteRepository extends JpaRepository<Note, UUID> {
     Page<Note> searchPrivateNotesByTag(Pageable pageable, UUID id, String q);
 
     @EntityGraph(attributePaths = {"user", "tags"})
-    Optional<Note> findByIdAndHiddenFalseAndUserProfilePrivateFalse(UUID id);
-
-    @EntityGraph(attributePaths = {"user", "tags"})
     Page<Note> findAllByUserId(Pageable pageable, UUID id);
 
     @EntityGraph(attributePaths = {"user", "tags"})
     Page<Note> findAllByUserProfilePrivateFalseAndUserUsernameAndHiddenFalse(Pageable pageable, String username);
 
     @EntityGraph(attributePaths = {"user", "tags"})
-    Page<Note> findAllByHiddenFalseAndUserIdIn(Pageable pageable, List<UUID> ids);
+    Page<Note> findAllByHiddenFalseAndUserProfilePrivateFalseAndUserIdIn(Pageable pageable, List<UUID> following);
+
+    @EntityGraph(attributePaths = {"user", "tags"})
+    Page<Note> findAllByUserUsernameAndHiddenFalse(Pageable pageable, String username);
 
 }

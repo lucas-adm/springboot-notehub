@@ -325,6 +325,26 @@ public class NoteController {
         return ResponseEntity.status(HttpStatus.OK).body(new DetailNoteRES(note));
     }
 
+    @Operation(
+            summary = "Get details of a note created by a private profile user",
+            description = "Both the requester and the note's owner must follow each other to access the note."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Note details retrieved successfully."),
+            @ApiResponse(responseCode = "403", description = "No bidirectional follow relationship between users or invalid token.", content = @Content(examples = {})),
+            @ApiResponse(responseCode = "404", description = "Note not found", content = @Content(examples = {})),
+            @ApiResponse(responseCode = "500", description = "Internal server error.", content = @Content(examples = {}))
+    })
+    @GetMapping("/private/mutual/{id}")
+    public ResponseEntity<DetailNoteRES> getPrivateFollowingUserNote(
+            @Parameter(hidden = true) @RequestHeader("Authorization") String accessToken,
+            @PathVariable("id") UUID idFromPath
+    ) {
+        UUID idFromToken = getSubject(accessToken);
+        Note note = service.getPrivateFollowingUserNote(idFromToken, idFromPath);
+        return ResponseEntity.status(HttpStatus.OK).body(new DetailNoteRES(note));
+    }
+
     @Operation(summary = "Search for notes", description = "Searches notes by user username.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Search results retrieved successfully."),
@@ -368,12 +388,33 @@ public class NoteController {
             @ApiResponse(responseCode = "500", description = "Internal server error.", content = @Content(examples = {}))
     })
     @GetMapping("/private/following")
-    public ResponseEntity<PageRES<LowDetailNoteRES>> getAllUserFollowingNotes(
+    public ResponseEntity<PageRES<LowDetailNoteRES>> getAllFollowingUsersNotes(
             @Parameter(hidden = true) @RequestHeader("Authorization") String accessToken,
             @ParameterObject @PageableDefault(page = 0, size = 10, sort = {"createdAt"}, direction = Sort.Direction.DESC) Pageable pageable
     ) {
         UUID idFromToken = getSubject(accessToken);
-        Page<LowDetailNoteRES> page = service.getNotesFromFollowedUsers(pageable, idFromToken).map(LowDetailNoteRES::new);
+        Page<LowDetailNoteRES> page = service.getAllFollowedUsersNotes(pageable, idFromToken).map(LowDetailNoteRES::new);
+        return ResponseEntity.status(HttpStatus.OK).body(new PageRES<>(page));
+    }
+
+    @Operation(
+            summary = "Get notes from a user with mutual connections",
+            description = "Retrieves a paginated list of notes from a user that the authenticated user is following."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Notes retrieved successfully."),
+            @ApiResponse(responseCode = "400", description = "Invalid pageable criteria.", content = @Content(examples = {})),
+            @ApiResponse(responseCode = "403", description = "Access token is invalid or missing.", content = @Content(examples = {})),
+            @ApiResponse(responseCode = "500", description = "Internal server error.", content = @Content(examples = {}))
+    })
+    @GetMapping("/private/following/{username}")
+    public ResponseEntity<PageRES<LowDetailNoteRES>> getAllFollowingUserNotes(
+            @Parameter(hidden = true) @RequestHeader("Authorization") String accessToken,
+            @PathVariable("username") String username,
+            @ParameterObject @PageableDefault(page = 0, size = 10, sort = {"createdAt"}, direction = Sort.Direction.DESC) Pageable pageable
+    ) {
+        UUID idFromToken = getSubject(accessToken);
+        Page<LowDetailNoteRES> page = service.getAllFollowedUserNotes(pageable, idFromToken, username).map(LowDetailNoteRES::new);
         return ResponseEntity.status(HttpStatus.OK).body(new PageRES<>(page));
     }
 
