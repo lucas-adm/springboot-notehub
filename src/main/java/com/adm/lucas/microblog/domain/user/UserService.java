@@ -5,6 +5,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 @Service
@@ -47,6 +48,8 @@ public interface UserService {
     Page<User> getUserFollowing(Pageable pageable, UUID idFromToken, String username);
 
     Page<User> getUserFollowers(Pageable pageable, UUID idFromToken, String username);
+
+    Set<String> getUserMutualConnections(UUID id);
 
     List<String> getUserDisplayNameHistory(UUID id);
 

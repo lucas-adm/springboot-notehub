@@ -26,6 +26,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
@@ -213,6 +214,15 @@ public class UserServiceImpl implements UserService {
     @Override
     public Page<User> getUserFollowers(Pageable pageable, UUID idFromToken, String username) {
         return getUserConnections(pageable, idFromToken, username, User::getFollowers);
+    }
+
+    @Override
+    public Set<String> getUserMutualConnections(UUID id) {
+        User user = repository.findByIdWithFollowersAndFollowing(id).orElseThrow(EntityNotFoundException::new);
+        Set<String> following = user.getFollowing().stream().map(User::getUsername).collect(Collectors.toSet());
+        Set<String> followers = user.getFollowers().stream().map(User::getUsername).collect(Collectors.toSet());
+        following.retainAll(followers);
+        return following;
     }
 
     @Override

@@ -20,9 +20,14 @@ public interface UserRepository extends JpaRepository<User, UUID> {
 
     Optional<User> findByUsername(String username);
 
-    @EntityGraph(attributePaths = {"following"})
-    @Query("SELECT u FROM User u WHERE u.id = :id")
+    @Query("SELECT u FROM User u LEFT JOIN FETCH u.following WHERE u.id = :id")
     Optional<User> findByIdWithFollowing(@Param("id") UUID id);
+
+    @Query("SELECT u FROM User u LEFT JOIN FETCH u.followers LEFT JOIN FETCH u.following WHERE u.id = :id")
+    Optional<User> findByIdWithFollowersAndFollowing(@Param("id") UUID id);
+
+    @Query("SELECT u FROM User u LEFT JOIN FETCH u.followers LEFT JOIN FETCH u.following WHERE u.username = :username")
+    Optional<User> findByUsernameWithFollowersAndFollowing(@Param("username") String username);
 
     Page<User> findAllByActiveTrue(Pageable pageable);
 

@@ -5,9 +5,6 @@ import com.adm.lucas.microblog.application.dto.request.user.*;
 import com.adm.lucas.microblog.application.dto.response.page.PageRES;
 import com.adm.lucas.microblog.application.dto.response.user.CreateUserRES;
 import com.adm.lucas.microblog.application.dto.response.user.DetailUserRES;
-import com.adm.lucas.microblog.application.implementation.UserServiceImpl;
-import com.adm.lucas.microblog.domain.token.Token;
-import com.adm.lucas.microblog.domain.token.TokenService;
 import com.adm.lucas.microblog.domain.user.User;
 import com.adm.lucas.microblog.domain.user.UserService;
 import com.auth0.jwt.JWT;
@@ -34,6 +31,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 @RestController
@@ -381,6 +379,27 @@ public class UserController {
         UUID idFromToken = getSubject(accessToken);
         Page<DetailUserRES> page = service.getUserFollowers(pageable, idFromToken, username).map(DetailUserRES::new);
         return ResponseEntity.status(HttpStatus.OK).body(new PageRES<>(page));
+    }
+
+    @Operation(
+            summary = "Get user mutual connections",
+            description = """
+                    Retrieves a list of usernames that has mutual following with current user."
+                    This includes users that the current user follows and who also follow the current user."""
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "User mutual connections retrieved successfully."),
+            @ApiResponse(responseCode = "403", description = "Access denied due to invalid token.", content = @Content(examples = {})),
+            @ApiResponse(responseCode = "404", description = "User not found.", content = @Content(examples = {})),
+            @ApiResponse(responseCode = "500", description = "Internal server error.", content = @Content(examples = {}))
+    })
+    @GetMapping("/mutuals")
+    public ResponseEntity<Set<String>> getMutualConnections(
+            @Parameter(hidden = true) @RequestHeader("Authorization") String accessToken
+    ) {
+        UUID idFromToken = getSubject(accessToken);
+        Set<String> mutuals = service.getUserMutualConnections(idFromToken);
+        return ResponseEntity.status(HttpStatus.OK).body(mutuals);
     }
 
     @Operation(summary = "Get user display name history", description = "Retrieves the history of display names for a user by their ID.")
