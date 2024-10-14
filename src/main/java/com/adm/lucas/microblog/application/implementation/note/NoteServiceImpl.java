@@ -1,4 +1,4 @@
-package com.adm.lucas.microblog.application.implementation;
+package com.adm.lucas.microblog.application.implementation.note;
 
 import com.adm.lucas.microblog.application.dto.request.note.CreateNoteREQ;
 import com.adm.lucas.microblog.domain.note.Note;

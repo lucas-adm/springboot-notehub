@@ -1,4 +1,4 @@
-package com.adm.lucas.microblog.application.implementation;
+package com.adm.lucas.microblog.application.implementation.token;
 
 import com.adm.lucas.microblog.domain.token.Token;
 import com.adm.lucas.microblog.domain.token.TokenRepository;
@@ -14,19 +14,16 @@ import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
-import java.net.UnknownHostException;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
 
 @Component

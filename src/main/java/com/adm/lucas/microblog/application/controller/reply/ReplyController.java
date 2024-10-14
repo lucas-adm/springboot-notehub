@@ -1,4 +1,4 @@
-package com.adm.lucas.microblog.application.controller;
+package com.adm.lucas.microblog.application.controller.reply;
 
 import com.adm.lucas.microblog.application.dto.request.reply.CreateReplyREQ;
 import com.adm.lucas.microblog.application.dto.response.reply.CreateReplyRES;

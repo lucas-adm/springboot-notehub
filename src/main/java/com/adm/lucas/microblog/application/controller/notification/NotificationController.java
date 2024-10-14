@@ -1,4 +1,4 @@
-package com.adm.lucas.microblog.application.controller;
+package com.adm.lucas.microblog.application.controller.notification;
 
 import com.adm.lucas.microblog.application.dto.response.notification.DetailNotificationRES;
 import com.adm.lucas.microblog.application.dto.response.page.PageRES;

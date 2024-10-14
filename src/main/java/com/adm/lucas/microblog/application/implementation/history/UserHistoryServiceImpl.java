@@ -1,4 +1,4 @@
-package com.adm.lucas.microblog.application.implementation;
+package com.adm.lucas.microblog.application.implementation.history;
 
 import com.adm.lucas.microblog.domain.history.UserHistoryService;
 import com.adm.lucas.microblog.domain.user.User;

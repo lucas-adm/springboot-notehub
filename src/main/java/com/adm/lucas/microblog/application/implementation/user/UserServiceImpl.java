@@ -1,4 +1,4 @@
-package com.adm.lucas.microblog.application.implementation;
+package com.adm.lucas.microblog.application.implementation.user;
 
 import com.adm.lucas.microblog.application.dto.notification.MessageNotification;
 import com.adm.lucas.microblog.domain.history.UserHistoryService;

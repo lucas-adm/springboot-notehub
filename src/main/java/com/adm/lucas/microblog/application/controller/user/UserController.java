@@ -1,4 +1,4 @@
-package com.adm.lucas.microblog.application.controller;
+package com.adm.lucas.microblog.application.controller.user;
 
 import com.adm.lucas.microblog.adapter.producer.MailProducer;
 import com.adm.lucas.microblog.application.dto.request.user.*;

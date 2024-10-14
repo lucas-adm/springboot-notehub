@@ -1,4 +1,4 @@
-package com.adm.lucas.microblog.application.controller;
+package com.adm.lucas.microblog.application.controller.flame;
 
 import com.adm.lucas.microblog.domain.flame.FlameService;
 import com.auth0.jwt.JWT;

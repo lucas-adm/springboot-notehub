@@ -1,4 +1,4 @@
-package com.adm.lucas.microblog.application.controller;
+package com.adm.lucas.microblog.application.controller.comment;
 
 import com.adm.lucas.microblog.application.dto.request.comment.CreateCommentREQ;
 import com.adm.lucas.microblog.application.dto.response.comment.CreateCommentRES;

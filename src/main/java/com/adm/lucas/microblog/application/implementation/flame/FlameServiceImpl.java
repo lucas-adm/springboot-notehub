@@ -1,4 +1,4 @@
-package com.adm.lucas.microblog.application.implementation;
+package com.adm.lucas.microblog.application.implementation.flame;
 
 import com.adm.lucas.microblog.application.counter.Counter;
 import com.adm.lucas.microblog.application.dto.notification.MessageNotification;

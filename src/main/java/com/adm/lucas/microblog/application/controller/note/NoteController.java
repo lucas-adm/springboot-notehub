@@ -1,4 +1,4 @@
-package com.adm.lucas.microblog.application.controller;
+package com.adm.lucas.microblog.application.controller.note;
 
 import com.adm.lucas.microblog.application.dto.request.note.*;
 import com.adm.lucas.microblog.application.dto.response.note.CreateNoteRES;
