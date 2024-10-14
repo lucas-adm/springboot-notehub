@@ -29,20 +29,20 @@ public class Reply {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @OneToMany(mappedBy = "toReply")
+    @OneToMany(mappedBy = "toReply", fetch = FetchType.LAZY)
     private List<Reply> replies = new ArrayList<>();
 
     @JoinColumn(name = "user_id")
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.SET_NULL)
     private User user;
 
     @JoinColumn(name = "comment_id")
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     private Comment comment;
 
     @JoinColumn(name = "reply_id")
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.SET_NULL)
     private Reply toReply;
 

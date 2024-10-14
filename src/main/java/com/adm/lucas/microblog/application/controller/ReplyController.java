@@ -128,7 +128,7 @@ public class ReplyController {
     })
     @GetMapping("/{id}/replies")
     public ResponseEntity<PageRES<DetailReplyRES>> getReplies(
-            @ParameterObject @PageableDefault(page = 0, size = 10, sort = {"createdAt"}, direction = Sort.Direction.DESC) Pageable pageable,
+            @ParameterObject @PageableDefault(page = 0, size = 10, sort = {"createdAt"}, direction = Sort.Direction.ASC) Pageable pageable,
             @PathVariable("id") UUID idFromPath
     ) {
         Page<DetailReplyRES> page = service.getReplies(pageable, idFromPath).map(DetailReplyRES::new);

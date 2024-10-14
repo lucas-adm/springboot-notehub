@@ -25,11 +25,11 @@ public class Flame {
     private UUID id;
 
     @JoinColumn(name = "user_id")
-    @ManyToOne(cascade = CascadeType.PERSIST)
+    @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
     private User user;
 
     @JoinColumn(name = "note_id")
-    @ManyToOne(cascade = CascadeType.PERSIST)
+    @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
     private Note note;
 
     public Flame(User user, Note note) {

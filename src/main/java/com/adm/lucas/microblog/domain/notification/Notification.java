@@ -24,11 +24,11 @@ public class Notification {
     private UUID id;
 
     @JoinColumn(name = "user_id")
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     private User user;
 
     @JoinColumn(name = "from_user_id")
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     private User fromUser;
 
     private Instant createdAt = Instant.now();

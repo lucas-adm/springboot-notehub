@@ -1,7 +1,7 @@
 package com.adm.lucas.microblog.domain.comment;
 
-import com.adm.lucas.microblog.domain.reply.Reply;
 import com.adm.lucas.microblog.domain.note.Note;
+import com.adm.lucas.microblog.domain.reply.Reply;
 import com.adm.lucas.microblog.domain.user.User;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
@@ -31,12 +31,12 @@ public class Comment {
     private UUID id;
 
     @JoinColumn(name = "user_id")
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.SET_NULL)
     private User user;
 
     @JoinColumn(name = "note_id")
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     private Note note;
 
     private Instant createdAt = Instant.now();
@@ -47,7 +47,7 @@ public class Comment {
 
     private boolean modified = false;
 
-    @OneToMany(mappedBy = "comment", orphanRemoval = true, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "comment", orphanRemoval = true, fetch = FetchType.LAZY)
     private List<Reply> replies = new ArrayList<>();
     private int repliesCount = 0;
 

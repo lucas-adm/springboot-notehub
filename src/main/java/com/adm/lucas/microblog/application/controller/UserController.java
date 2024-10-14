@@ -300,7 +300,7 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).body(page);
     }
 
-    @Operation(summary = "Search users", description = "Searches users by email or display name.")
+    @Operation(summary = "Search users", description = "Searches users by username or display name.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Search results retrieved successfully."),
             @ApiResponse(responseCode = "400", description = "Invalid search criteria.", content = @Content(mediaType = "application/json")),
