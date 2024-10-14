@@ -16,11 +16,9 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
@@ -193,9 +191,12 @@ public class NoteServiceImpl implements NoteService {
 
     @Override
     public Page<Note> getAllFollowedUsersNotes(Pageable pageable, UUID idFromToken) {
-        User user = userRepository.findByIdWithFollowing(idFromToken).orElseThrow(EntityNotFoundException::new);
-        List<UUID> ids = user.getFollowing().stream().map(User::getId).toList();
-        return repository.findAllByHiddenFalseAndUserProfilePrivateFalseAndUserIdIn(pageable, ids);
+        User user = userRepository.findByIdWithFollowersAndFollowing(idFromToken).orElseThrow(EntityNotFoundException::new);
+        Set<UUID> following = user.getFollowing().stream().map(User::getId).collect(Collectors.toSet());
+        Set<UUID> followers = user.getFollowers().stream().map(User::getId).collect(Collectors.toSet());
+        Set<UUID> mutuals = new HashSet<>(following);
+        mutuals.retainAll(followers);
+        return repository.findAllForUserFeed(pageable, following, mutuals);
     }
 
     @Override

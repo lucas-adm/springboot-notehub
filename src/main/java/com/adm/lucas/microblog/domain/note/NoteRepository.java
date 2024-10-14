@@ -8,8 +8,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 @Repository
@@ -96,8 +96,18 @@ public interface NoteRepository extends JpaRepository<Note, UUID> {
     @EntityGraph(attributePaths = {"user", "tags"})
     Page<Note> findAllByUserProfilePrivateFalseAndUserUsernameAndHiddenFalse(Pageable pageable, String username);
 
-    @EntityGraph(attributePaths = {"user", "tags"})
-    Page<Note> findAllByHiddenFalseAndUserProfilePrivateFalseAndUserIdIn(Pageable pageable, List<UUID> following);
+    @Query("""
+            SELECT DISTINCT n FROM Note n
+            LEFT JOIN FETCH n.user u
+            LEFT JOIN FETCH n.tags t
+            WHERE n.hidden = false
+            AND (
+                (u.profilePrivate = false AND u.id IN :following)
+                OR
+                (u.id IN :mutuals)
+            )
+            """)
+    Page<Note> findAllForUserFeed(Pageable pageable, Set<UUID> following, Set<UUID> mutuals);
 
     @EntityGraph(attributePaths = {"user", "tags"})
     Page<Note> findAllByUserUsernameAndHiddenFalse(Pageable pageable, String username);
