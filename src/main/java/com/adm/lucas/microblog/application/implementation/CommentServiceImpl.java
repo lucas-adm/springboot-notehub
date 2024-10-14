@@ -1,12 +1,12 @@
 package com.adm.lucas.microblog.application.implementation;
 
+import com.adm.lucas.microblog.application.counter.Counter;
 import com.adm.lucas.microblog.application.dto.notification.MessageNotification;
 import com.adm.lucas.microblog.application.dto.request.comment.CreateCommentREQ;
 import com.adm.lucas.microblog.domain.comment.Comment;
 import com.adm.lucas.microblog.domain.comment.CommentRepository;
 import com.adm.lucas.microblog.domain.comment.CommentService;
 import com.adm.lucas.microblog.domain.note.Note;
-import com.adm.lucas.microblog.domain.note.NoteCounterService;
 import com.adm.lucas.microblog.domain.note.NoteRepository;
 import com.adm.lucas.microblog.domain.notification.NotificationService;
 import com.adm.lucas.microblog.domain.user.User;
@@ -30,7 +30,7 @@ public class CommentServiceImpl implements CommentService {
     private final NoteRepository noteRepository;
     private final CommentRepository repository;
     private final NotificationService notifier;
-    private final NoteCounterService counter;
+    private final Counter counter;
 
     private void validateAccess(UUID idFromToken, Comment comment) {
         if (!Objects.equals(idFromToken, comment.getUser().getId())) {

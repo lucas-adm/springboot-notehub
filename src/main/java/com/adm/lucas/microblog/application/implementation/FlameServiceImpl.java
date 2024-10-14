@@ -1,11 +1,11 @@
 package com.adm.lucas.microblog.application.implementation;
 
+import com.adm.lucas.microblog.application.counter.Counter;
 import com.adm.lucas.microblog.application.dto.notification.MessageNotification;
 import com.adm.lucas.microblog.domain.flame.Flame;
 import com.adm.lucas.microblog.domain.flame.FlameRepository;
 import com.adm.lucas.microblog.domain.flame.FlameService;
 import com.adm.lucas.microblog.domain.note.Note;
-import com.adm.lucas.microblog.domain.note.NoteCounterService;
 import com.adm.lucas.microblog.domain.note.NoteRepository;
 import com.adm.lucas.microblog.domain.notification.NotificationService;
 import com.adm.lucas.microblog.domain.user.User;
@@ -26,7 +26,7 @@ public class FlameServiceImpl implements FlameService {
     private final NoteRepository noteRepository;
     private final FlameRepository repository;
     private final NotificationService notifier;
-    private final NoteCounterService counter;
+    private final Counter counter;
 
     @Override
     public void inflame(UUID userIdFromToken, UUID noteIdFromPath) {

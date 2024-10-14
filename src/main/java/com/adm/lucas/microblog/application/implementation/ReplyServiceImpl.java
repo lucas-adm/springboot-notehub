@@ -1,9 +1,9 @@
 package com.adm.lucas.microblog.application.implementation;
 
+import com.adm.lucas.microblog.application.counter.Counter;
 import com.adm.lucas.microblog.application.dto.notification.MessageNotification;
 import com.adm.lucas.microblog.application.dto.request.reply.CreateReplyREQ;
 import com.adm.lucas.microblog.domain.comment.Comment;
-import com.adm.lucas.microblog.domain.comment.CommentCounterService;
 import com.adm.lucas.microblog.domain.comment.CommentRepository;
 import com.adm.lucas.microblog.domain.notification.NotificationService;
 import com.adm.lucas.microblog.domain.reply.Reply;
@@ -30,7 +30,7 @@ public class ReplyServiceImpl implements ReplyService {
     private final CommentRepository commentRepository;
     private final ReplyRepository repository;
     private final NotificationService notifier;
-    private final CommentCounterService counter;
+    private final Counter counter;
 
     private void validateAccess(UUID idFromToken, Reply reply) {
         if (!Objects.equals(idFromToken, reply.getUser().getId())) {
