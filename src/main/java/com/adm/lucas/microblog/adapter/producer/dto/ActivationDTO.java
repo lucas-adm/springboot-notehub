@@ -27,7 +27,7 @@ public record ActivationDTO(
     public ActivationDTO(String client, String jwt, User user) {
         this(
                 user.getEmail(),
-                "Microblog",
+                "Confirme o seu email",
                 text(client, jwt, user.getUsername())
         );
     }

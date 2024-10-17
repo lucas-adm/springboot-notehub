@@ -25,7 +25,7 @@ public record RecoveryDTO(
     public static RecoveryDTO of(String client, String mailTo, String token) {
         return new RecoveryDTO(
                 mailTo,
-                "Recuperar conta",
+                "Redefina a sua senha",
                 text(client, token)
         );
     }
