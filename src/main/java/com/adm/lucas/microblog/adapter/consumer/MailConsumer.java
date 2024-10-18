@@ -18,13 +18,16 @@ public class MailConsumer {
 
     private final JavaMailSender mailSender;
 
+    @Value("${spring.mail.friendly.name}")
+    private String friendlyName;
+
     @Value("${spring.mail.username}")
     private String mailFrom;
 
     public void sendActivationMail(ActivationDTO dto) throws MessagingException {
         MimeMessage message = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message, false, "utf-8");
-        helper.setFrom(mailFrom);
+        helper.setFrom(String.format("%s <%s>", friendlyName, mailFrom));
         helper.setTo(dto.mailTo());
         helper.setSubject(dto.subject());
         helper.setText(dto.text(), true);
@@ -34,7 +37,7 @@ public class MailConsumer {
     public void sendRecoveryMail(RecoveryDTO dto) throws MessagingException {
         MimeMessage message = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message, false, "utf-8");
-        helper.setFrom(mailFrom);
+        helper.setFrom(String.format("%s <%s>", friendlyName, mailFrom));
         helper.setTo(dto.mailTo());
         helper.setSubject(dto.subject());
         helper.setText(dto.text(), true);

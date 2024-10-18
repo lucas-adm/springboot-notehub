@@ -35,8 +35,7 @@ public class Notification {
 
     private boolean read = false;
 
-    //    @Column(columnDefinition = "JSON") // PostgreSQL
-    @Convert(converter = NotificationFieldInfoConverter.class) // H2
+    @Convert(converter = NotificationFieldInfoConverter.class)
     private Map<String, Object> info;
 
     public Notification(User user, User fromUser, Map<String, Object> info) {
