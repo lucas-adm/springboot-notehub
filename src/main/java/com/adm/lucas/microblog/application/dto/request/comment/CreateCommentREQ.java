@@ -10,7 +10,7 @@ public record CreateCommentREQ(
                 message = "👀"
         )
         @NotBlank(message = "Não pode ser vazio")
-        @Size(max = 777, message = "Tamanho excedido")
+        @Size(max = 3333, message = "Tamanho excedido")
         String text
 ) {
 }

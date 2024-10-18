@@ -7,8 +7,8 @@ import jakarta.validation.constraints.Size;
 public record ChangeUsernameREQ(
         @NotBlank(message = "Não pode ser vazio")
         @Pattern(
-                regexp = "^(?!.*[\\p{Zs}\\u00A0\\u2007\\u202F]).*$",
-                message = "Não use espaços"
+                regexp = "^[a-zA-Z0-9_.]+$",
+                message = "Apenas letras, números, _ e ."
         )
         @Size(min = 4, max = 12, message = "Tamanho inválido")
         String username

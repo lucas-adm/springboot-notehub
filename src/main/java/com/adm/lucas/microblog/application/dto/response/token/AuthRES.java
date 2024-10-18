@@ -35,7 +35,7 @@ public record AuthRES(
                         token.getUser().isSponsor(),
                         token.getUser().getScore(),
                         token.getUser().getFollowersCount(),
-                        token.getUser().getFollowersCount(),
+                        token.getUser().getFollowingCount(),
                         token.getUser().getNotificationsToUser().stream().filter(notification -> !notification.isRead()).count()
                 )
         );

@@ -16,8 +16,8 @@ public record CreateUserREQ(
 
         @NotBlank(message = "Não pode ser vazio")
         @Pattern(
-                regexp = "^(?!.*[\\p{Zs}\\u00A0\\u2007\\u202F]).*$",
-                message = "Não use espaços"
+                regexp = "^[a-zA-Z0-9_.]+$",
+                message = "Apenas letras, números, _ e ."
         )
         @Size(min = 4, max = 12, message = "Tamanho inválido")
         String username,
@@ -30,6 +30,7 @@ public record CreateUserREQ(
         @Size(min = 4, max = 24, message = "Tamanho inválido")
         String displayName,
 
+        @NotBlank(message = "Não pode ser vazio")
         String avatar,
 
         @NotBlank(message = "Não pode ser vazio")
