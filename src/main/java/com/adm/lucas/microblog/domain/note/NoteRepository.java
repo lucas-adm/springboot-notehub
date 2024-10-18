@@ -21,14 +21,21 @@ public interface NoteRepository extends JpaRepository<Note, UUID> {
     @Query("SELECT n FROM Note n LEFT JOIN FETCH n.user LEFT JOIN FETCH n.tags WHERE n.id = :id AND n.hidden = false")
     Optional<Note> findByIdAndHiddenFalseWithUserAndTags(@Param("id") UUID id);
 
-    @EntityGraph(attributePaths = {"user", "tags"})
-    Optional<Note> findByIdAndHiddenFalseAndUserProfilePrivateFalse(UUID id);
+    @Query("""
+            SELECT n FROM Note n
+            LEFT JOIN FETCH n.user u
+            LEFT JOIN FETCH n.tags t
+            WHERE n.id = :id
+            AND n.hidden = false
+            AND (u IS NULL OR u.profilePrivate = false)
+            """)
+    Optional<Note> findByIdAndHiddenFalseAndUserProfilePrivateFalse(@Param("id") UUID id);
 
     @Query("""
             SELECT DISTINCT n FROM Note n
             LEFT JOIN FETCH n.user u
             LEFT JOIN FETCH n.tags t
-            WHERE u.profilePrivate = false
+            WHERE (u IS NULL OR u.profilePrivate = false)
             AND n.hidden = false
             AND (
                 LOWER(n.title) LIKE LOWER(CONCAT('%', :q, '%'))
@@ -46,7 +53,7 @@ public interface NoteRepository extends JpaRepository<Note, UUID> {
             SELECT DISTINCT n FROM Note n
             LEFT JOIN FETCH n.user u
             LEFT JOIN FETCH n.tags t
-            WHERE u.profilePrivate = false
+            WHERE (u IS NULL OR u.profilePrivate = false)
             AND n.hidden = false
             AND (
                 EXISTS (
