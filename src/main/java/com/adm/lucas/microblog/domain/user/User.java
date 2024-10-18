@@ -26,9 +26,9 @@ import java.util.*;
 @Table(name = "users")
 @NoArgsConstructor
 @Data
-@JsonIgnoreProperties({"history", "notes", "comments", "replies", "flames", "followers", "following", "notificationsToUser", "notificationsFromUser"})
-@ToString(exclude = {"history", "notes", "comments", "replies", "flames", "followers", "following", "notificationsToUser", "notificationsFromUser"})
-@EqualsAndHashCode(exclude = {"history", "notes", "comments", "replies", "flames", "followers", "following", "notificationsToUser", "notificationsFromUser"})
+@JsonIgnoreProperties({"token", "history", "notes", "comments", "replies", "flames", "followers", "following", "notificationsToUser", "notificationsFromUser"})
+@ToString(exclude = {"token", "history", "notes", "comments", "replies", "flames", "followers", "following", "notificationsToUser", "notificationsFromUser"})
+@EqualsAndHashCode(exclude = {"token", "history", "notes", "comments", "replies", "flames", "followers", "following", "notificationsToUser", "notificationsFromUser"})
 public class User implements UserDetails {
 
     @Id
@@ -64,6 +64,9 @@ public class User implements UserDetails {
     private Instant createdAt = LocalDateTime.now().toInstant(ZoneOffset.of("-03:00"));
 
     private boolean active;
+
+    @OneToOne(mappedBy = "user", orphanRemoval = true)
+    private Token token;
 
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     private List<UserHistory> history = new ArrayList<>();
@@ -112,7 +115,7 @@ public class User implements UserDetails {
         this.username = username;
         this.displayName = displayName;
         this.avatar = avatar;
-        this.active = false;
+        this.active = true;
     }
 
     public User(String username, String displayName, String avatar) {

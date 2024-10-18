@@ -1,5 +1,6 @@
 package com.adm.lucas.microblog.application.implementation.user;
 
+import com.adm.lucas.microblog.application.counter.Counter;
 import com.adm.lucas.microblog.application.dto.notification.MessageNotification;
 import com.adm.lucas.microblog.domain.history.UserHistoryService;
 import com.adm.lucas.microblog.domain.notification.NotificationService;
@@ -37,6 +38,7 @@ public class UserServiceImpl implements UserService {
     private final NotificationService notifier;
     private final TokenService tokenService;
     private final PasswordEncoder encoder;
+    private final Counter counter;
 
     @SneakyThrows
     private <T> void changeField(UUID idFromToken, String field, Function<User, T> getter, Consumer<User> setter) {
@@ -60,22 +62,6 @@ public class UserServiceImpl implements UserService {
 
     private void validateActiveField(boolean active) {
         if (!active) throw new EntityNotFoundException();
-    }
-
-    private void updateFollowerAndFollowingCount(User follower, User following, boolean increment) {
-        if (increment) {
-            follower.getFollowing().add(following);
-            follower.setFollowingCount(follower.getFollowingCount() + 1);
-            following.getFollowers().add(follower);
-            following.setFollowersCount(following.getFollowersCount() + 1);
-        } else {
-            follower.getFollowing().remove(following);
-            follower.setFollowingCount(follower.getFollowingCount() - 1);
-            following.getFollowers().remove(follower);
-            following.setFollowersCount(following.getFollowersCount() - 1);
-        }
-        repository.save(follower);
-        repository.save(following);
     }
 
     private void validateBidirectionalFollowAccess(User requesting, User requested) {
@@ -162,30 +148,38 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void follow(UUID idFromToken, String username) {
-        User follower = repository.findById(idFromToken).orElseThrow(EntityNotFoundException::new);
-        User following = repository.findByUsername(username).orElseThrow(EntityNotFoundException::new);
+        User follower = repository.findByIdWithFollowersAndFollowing(idFromToken).orElseThrow(EntityNotFoundException::new);
+        User following = repository.findByUsernameWithFollowersAndFollowing(username).orElseThrow(EntityNotFoundException::new);
         if (Objects.equals(follower.getId(), following.getId())) {
             return;
         }
-        updateFollowerAndFollowingCount(follower, following, true);
+        counter.updateFollowersAndFollowingCount(follower, following, true);
         notifier.notify(following, follower, MessageNotification.of(follower));
     }
 
     @Override
     public void unfollow(UUID idFromToken, String username) {
-        User follower = repository.findById(idFromToken).orElseThrow(EntityNotFoundException::new);
-        User following = repository.findByUsername(username).orElseThrow(EntityNotFoundException::new);
+        User follower = repository.findByIdWithFollowersAndFollowing(idFromToken).orElseThrow(EntityNotFoundException::new);
+        User following = repository.findByUsernameWithFollowersAndFollowing(username).orElseThrow(EntityNotFoundException::new);
         if (Objects.equals(follower.getId(), following.getId())) {
             return;
         }
-        updateFollowerAndFollowingCount(follower, following, false);
+        counter.updateFollowersAndFollowingCount(follower, following, false);
     }
 
     @Override
     public void delete(UUID idFromToken) {
         User user = repository.findById(idFromToken).orElseThrow(EntityNotFoundException::new);
-        user.getFollowing().forEach(following -> following.getFollowers().remove(user));
-        user.getFollowers().forEach(follower -> follower.getFollowing().remove(user));
+        user.getFollowing().forEach(following -> {
+            following.getFollowers().remove(user);
+            following.setFollowersCount(following.getFollowersCount() - 1);
+            repository.save(following);
+        });
+        user.getFollowers().forEach(follower -> {
+            follower.getFollowing().remove(user);
+            follower.setFollowingCount(follower.getFollowingCount() - 1);
+            repository.save(follower);
+        });
         repository.delete(user);
     }
 
