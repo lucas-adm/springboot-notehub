@@ -106,7 +106,7 @@ public class User implements UserDetails {
         this.username = username;
         this.avatar = avatar;
         this.password = password;
-        this.active = true;
+        this.active = false;
     }
 
     public User(String email, String username, String displayName, String avatar) {
