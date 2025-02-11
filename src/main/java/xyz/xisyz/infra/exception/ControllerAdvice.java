@@ -162,4 +162,25 @@ public class ControllerAdvice {
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(errors.stream().map(CustomResponse::new).toList());
     }
 
+    @ExceptionHandler(CustomExceptions.SelfFollowException.class)
+    private ResponseEntity<List<CustomResponse>> handleSelfFollowException(CustomExceptions.SelfFollowException ex) {
+        List<FieldError> errors = new ArrayList<>();
+        errors.add(new FieldError("user", "user", ex.getMessage()));
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(errors.stream().map(CustomResponse::new).toList());
+    }
+
+    @ExceptionHandler(CustomExceptions.AlreadyFollowingException.class)
+    private ResponseEntity<List<CustomResponse>> handleSAlreadyFollowingException(CustomExceptions.AlreadyFollowingException ex) {
+        List<FieldError> errors = new ArrayList<>();
+        errors.add(new FieldError("user", "user", ex.getMessage()));
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(errors.stream().map(CustomResponse::new).toList());
+    }
+
+    @ExceptionHandler(CustomExceptions.NotFollowingException.class)
+    private ResponseEntity<List<CustomResponse>> handleNotFollowingException(CustomExceptions.NotFollowingException ex) {
+        List<FieldError> errors = new ArrayList<>();
+        errors.add(new FieldError("user", "user", ex.getMessage()));
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(errors.stream().map(CustomResponse::new).toList());
+    }
+
 }

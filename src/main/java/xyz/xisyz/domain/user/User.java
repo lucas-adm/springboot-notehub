@@ -90,14 +90,17 @@ public class User implements UserDetails {
     private List<Notification> notificationsFromUser = new ArrayList<>();
 
     @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(name = "user_followers", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "follower_id"))
-    private Set<User> followers = new HashSet<>();
-    private int followersCount = 0;
-
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(name = "user_following", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "following_id"))
+    @JoinTable(
+            name = "user_follows",
+            joinColumns = @JoinColumn(name = "follower_id"),
+            inverseJoinColumns = @JoinColumn(name = "following_id")
+    )
     private Set<User> following = new HashSet<>();
     private int followingCount = 0;
+
+    @ManyToMany(mappedBy = "following", fetch = FetchType.LAZY)
+    private Set<User> followers = new HashSet<>();
+    private int followersCount = 0;
 
     public User(String email, String username, String displayName, String avatar, String password) {
         this.host = "XYZ";

@@ -241,6 +241,7 @@ public class UserController {
             @ApiResponse(responseCode = "500", description = "Internal server error.", content = @Content(examples = {}))
     })
     @PostMapping("/{username}/follow")
+    @Transactional
     public ResponseEntity<Void> followUser(
             @Parameter(hidden = true) @RequestHeader("Authorization") String accessToken,
             @PathVariable("username") String userToFollow
@@ -258,6 +259,7 @@ public class UserController {
             @ApiResponse(responseCode = "500", description = "Internal server error.", content = @Content(examples = {}))
     })
     @DeleteMapping("/{username}/unfollow")
+    @Transactional
     public ResponseEntity<Void> unfollowUser(
             @Parameter(hidden = true) @RequestHeader("Authorization") String accessToken,
             @PathVariable("username") String userToFollow

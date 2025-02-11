@@ -17,6 +17,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
+import xyz.xisyz.infra.exception.CustomExceptions;
 
 import java.net.UnknownHostException;
 import java.time.Instant;
@@ -80,6 +81,13 @@ public class UserServiceImpl implements UserService {
         validateBidirectionalFollowAccess(requesting, requested);
         List<UUID> ids = getter.apply(requested).stream().map(User::getId).toList();
         return repository.findAllByIdIn(pageable, ids);
+    }
+
+    private boolean isFollowing(User follower, User following) {
+        if (Objects.equals(follower.getId(), following.getId())) {
+            throw new CustomExceptions.SelfFollowException();
+        }
+        return following.getFollowers().contains(follower);
     }
 
     @Override
@@ -150,9 +158,7 @@ public class UserServiceImpl implements UserService {
     public void follow(UUID idFromToken, String username) {
         User follower = repository.findByIdWithFollowersAndFollowing(idFromToken).orElseThrow(EntityNotFoundException::new);
         User following = repository.findByUsernameWithFollowersAndFollowing(username).orElseThrow(EntityNotFoundException::new);
-        if (Objects.equals(follower.getId(), following.getId())) {
-            return;
-        }
+        if (isFollowing(follower, following)) throw new CustomExceptions.AlreadyFollowingException();
         counter.updateFollowersAndFollowingCount(follower, following, true);
         notifier.notify(following, follower, MessageNotification.of(follower));
     }
@@ -161,9 +167,7 @@ public class UserServiceImpl implements UserService {
     public void unfollow(UUID idFromToken, String username) {
         User follower = repository.findByIdWithFollowersAndFollowing(idFromToken).orElseThrow(EntityNotFoundException::new);
         User following = repository.findByUsernameWithFollowersAndFollowing(username).orElseThrow(EntityNotFoundException::new);
-        if (Objects.equals(follower.getId(), following.getId())) {
-            return;
-        }
+        if (!isFollowing(follower, following)) throw new CustomExceptions.NotFollowingException();
         counter.updateFollowersAndFollowingCount(follower, following, false);
     }
 
