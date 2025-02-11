@@ -9,5 +9,6 @@ public record OAuth2GoogleREQ(
                 regexp = "^(?!.*[\\u00A0\\u2007\\u202F]).*$",
                 message = "👀"
         )
-        String jwt) {
+        String token
+) {
 }

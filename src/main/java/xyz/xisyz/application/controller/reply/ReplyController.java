@@ -1,11 +1,5 @@
 package xyz.xisyz.application.controller.reply;
 
-import xyz.xisyz.application.dto.request.reply.CreateReplyREQ;
-import xyz.xisyz.application.dto.response.reply.CreateReplyRES;
-import xyz.xisyz.application.dto.response.reply.DetailReplyRES;
-import xyz.xisyz.application.dto.response.page.PageRES;
-import xyz.xisyz.domain.reply.Reply;
-import xyz.xisyz.domain.reply.ReplyService;
 import com.auth0.jwt.JWT;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -25,10 +19,17 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import xyz.xisyz.application.dto.request.reply.CreateReplyREQ;
+import xyz.xisyz.application.dto.response.page.PageRES;
+import xyz.xisyz.application.dto.response.reply.CreateReplyRES;
+import xyz.xisyz.application.dto.response.reply.DetailReplyRES;
+import xyz.xisyz.domain.reply.Reply;
+import xyz.xisyz.domain.reply.ReplyService;
 
 import java.util.UUID;
 
 @RestController
+@CrossOrigin(origins = {"http://localhost:3000", "https://xisyz.xyz"})
 @RequestMapping("/api/v1/notes/comments")
 @SecurityRequirement(name = "bearer-key")
 @Tag(name = "Reply Controller", description = "Endpoints for managing replies")

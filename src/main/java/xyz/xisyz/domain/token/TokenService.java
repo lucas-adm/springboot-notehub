@@ -1,9 +1,9 @@
 package xyz.xisyz.domain.token;
 
-import xyz.xisyz.domain.user.User;
 import com.auth0.jwt.exceptions.TokenExpiredException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Service;
+import xyz.xisyz.domain.user.User;
 
 import java.time.Instant;
 import java.util.UUID;
@@ -15,15 +15,17 @@ public interface TokenService {
 
     String generateToken(User user);
 
+    String generateActivationToken(User user);
+
     String generateChangePasswordToken(String email);
 
     String validateToken(String accessToken);
 
     Token auth(String username, String password) throws BadCredentialsException;
 
-    Token authWithGoogleAcc(String jwt);
+    Token authWithGoogleAcc(String token);
 
-    Token authWithGitHubAcc(Integer id, String login, String avatar_url);
+    Token authWithGitHubAcc(String code);
 
     Token recreateToken(UUID refreshToken) throws TokenExpiredException;
 

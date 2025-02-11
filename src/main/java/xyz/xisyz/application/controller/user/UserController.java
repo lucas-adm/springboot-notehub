@@ -1,11 +1,5 @@
 package xyz.xisyz.application.controller.user;
 
-import xyz.xisyz.adapter.producer.MailProducer;
-import xyz.xisyz.application.dto.response.page.PageRES;
-import xyz.xisyz.application.dto.response.user.CreateUserRES;
-import xyz.xisyz.application.dto.response.user.DetailUserRES;
-import xyz.xisyz.domain.user.User;
-import xyz.xisyz.domain.user.UserService;
 import com.auth0.jwt.JWT;
 import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
@@ -27,14 +21,20 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import xyz.xisyz.adapter.producer.MailProducer;
 import xyz.xisyz.application.dto.request.user.*;
+import xyz.xisyz.application.dto.response.page.PageRES;
+import xyz.xisyz.application.dto.response.user.CreateUserRES;
+import xyz.xisyz.application.dto.response.user.DetailUserRES;
+import xyz.xisyz.domain.user.User;
+import xyz.xisyz.domain.user.UserService;
 
-import java.net.URI;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
 @RestController
+@CrossOrigin(origins = {"http://localhost:3000", "https://xisyz.xyz"})
 @RequestMapping("/api/v1/users")
 @SecurityRequirement(name = "bearer-key")
 @Tag(name = "User Controller", description = "Endpoints for managing users")
@@ -78,7 +78,7 @@ public class UserController {
     ) {
         UUID idFromToken = getSubject(accessToken);
         service.activate(idFromToken);
-        return ResponseEntity.status(HttpStatus.FOUND).location(URI.create(String.format("%s/greetings", client))).build();
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 
     @Operation(summary = "Change profile visibility", description = "Changes the visibility of the user's profile.")

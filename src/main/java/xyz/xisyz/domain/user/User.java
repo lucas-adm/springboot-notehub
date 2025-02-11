@@ -1,12 +1,5 @@
 package xyz.xisyz.domain.user;
 
-import xyz.xisyz.domain.comment.Comment;
-import xyz.xisyz.domain.flame.Flame;
-import xyz.xisyz.domain.history.UserHistory;
-import xyz.xisyz.domain.note.Note;
-import xyz.xisyz.domain.notification.Notification;
-import xyz.xisyz.domain.reply.Reply;
-import xyz.xisyz.domain.token.Token;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.Data;
@@ -16,6 +9,13 @@ import lombok.ToString;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import xyz.xisyz.domain.comment.Comment;
+import xyz.xisyz.domain.flame.Flame;
+import xyz.xisyz.domain.history.UserHistory;
+import xyz.xisyz.domain.note.Note;
+import xyz.xisyz.domain.notification.Notification;
+import xyz.xisyz.domain.reply.Reply;
+import xyz.xisyz.domain.token.Token;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -34,6 +34,9 @@ public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
+
+    @Column(unique = true)
+    private String providerId;
 
     @Column(unique = true)
     private String email;
@@ -112,18 +115,20 @@ public class User implements UserDetails {
         this.active = false;
     }
 
-    public User(String email, String username, String displayName, String avatar) {
-        this.host = "Google";
+    public User(String id, String provider, String email, String username, String displayName, String avatar) {
+        this.providerId = id;
+        this.host = provider;
         this.email = email;
-        this.username = username;
+        this.username = username.toLowerCase();
         this.displayName = displayName;
         this.avatar = avatar;
         this.active = true;
     }
 
-    public User(String username, String displayName, String avatar) {
-        this.host = "GitHub";
-        this.username = username;
+    public User(Integer id, String provider, String username, String displayName, String avatar) {
+        this.providerId = id.toString();
+        this.host = provider;
+        this.username = username.toLowerCase();
         this.displayName = displayName;
         this.avatar = avatar;
         this.active = true;

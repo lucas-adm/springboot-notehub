@@ -21,18 +21,36 @@ public class SecurityConfig {
 
     private final SecurityFilter securityFilter;
 
+    private static final String[] PUBLIC_ALL_ROUTES = {
+            "/h2-console", "/h2-console/**",
+            "/v3/api-docs/**", "/swagger-ui.html", "/swagger-ui/**",
+    };
+
+    private static final String[] PUBLIC_POST_ROUTES = {
+            "/api/v1/users/register", "/api/v1/auth/**"
+    };
+
+    private static final String[] PUBLIC_GET_ROUTES = {
+            "/", "/docs",
+            "/api/v1/users", "/api/v1/users/**", "/api/v1/auth/refresh",
+            "/api/v1/notes", "/api/v1/notes/**"
+    };
+
+    private static final String[] PRIVATE_GET_ROUTES = {
+            "/api/v1/users/activate",
+            "/api/v1/notes/private", "/api/v1/notes/private/**"
+    };
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http.csrf(csrf -> csrf.disable())
                 .headers(httpSecurityHeadersConfigurer -> httpSecurityHeadersConfigurer.frameOptions(frameOptionsConfig -> frameOptionsConfig.disable()))
                 .sessionManagement((sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS)))
                 .authorizeHttpRequests(req -> {
-                    req.requestMatchers("/h2-console", "/h2-console/**").permitAll();
-                    req.requestMatchers("/v3/api-docs/**", "/swagger-ui.html", "/swagger-ui/**").permitAll();
-                    req.requestMatchers(HttpMethod.GET, "/", "/docs").permitAll();
-                    req.requestMatchers(HttpMethod.POST, "/api/v1/users/register", "/api/v1/auth/**").permitAll();
-                    req.requestMatchers(HttpMethod.GET, "/api/v1/users", "/api/v1/users/**", "/api/v1/auth/refresh", "/api/v1/notes", "/api/v1/notes/**").permitAll();
-                    req.requestMatchers(HttpMethod.GET, "/api/v1/notes/private", "/api/v1/notes/private/**").hasRole("BASIC");
+                    req.requestMatchers(PUBLIC_ALL_ROUTES).permitAll();
+                    req.requestMatchers(HttpMethod.POST, PUBLIC_POST_ROUTES).permitAll();
+                    req.requestMatchers(HttpMethod.GET, PUBLIC_GET_ROUTES).permitAll();
+                    req.requestMatchers(HttpMethod.GET, PRIVATE_GET_ROUTES).hasRole("BASIC");
                     req.anyRequest().hasRole("BASIC");
                 })
                 .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)

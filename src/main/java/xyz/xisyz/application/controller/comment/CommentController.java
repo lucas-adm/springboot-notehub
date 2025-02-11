@@ -1,11 +1,5 @@
 package xyz.xisyz.application.controller.comment;
 
-import xyz.xisyz.application.dto.request.comment.CreateCommentREQ;
-import xyz.xisyz.application.dto.response.comment.CreateCommentRES;
-import xyz.xisyz.application.dto.response.comment.DetailCommentRES;
-import xyz.xisyz.application.dto.response.page.PageRES;
-import xyz.xisyz.domain.comment.Comment;
-import xyz.xisyz.domain.comment.CommentService;
 import com.auth0.jwt.JWT;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -25,10 +19,17 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import xyz.xisyz.application.dto.request.comment.CreateCommentREQ;
+import xyz.xisyz.application.dto.response.comment.CreateCommentRES;
+import xyz.xisyz.application.dto.response.comment.DetailCommentRES;
+import xyz.xisyz.application.dto.response.page.PageRES;
+import xyz.xisyz.domain.comment.Comment;
+import xyz.xisyz.domain.comment.CommentService;
 
 import java.util.UUID;
 
 @RestController
+@CrossOrigin(origins = {"http://localhost:3000", "https://xisyz.xyz"})
 @RequestMapping("/api/v1/notes")
 @SecurityRequirement(name = "bearer-key")
 @Tag(name = "Comment Controller", description = "Endpoints for managing comments")

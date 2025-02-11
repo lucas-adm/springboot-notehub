@@ -1,13 +1,5 @@
 package xyz.xisyz.application.implementation.user;
 
-import xyz.xisyz.application.counter.Counter;
-import xyz.xisyz.application.dto.notification.MessageNotification;
-import xyz.xisyz.domain.history.UserHistoryService;
-import xyz.xisyz.domain.notification.NotificationService;
-import xyz.xisyz.domain.token.TokenService;
-import xyz.xisyz.domain.user.User;
-import xyz.xisyz.domain.user.UserRepository;
-import xyz.xisyz.domain.user.UserService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -17,6 +9,14 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
+import xyz.xisyz.application.counter.Counter;
+import xyz.xisyz.application.dto.notification.MessageNotification;
+import xyz.xisyz.domain.history.UserHistoryService;
+import xyz.xisyz.domain.notification.NotificationService;
+import xyz.xisyz.domain.token.TokenService;
+import xyz.xisyz.domain.user.User;
+import xyz.xisyz.domain.user.UserRepository;
+import xyz.xisyz.domain.user.UserService;
 import xyz.xisyz.infra.exception.CustomExceptions;
 
 import java.net.UnknownHostException;
@@ -103,7 +103,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public String generateActivationToken(User user) {
-        return tokenService.generateToken(user);
+        return tokenService.generateActivationToken(user);
     }
 
     @Override

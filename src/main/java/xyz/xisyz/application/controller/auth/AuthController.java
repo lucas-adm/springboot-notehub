@@ -1,12 +1,5 @@
 package xyz.xisyz.application.controller.auth;
 
-import xyz.xisyz.adapter.producer.MailProducer;
-import xyz.xisyz.application.dto.request.token.AuthREQ;
-import xyz.xisyz.application.dto.request.token.OAuth2GitHubREQ;
-import xyz.xisyz.application.dto.request.token.OAuth2GoogleREQ;
-import xyz.xisyz.application.dto.request.token.RecoverPasswordREQ;
-import xyz.xisyz.application.dto.response.token.AuthRES;
-import xyz.xisyz.domain.token.TokenService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -20,11 +13,18 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import xyz.xisyz.adapter.producer.MailProducer;
+import xyz.xisyz.application.dto.request.token.AuthREQ;
+import xyz.xisyz.application.dto.request.token.OAuth2GoogleREQ;
+import xyz.xisyz.application.dto.request.token.OAuthGitHubREQ;
+import xyz.xisyz.application.dto.request.token.RecoverPasswordREQ;
+import xyz.xisyz.application.dto.response.token.AuthRES;
+import xyz.xisyz.domain.token.TokenService;
 
 import java.util.UUID;
 
 @RestController
-@CrossOrigin
+@CrossOrigin(origins = {"http://localhost:3000", "https://xisyz.xyz"})
 @RequestMapping("/api/v1/auth")
 @SecurityRequirement(name = "bearer-key")
 @Tag(name = "Auth Controller", description = "Endpoints for authentication and authorization")
@@ -73,12 +73,12 @@ public class AuthController {
             @ApiResponse(responseCode = "400", description = "Invalid Google token.", content = @Content(mediaType = "application/json")),
             @ApiResponse(responseCode = "500", description = "Internal server error.", content = @Content(examples = {}))
     })
-    @PostMapping("/login/oauth2/google")
+    @PostMapping("/login/google")
     @Transactional
     public ResponseEntity<AuthRES> loginGoogleUser(
             @Valid @RequestBody OAuth2GoogleREQ dto
     ) {
-        AuthRES token = new AuthRES(service.authWithGoogleAcc(dto.jwt()));
+        AuthRES token = new AuthRES(service.authWithGoogleAcc(dto.token()));
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(token);
     }
 
@@ -88,12 +88,12 @@ public class AuthController {
             @ApiResponse(responseCode = "400", description = "Invalid input data.", content = @Content(mediaType = "application/json")),
             @ApiResponse(responseCode = "500", description = "Internal server error.", content = @Content(examples = {}))
     })
-    @PostMapping("/login/oauth2/github")
+    @PostMapping("/login/github")
     @Transactional
     public ResponseEntity<AuthRES> loginGitHubUser(
-            @Valid @RequestBody OAuth2GitHubREQ dto
+            @Valid @RequestBody OAuthGitHubREQ dto
     ) {
-        AuthRES token = new AuthRES(service.authWithGitHubAcc(dto.id(), dto.login(), dto.avatar_url()));
+        AuthRES token = new AuthRES(service.authWithGitHubAcc(dto.code()));
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(token);
     }
 

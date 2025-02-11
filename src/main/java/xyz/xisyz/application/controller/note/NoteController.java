@@ -1,11 +1,5 @@
 package xyz.xisyz.application.controller.note;
 
-import xyz.xisyz.application.dto.response.note.CreateNoteRES;
-import xyz.xisyz.application.dto.response.note.DetailNoteRES;
-import xyz.xisyz.application.dto.response.note.LowDetailNoteRES;
-import xyz.xisyz.application.dto.response.page.PageRES;
-import xyz.xisyz.domain.note.Note;
-import xyz.xisyz.domain.note.NoteService;
 import com.auth0.jwt.JWT;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -27,11 +21,18 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import xyz.xisyz.application.dto.request.note.*;
+import xyz.xisyz.application.dto.response.note.CreateNoteRES;
+import xyz.xisyz.application.dto.response.note.DetailNoteRES;
+import xyz.xisyz.application.dto.response.note.LowDetailNoteRES;
+import xyz.xisyz.application.dto.response.page.PageRES;
+import xyz.xisyz.domain.note.Note;
+import xyz.xisyz.domain.note.NoteService;
 
 import java.util.List;
 import java.util.UUID;
 
 @RestController
+@CrossOrigin(origins = {"http://localhost:3000", "https://xisyz.xyz"})
 @RequestMapping("/api/v1/notes")
 @SecurityRequirement(name = "bearer-key")
 @Tag(name = "Note Controller", description = "Endpoints for managing notes")

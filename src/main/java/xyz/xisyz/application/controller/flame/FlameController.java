@@ -1,6 +1,5 @@
 package xyz.xisyz.application.controller.flame;
 
-import xyz.xisyz.domain.flame.FlameService;
 import com.auth0.jwt.JWT;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -14,11 +13,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import xyz.xisyz.domain.flame.FlameService;
 
 import java.util.List;
 import java.util.UUID;
 
 @RestController
+@CrossOrigin(origins = {"http://localhost:3000", "https://xisyz.xyz"})
 @RequestMapping("/api/v1/flames")
 @SecurityRequirement(name = "bearer-key")
 @Tag(name = "Flame Controller", description = "Endpoints for managing user flames")
