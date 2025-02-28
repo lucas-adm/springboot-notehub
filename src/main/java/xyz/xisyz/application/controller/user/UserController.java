@@ -81,6 +81,26 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
+    @Operation(summary = "Update user profile", description = "Updates the user's profile information based on the provided data.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "202", description = "User profile updated successfully."),
+            @ApiResponse(responseCode = "400", description = "Invalid input data.", content = @Content(mediaType = "application/json")),
+            @ApiResponse(responseCode = "403", description = "Invalid token.", content = @Content(mediaType = "application/json")),
+            @ApiResponse(responseCode = "404", description = "User not found.", content = @Content(mediaType = "application/json")),
+            @ApiResponse(responseCode = "406", description = "Input data conflicts with existing information.", content = @Content(mediaType = "application/json")),
+            @ApiResponse(responseCode = "500", description = "Internal server error.", content = @Content(examples = {}))
+    })
+    @PutMapping("/profile")
+    @Transactional
+    public ResponseEntity<DetailUserRES> editUser(
+            @Parameter(hidden = true) @RequestHeader("Authorization") String accessToken,
+            @Valid @RequestBody ChangeUserREQ dto
+    ) {
+        UUID idFromToken = getSubject(accessToken);
+        User user = service.edit(idFromToken, dto.toUser());
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(new DetailUserRES(user));
+    }
+
     @Operation(summary = "Change profile visibility", description = "Changes the visibility of the user's profile.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Profile visibility changed successfully."),
@@ -88,7 +108,7 @@ public class UserController {
             @ApiResponse(responseCode = "404", description = "User not found."),
             @ApiResponse(responseCode = "500", description = "Internal server error.")
     })
-    @PatchMapping("/profile/change-visibility")
+    @PatchMapping("/profile/visibility")
     @Transactional
     public ResponseEntity<Void> changeProfileVisibility(
             @Parameter(hidden = true) @RequestHeader("Authorization") String accessToken
@@ -107,7 +127,7 @@ public class UserController {
             @ApiResponse(responseCode = "406", description = "Email already exists."),
             @ApiResponse(responseCode = "500", description = "Internal server error.")
     })
-    @PatchMapping("/email")
+    @PatchMapping("/profile/email")
     @Transactional
     public ResponseEntity<Void> patchEmail(
             @Parameter(hidden = true) @RequestHeader("Authorization") String accessToken,
@@ -127,7 +147,7 @@ public class UserController {
             @ApiResponse(responseCode = "406", description = "Username already exists."),
             @ApiResponse(responseCode = "500", description = "Internal server error.")
     })
-    @PatchMapping("/username")
+    @PatchMapping("/profile/username")
     @Transactional
     public ResponseEntity<Void> patchUsername(
             @Parameter(hidden = true) @RequestHeader("Authorization") String accessToken,
@@ -146,7 +166,7 @@ public class UserController {
             @ApiResponse(responseCode = "404", description = "User not found."),
             @ApiResponse(responseCode = "500", description = "Internal server error.")
     })
-    @PatchMapping("/display-name")
+    @PatchMapping("/profile/display-name")
     @Transactional
     public ResponseEntity<Void> patchDisplayName(
             @Parameter(hidden = true) @RequestHeader("Authorization") String accessToken,
@@ -165,7 +185,7 @@ public class UserController {
             @ApiResponse(responseCode = "404", description = "User not found."),
             @ApiResponse(responseCode = "500", description = "Internal server error.")
     })
-    @PatchMapping("/profile/change-picture")
+    @PatchMapping("/profile/avatar")
     @Transactional
     public ResponseEntity<Void> patchAvatar(
             @Parameter(hidden = true) @RequestHeader("Authorization") String accessToken,
@@ -184,7 +204,7 @@ public class UserController {
             @ApiResponse(responseCode = "404", description = "User not found."),
             @ApiResponse(responseCode = "500", description = "Internal server error.")
     })
-    @PatchMapping("/profile/change-banner")
+    @PatchMapping("/profile/banner")
     @Transactional
     public ResponseEntity<Void> patchBanner(
             @Parameter(hidden = true) @RequestHeader("Authorization") String accessToken,
@@ -203,7 +223,7 @@ public class UserController {
             @ApiResponse(responseCode = "404", description = "User not found.", content = @Content(examples = {})),
             @ApiResponse(responseCode = "500", description = "Internal server error.", content = @Content(examples = {}))
     })
-    @PatchMapping("/message")
+    @PatchMapping("/profile/message")
     @Transactional
     public ResponseEntity<Void> patchMessage(
             @Parameter(hidden = true) @RequestHeader("Authorization") String accessToken,
@@ -222,7 +242,7 @@ public class UserController {
             @ApiResponse(responseCode = "404", description = "User not found."),
             @ApiResponse(responseCode = "500", description = "Internal server error.")
     })
-    @PatchMapping("/reset-password")
+    @PatchMapping("/profile/reset-password")
     @Transactional
     public ResponseEntity<Void> patchPassword(
             @Parameter(hidden = true) @RequestHeader("Authorization") String token,

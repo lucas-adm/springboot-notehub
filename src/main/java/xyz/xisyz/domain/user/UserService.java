@@ -17,6 +17,8 @@ public interface UserService {
 
     void activate(UUID idFromToken);
 
+    User edit(UUID idFromToken, User user);
+
     void changeProfileVisibility(UUID idFromToken);
 
     void changeEmail(UUID idFromToken, String email);

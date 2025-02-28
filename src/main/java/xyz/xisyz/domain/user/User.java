@@ -115,6 +115,15 @@ public class User implements UserDetails {
         this.active = false;
     }
 
+    public User(String username, String displayName, String avatar, String banner, String message, boolean profilePrivate) {
+        this.username = username;
+        this.displayName = displayName;
+        this.avatar = avatar;
+        this.banner = banner;
+        this.message = message;
+        this.profilePrivate = profilePrivate;
+    }
+
     public User(String id, String provider, String email, String username, String displayName, String avatar) {
         this.providerId = id;
         this.host = provider;

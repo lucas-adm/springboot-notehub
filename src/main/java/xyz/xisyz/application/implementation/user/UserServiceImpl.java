@@ -53,12 +53,26 @@ public class UserServiceImpl implements UserService {
         historian.setHistory(user, field, String.valueOf(oldValue), getter.apply(user).toString());
     }
 
-    private void validateEmail(String email) {
-        if (repository.findByEmail(email).isPresent()) throw new DataIntegrityViolationException("email");
+    private void validateEmail(UUID idFromToken, String email) {
+        repository.findByEmail(email).ifPresent((stored) -> {
+            repository.findById(idFromToken).ifPresent((user) -> {
+                        if (!Objects.equals(stored, user)) {
+                            throw new DataIntegrityViolationException("email");
+                        }
+                    }
+            );
+        });
     }
 
-    private void validateUsername(String username) {
-        if (repository.findByUsername(username).isPresent()) throw new DataIntegrityViolationException("username");
+    private void validateUsername(UUID idFromToken, String username) {
+        repository.findByUsername(username).ifPresent((stored) -> {
+            repository.findById(idFromToken).ifPresent((user) -> {
+                        if (!Objects.equals(stored, user)) {
+                            throw new DataIntegrityViolationException("username");
+                        }
+                    }
+            );
+        });
     }
 
     private void validateActiveField(boolean active) {
@@ -95,8 +109,8 @@ public class UserServiceImpl implements UserService {
         if (repository.findByEmail(user.getEmail()).isPresent() && repository.findByUsername(user.getUsername()).isPresent()) {
             throw new DataIntegrityViolationException("both");
         }
-        validateEmail(user.getEmail());
-        validateUsername(user.getUsername());
+        validateEmail(null, user.getEmail());
+        validateUsername(null, user.getUsername());
         user.setPassword(encoder.encode(user.getPassword()));
         return repository.save(user);
     }
@@ -112,19 +126,31 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public User edit(UUID idFromToken, User user) {
+        validateUsername(idFromToken, user.getUsername());
+        changeField(idFromToken, "username", User::getUsername, stored -> stored.setUsername(user.getUsername()));
+        changeField(idFromToken, "display_name", User::getDisplayName, stored -> stored.setDisplayName(user.getDisplayName()));
+        changeField(idFromToken, "avatar", User::getAvatar, stored -> stored.setAvatar(user.getAvatar()));
+        changeField(idFromToken, "banner", User::getBanner, stored -> stored.setBanner(user.getBanner()));
+        changeField(idFromToken, "message", User::getMessage, stored -> stored.setMessage(user.getMessage()));
+        changeField(idFromToken, "profile_private", User::isProfilePrivate, stored -> stored.setProfilePrivate(user.isProfilePrivate()));
+        return user;
+    }
+
+    @Override
     public void changeProfileVisibility(UUID idFromToken) {
         changeField(idFromToken, "profile_private", User::isProfilePrivate, user -> user.setProfilePrivate(!user.isProfilePrivate()));
     }
 
     @Override
     public void changeEmail(UUID idFromToken, String email) {
-        validateEmail(email);
+        validateEmail(idFromToken, email);
         changeField(idFromToken, "email", User::getEmail, user -> user.setEmail(email.toLowerCase()));
     }
 
     @Override
     public void changeUsername(UUID idFromToken, String username) {
-        validateUsername(username);
+        validateUsername(idFromToken, username);
         changeField(idFromToken, "username", User::getUsername, user -> user.setUsername(username.toLowerCase()));
     }
 

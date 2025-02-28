@@ -5,14 +5,7 @@ import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import xyz.xisyz.domain.user.User;
 
-public record CreateUserREQ(
-
-        @NotBlank(message = "Não pode ser vazio")
-        @Pattern(
-                regexp = "(?i)[a-z0-9!#$%&'*+=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&'*+=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?",
-                message = "Email inválido"
-        )
-        String email,
+public record ChangeUserREQ(
 
         @NotBlank(message = "Não pode ser vazio")
         @Pattern(
@@ -37,12 +30,24 @@ public record CreateUserREQ(
         @NotBlank(message = "Não pode ser vazio")
         String avatar,
 
+        @Pattern(
+                regexp = "^(?!.*[\\u00A0\\u2007\\u202F]).*$",
+                message = "👀"
+        )
         @NotBlank(message = "Não pode ser vazio")
-        @Size(min = 4, max = 8, message = "Tamanho inválido")
-        String password
+        String banner,
+
+        @Size(max = 48, message = "Tamanho inválido")
+        @Pattern(
+                regexp = "^(?!.*[\\u00A0\\u2007\\u202F]).*$",
+                message = "👀"
+        )
+        String message,
+
+        boolean profilePrivate
 
 ) {
     public User toUser() {
-        return new User(email.toLowerCase(), username.toLowerCase(), displayName, avatar, password);
+        return new User(username.toLowerCase(), displayName, avatar, banner, message, profilePrivate);
     }
 }
