@@ -422,17 +422,17 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).body(mutuals);
     }
 
-    @Operation(summary = "Get user display name history", description = "Retrieves the history of display names for a user by their ID.")
+    @Operation(summary = "Get user display name history", description = "Retrieves the history of display names for a user by their username.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "User display name history retrieved successfully."),
             @ApiResponse(responseCode = "404", description = "User not found.", content = @Content(examples = {})),
             @ApiResponse(responseCode = "500", description = "Internal server error.", content = @Content(examples = {}))
     })
-    @GetMapping("/{id}/display-names")
+    @GetMapping("/{username}/display-names")
     public ResponseEntity<List<String>> getUserDisplayNameHistory(
-            @PathVariable("id") UUID id
+            @PathVariable("username") String username
     ) {
-        return ResponseEntity.status(HttpStatus.OK).body(service.getUserDisplayNameHistory(id));
+        return ResponseEntity.status(HttpStatus.OK).body(service.getUserDisplayNameHistory(username));
     }
 
 }

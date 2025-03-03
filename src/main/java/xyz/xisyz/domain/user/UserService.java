@@ -53,7 +53,7 @@ public interface UserService {
 
     Set<String> getUserMutualConnections(UUID id);
 
-    List<String> getUserDisplayNameHistory(UUID id);
+    List<String> getUserDisplayNameHistory(String username);
 
     void cleanUsersWithExpiredActivationTime();
 

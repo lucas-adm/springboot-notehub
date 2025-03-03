@@ -49,8 +49,10 @@ public class UserServiceImpl implements UserService {
         }
         T oldValue = getter.apply(user);
         setter.accept(user);
+        T newValue = getter.apply(user);
+        if (Objects.equals(oldValue, newValue)) return;
         repository.save(user);
-        historian.setHistory(user, field, String.valueOf(oldValue), getter.apply(user).toString());
+        historian.setHistory(user, field, String.valueOf(oldValue), newValue.toString());
     }
 
     private void validateEmail(UUID idFromToken, String email) {
@@ -250,8 +252,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<String> getUserDisplayNameHistory(UUID id) {
-        User user = repository.findById(id).orElseThrow(EntityNotFoundException::new);
+    public List<String> getUserDisplayNameHistory(String username) {
+        User user = repository.findByUsername(username).orElseThrow(EntityNotFoundException::new);
         validateActiveField(user.isActive());
         return historian.getLastFiveUserDisplayName(user);
     }
