@@ -1,11 +1,11 @@
 package xyz.xisyz.domain.notification;
 
-import xyz.xisyz.domain.user.User;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import xyz.xisyz.domain.user.User;
 
 import java.time.Instant;
 import java.util.Map;
@@ -42,6 +42,15 @@ public class Notification {
         this.user = user;
         this.fromUser = fromUser;
         this.info = info;
+    }
+
+    public Notification(Notification snapshot) {
+        this.id = snapshot.id;
+        this.user = snapshot.user;
+        this.fromUser = snapshot.fromUser;
+        this.createdAt = snapshot.createdAt;
+        this.read = snapshot.read;
+        this.info = snapshot.info;
     }
 
 }

@@ -12,7 +12,6 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -50,12 +49,10 @@ public class NotificationController {
     @Transactional
     public ResponseEntity<PageRES<DetailNotificationRES>> readNotification(
             @Parameter(hidden = true) @RequestHeader("Authorization") String accessToken,
-            @ParameterObject @PageableDefault(page = 0, size = 10) Pageable pageable
+            @ParameterObject @PageableDefault(page = 0, size = 10, sort = {"createdAt"}, direction = Sort.Direction.DESC) Pageable pageable
     ) {
-        Sort sort = Sort.by(Sort.Order.asc("read"), Sort.Order.desc("createdAt"));
-        PageRequest request = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sort);
         UUID idFromToken = UUID.fromString(JWT.decode(accessToken.replace("Bearer ", "")).getSubject());
-        Page<DetailNotificationRES> page = service.getNotifications(request, idFromToken).map(DetailNotificationRES::new);
+        Page<DetailNotificationRES> page = service.getNotifications(pageable, idFromToken).map(DetailNotificationRES::new);
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(new PageRES<>(page));
     }
 
