@@ -105,14 +105,32 @@ public class User implements UserDetails {
     private Set<User> followers = new HashSet<>();
     private int followersCount = 0;
 
-    public User(String email, String username, String displayName, String avatar, String password) {
+    public User(String email, String username, String displayName, String password) {
         this.host = "XYZ";
         this.email = email;
         this.displayName = displayName;
         this.username = username;
-        this.avatar = avatar;
         this.password = password;
         this.active = false;
+    }
+
+    public User(String id, String email, String username, String displayName, String avatar) {
+        this.providerId = id;
+        this.host = "Google";
+        this.email = email;
+        this.username = username.toLowerCase();
+        this.displayName = displayName;
+        this.avatar = avatar;
+        this.active = true;
+    }
+
+    public User(Integer id, String username, String displayName, String avatar) {
+        this.providerId = id.toString();
+        this.host = "GitHub";
+        this.username = username.toLowerCase();
+        this.displayName = displayName;
+        this.avatar = avatar;
+        this.active = true;
     }
 
     public User(String username, String displayName, String avatar, String banner, String message, boolean profilePrivate) {
@@ -122,25 +140,6 @@ public class User implements UserDetails {
         this.banner = banner;
         this.message = message;
         this.profilePrivate = profilePrivate;
-    }
-
-    public User(String id, String provider, String email, String username, String displayName, String avatar) {
-        this.providerId = id;
-        this.host = provider;
-        this.email = email;
-        this.username = username.toLowerCase();
-        this.displayName = displayName;
-        this.avatar = avatar;
-        this.active = true;
-    }
-
-    public User(Integer id, String provider, String username, String displayName, String avatar) {
-        this.providerId = id.toString();
-        this.host = provider;
-        this.username = username.toLowerCase();
-        this.displayName = displayName;
-        this.avatar = avatar;
-        this.active = true;
     }
 
     @Override

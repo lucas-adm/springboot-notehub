@@ -1,6 +1,7 @@
 package xyz.xisyz.application.dto.request.user;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Null;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import xyz.xisyz.domain.user.User;
@@ -24,17 +25,15 @@ public record ChangeUserREQ(
         String displayName,
 
         @Pattern(
-                regexp = "^(?!.*[\\u00A0\\u2007\\u202F]).*$",
-                message = "👀"
+                regexp = "^https://(([a-zA-Z0-9\\-]+\\.)+[a-zA-Z]{2,})(?!:)(/\\S*)?$",
+                message = "Link inválido"
         )
-        @NotBlank(message = "Não pode ser vazio")
         String avatar,
 
         @Pattern(
-                regexp = "^(?!.*[\\u00A0\\u2007\\u202F]).*$",
-                message = "👀"
+                regexp = "^https://(([a-zA-Z0-9\\-]+\\.)+[a-zA-Z]{2,})(?!:)(/\\S*)?$",
+                message = "Link inválido"
         )
-        @NotBlank(message = "Não pode ser vazio")
         String banner,
 
         @Size(max = 48, message = "Tamanho inválido")

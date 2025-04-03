@@ -174,7 +174,7 @@ public class TokenServiceImpl implements TokenService {
             String displayName = (String) info.get("name");
             String username = String.format("%s%s", givenName, id.substring(0, 4));
             String avatar = (String) info.get("picture");
-            User provided = new User(id, "Google", email, username, displayName, avatar);
+            User provided = new User(id, email, username, displayName, avatar);
 
             User user = userRepository.findByProviderId(id).orElseGet(() -> userRepository.save(provided));
             repository.findByUserId(user.getId()).ifPresent(this::deleteAndFlush);
@@ -196,7 +196,7 @@ public class TokenServiceImpl implements TokenService {
         String username = String.format("%s%s", login, id.toString().substring(0, 4));
         String displayName = (String) info.get("name");
         String avatar = (String) info.get("avatar_url");
-        User provided = new User(id, "GitHub", username, displayName, avatar);
+        User provided = new User(id, username, displayName, avatar);
 
         User user = userRepository.findByProviderId(id.toString()).orElseGet(() -> userRepository.save(provided));
         repository.findByUserId(user.getId()).ifPresent(this::deleteAndFlush);
