@@ -97,6 +97,30 @@ public interface NoteRepository extends JpaRepository<Note, UUID> {
             """)
     Page<Note> searchPrivateNotesByTag(Pageable pageable, UUID id, String q);
 
+    @Query("""
+            SELECT DISTINCT n FROM Note n
+            LEFT JOIN FETCH n.user u
+            LEFT JOIN FETCH n.tags t
+            WHERE u.username = :username
+            AND (:q IS NULL OR LOWER(n.title) LIKE LOWER(CONCAT('%', CAST(:q AS text), '%')))
+            AND (:tag IS NULL OR EXISTS (
+                SELECT 1 FROM Tag t
+                JOIN t.notes tn
+                WHERE tn.id = n.id
+                AND LOWER(t.name) LIKE LOWER(CONCAT('%', CAST(:tag AS text), '%'))
+            ))
+            AND (:type IS NULL AND n.hidden = false OR (
+                (:type = 'open' AND n.closed = false AND n.hidden = false) OR
+                (:type = 'closed' AND n.closed = true AND n.hidden = false) OR
+                (:type = 'hidden' AND n.hidden = true)
+            ))
+            """)
+    Page<Note> searchUserNotesBySpecs(Pageable pageable,
+                                      @Param("username") String username,
+                                      @Param("q") String q,
+                                      @Param("tag") String tag,
+                                      @Param("type") String type);
+
     @EntityGraph(attributePaths = {"user", "tags"})
     Page<Note> findAllByUserId(Pageable pageable, UUID id);
 

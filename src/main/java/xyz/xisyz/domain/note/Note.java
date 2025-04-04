@@ -1,9 +1,5 @@
 package xyz.xisyz.domain.note;
 
-import xyz.xisyz.domain.comment.Comment;
-import xyz.xisyz.domain.flame.Flame;
-import xyz.xisyz.domain.tag.Tag;
-import xyz.xisyz.domain.user.User;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.Data;
@@ -12,6 +8,10 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
+import xyz.xisyz.domain.comment.Comment;
+import xyz.xisyz.domain.flame.Flame;
+import xyz.xisyz.domain.tag.Tag;
+import xyz.xisyz.domain.user.User;
 
 import java.time.Instant;
 import java.util.*;
@@ -36,14 +36,14 @@ public class Note {
 
     private Instant createdAt = Instant.now();
 
+    private Instant modifiedAt = Instant.now();
+
     private String title;
 
     @Column(columnDefinition = "TEXT")
     private String markdown;
 
     private boolean modified = false;
-
-    private Instant modifiedAt;
 
     private boolean closed;
 

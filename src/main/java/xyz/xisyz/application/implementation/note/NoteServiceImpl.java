@@ -1,5 +1,11 @@
 package xyz.xisyz.application.implementation.note;
 
+import jakarta.persistence.EntityNotFoundException;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.stereotype.Component;
 import xyz.xisyz.application.dto.request.note.CreateNoteREQ;
 import xyz.xisyz.domain.note.Note;
 import xyz.xisyz.domain.note.NoteRepository;
@@ -8,12 +14,6 @@ import xyz.xisyz.domain.tag.Tag;
 import xyz.xisyz.domain.tag.TagRepository;
 import xyz.xisyz.domain.user.User;
 import xyz.xisyz.domain.user.UserRepository;
-import jakarta.persistence.EntityNotFoundException;
-import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.security.access.AccessDeniedException;
-import org.springframework.stereotype.Component;
 
 import java.time.Instant;
 import java.util.*;
@@ -31,6 +31,12 @@ public class NoteServiceImpl implements NoteService {
     private void validateAccess(UUID idFromToken, Note note) {
         if (!Objects.equals(idFromToken, note.getUser().getId())) {
             throw new AccessDeniedException("Usuário sem permissão.");
+        }
+    }
+
+    private void validateUser(UUID idFromToken, UUID idFromRequested) {
+        if (!Objects.equals(idFromToken, idFromRequested)) {
+            throw new AccessDeniedException("Usuário sem permissão");
         }
     }
 
@@ -156,6 +162,15 @@ public class NoteServiceImpl implements NoteService {
     @Override
     public Page<Note> findPrivateNotesByTag(Pageable pageable, UUID idFromToken, String tag) {
         return repository.searchPrivateNotesByTag(pageable, idFromToken, tag);
+    }
+
+    @Override
+    public Page<Note> findUserNotesBySpecs(UUID idFromToken, Pageable pageable, String username, String q, String tag, String type) {
+        User requesting = userRepository.findById(idFromToken).orElseThrow(EntityNotFoundException::new);
+        User requested = userRepository.findByUsername(username).orElseThrow(EntityNotFoundException::new);
+        if (requested.isProfilePrivate()) validateBidirectionalFollowAccess(requesting, requested);
+        if (Objects.equals(type, "hidden") || type == null) validateUser(idFromToken, requested.getId());
+        return repository.searchUserNotesBySpecs(pageable, username, q, tag, type);
     }
 
     @Override

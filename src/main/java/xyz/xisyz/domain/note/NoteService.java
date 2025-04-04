@@ -1,9 +1,9 @@
 package xyz.xisyz.domain.note;
 
-import xyz.xisyz.application.dto.request.note.CreateNoteREQ;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import xyz.xisyz.application.dto.request.note.CreateNoteREQ;
 
 import java.util.List;
 import java.util.UUID;
@@ -40,6 +40,8 @@ public interface NoteService {
     Page<Note> findPublicNotesByTag(Pageable pageable, String tag);
 
     Page<Note> findPrivateNotesByTag(Pageable pageable, UUID idFromToken, String tag);
+
+    Page<Note> findUserNotesBySpecs(UUID idFromToken, Pageable pageable, String username, String q, String tag, String type);
 
     Note getPublicNote(UUID idFromPath);
 

@@ -16,8 +16,10 @@ public record LowDetailNoteRES(
         List<String> tags,
         DetailUserRES user,
         String created_at,
+        String modified_at,
         boolean modified,
         boolean closed,
+        boolean hidden,
         int comments_count,
         int flames_count
 ) {
@@ -28,8 +30,10 @@ public record LowDetailNoteRES(
                 note.getTags().stream().map(Tag::getName).toList(),
                 note.getUser() != null ? new DetailUserRES(note.getUser()) : null,
                 note.getCreatedAt().atZone(ZoneId.of("America/Sao_Paulo")).format(DateTimeFormatter.ofPattern("d/M/yy HH:mm", Locale.of("pt-BR"))),
+                note.getModifiedAt().atZone(ZoneId.of("America/Sao_Paulo")).format(DateTimeFormatter.ofPattern("d/M/yy HH:mm", Locale.of("pt-BR"))),
                 note.isModified(),
                 note.isClosed(),
+                note.isHidden(),
                 note.getCommentsCount(),
                 note.getFlamesCount()
         );

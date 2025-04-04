@@ -295,6 +295,37 @@ public class NoteController {
         return ResponseEntity.status(HttpStatus.OK).body(new PageRES<>(page));
     }
 
+    @Operation(
+            summary = "Search user notes by multiple criteria",
+            description = """
+                     Searches notes of a specific user combining optional filters:
+                     - Username (path parameter)
+                     - Text query (q) for title
+                     - Tag name (tag)
+                     - Type (open, closed and hidden)
+                    """
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Search results retrieved successfully."),
+            @ApiResponse(responseCode = "400", description = "Invalid pageable criteria.", content = @Content(examples = {})),
+            @ApiResponse(responseCode = "403", description = "Invalid token.", content = @Content(examples = {})),
+            @ApiResponse(responseCode = "404", description = "User not found.", content = @Content(examples = {})),
+            @ApiResponse(responseCode = "500", description = "Internal server error.", content = @Content(examples = {}))
+    })
+    @GetMapping("/{username}/specs")
+    public ResponseEntity<PageRES<LowDetailNoteRES>> searchUserNotesBySpecs(
+            @Parameter(hidden = true) @RequestHeader("Authorization") String accessToken,
+            @ParameterObject @PageableDefault(page = 0, size = 25, sort = {"modifiedAt"}, direction = Sort.Direction.DESC) Pageable pageable,
+            @PathVariable("username") String username,
+            @RequestParam(required = false) String q,
+            @RequestParam(required = false) String tag,
+            @RequestParam(required = false) String type
+    ) {
+        UUID idFromToken = getSubject(accessToken);
+        Page<LowDetailNoteRES> page = service.findUserNotesBySpecs(idFromToken, pageable, username, q, tag, type).map(LowDetailNoteRES::new);
+        return ResponseEntity.status(HttpStatus.OK).body(new PageRES<>(page));
+    }
+
     @Operation(summary = "Get a public note details", description = "Retrieves detailed information about a note by their uuid.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Search results retrieved successfully."),
