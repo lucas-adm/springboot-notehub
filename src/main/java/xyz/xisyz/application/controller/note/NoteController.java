@@ -137,7 +137,7 @@ public class NoteController {
     public ResponseEntity<Void> changeNoteMarkdown(
             @Parameter(hidden = true) @RequestHeader("Authorization") String accessToken,
             @PathVariable("id") UUID idFromPath,
-            @Valid @RequestBody ChangeMarkdownReq dto
+            @Valid @RequestBody ChangeMarkdownREQ dto
     ) {
         UUID idFromToken = getSubject(accessToken);
         service.changeMarkdown(idFromToken, idFromPath, dto.markdown());

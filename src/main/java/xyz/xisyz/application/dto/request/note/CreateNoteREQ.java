@@ -1,6 +1,5 @@
 package xyz.xisyz.application.dto.request.note;
 
-import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
@@ -20,7 +19,7 @@ public record CreateNoteREQ(
                 regexp = "^(?!.*[\\u00A0\\u2007\\u202F]).*$",
                 message = "👀"
         )
-        @Max(value = 255, message = "Além do limite")
+        @Size(max = 255, message = "Além do limite")
         String description,
 
         @Pattern(
@@ -33,7 +32,7 @@ public record CreateNoteREQ(
 
         boolean hidden,
 
-        @Max(value = 12, message = "Além do limite")
+        @Size(max = 12, message = "Capacidade máxima excedida")
         List<
                 @NotBlank(message = "Não pode ser vazio")
                 @Pattern(
