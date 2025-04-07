@@ -80,7 +80,7 @@ public class NoteController {
             @Valid @RequestBody EditNoteREQ dto
     ) {
         UUID idFromToken = getSubject(accessToken);
-        service.edit(idFromToken, idFromPath, dto.title(), dto.tags(), dto.closed(), dto.hidden());
+        service.edit(idFromToken, idFromPath, dto.title(), dto.description(), dto.tags(), dto.closed(), dto.hidden());
         return ResponseEntity.status(HttpStatus.ACCEPTED).build();
     }
 
