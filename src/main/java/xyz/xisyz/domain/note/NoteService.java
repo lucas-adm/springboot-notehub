@@ -15,9 +15,11 @@ public interface NoteService {
 
     Note create(Note note);
 
-    void edit(UUID idFromToken, UUID idFromPath, String title, List<String> tags, boolean closed, boolean hidden);
+    void edit(UUID idFromToken, UUID idFromPath, String title, String description, List<String> tags, boolean closed, boolean hidden);
 
     void changeTitle(UUID idFromToken, UUID idFromPath, String title);
+
+    void changeDescription(UUID idFromToken, UUID idFromPath, String description);
 
     void changeMarkdown(UUID idFromToken, UUID idFromPath, String markdown);
 

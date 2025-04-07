@@ -104,6 +104,26 @@ public class NoteController {
         return ResponseEntity.status(HttpStatus.ACCEPTED).build();
     }
 
+    @Operation(summary = "Change note description", description = "Changes the note description.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "202", description = "Note updated successfully."),
+            @ApiResponse(responseCode = "400", description = "Invalid input data.", content = @Content(mediaType = "application/json")),
+            @ApiResponse(responseCode = "403", description = "Invalid token."),
+            @ApiResponse(responseCode = "404", description = "Note not found."),
+            @ApiResponse(responseCode = "500", description = "Internal server error.")
+    })
+    @PatchMapping("/{id}/change-description")
+    @Transactional
+    public ResponseEntity<Void> changeNoteDescription(
+            @Parameter(hidden = true) @RequestHeader("Authorization") String accessToken,
+            @PathVariable("id") UUID idFromPath,
+            @Valid @RequestBody ChangeDescriptionREQ dto
+    ) {
+        UUID idFromToken = getSubject(accessToken);
+        service.changeDescription(idFromToken, idFromPath, dto.description());
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
     @Operation(summary = "Change note content", description = "Changes the note markdown content.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "202", description = "Note markdown changed successfully."),

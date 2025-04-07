@@ -60,7 +60,11 @@ public class NoteServiceImpl implements NoteService {
     }
 
     private List<Tag> findOrCreateTags(List<String> tags) {
-        return new ArrayList<>(tags.stream().map(tag -> tagRepository.findByName(tag).orElseGet(() -> new Tag(tag.toLowerCase()))).toList());
+        if (tags == null) return null;
+        return tags.stream()
+                .map(String::toLowerCase).distinct()
+                .map(tag -> tagRepository.findByName(tag).orElseGet(() -> new Tag(tag.toLowerCase())))
+                .toList();
     }
 
     private void changeField(UUID idFromToken, UUID idFromPath, Consumer<Note> setter) {
@@ -76,7 +80,7 @@ public class NoteServiceImpl implements NoteService {
     public Note mapToNote(UUID idFromToken, CreateNoteREQ req) {
         User user = userRepository.findById(idFromToken).orElseThrow(EntityNotFoundException::new);
         List<Tag> tags = findOrCreateTags(req.tags());
-        return new Note(user, req.title(), req.markdown(), req.closed(), req.hidden(), tags);
+        return new Note(user, req.title(), req.description(), req.markdown(), req.closed(), req.hidden(), tags);
     }
 
     @Override
@@ -85,10 +89,11 @@ public class NoteServiceImpl implements NoteService {
     }
 
     @Override
-    public void edit(UUID idFromToken, UUID idFromPath, String title, List<String> tags, boolean closed, boolean hidden) {
+    public void edit(UUID idFromToken, UUID idFromPath, String title, String description, List<String> tags, boolean closed, boolean hidden) {
         changeField(idFromToken, idFromPath, note -> {
             List<String> oldTags = note.getTags().stream().map(Tag::getName).toList();
             note.setTitle(title);
+            note.setDescription(description);
             note.setTags(findOrCreateTags(tags));
             note.setClosed(closed);
             note.setHidden(hidden);
@@ -99,6 +104,11 @@ public class NoteServiceImpl implements NoteService {
     @Override
     public void changeTitle(UUID idFromToken, UUID idFromPath, String title) {
         changeField(idFromToken, idFromPath, note -> note.setTitle(title));
+    }
+
+    @Override
+    public void changeDescription(UUID idFromToken, UUID idFromPath, String description) {
+        changeField(idFromToken, idFromPath, note -> note.setDescription(description));
     }
 
     @Override

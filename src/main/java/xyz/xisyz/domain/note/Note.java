@@ -40,6 +40,8 @@ public class Note {
 
     private String title;
 
+    private String description;
+
     @Column(columnDefinition = "TEXT")
     private String markdown;
 
@@ -61,12 +63,13 @@ public class Note {
     private Set<Flame> flames = new HashSet<>();
     private int flamesCount = 0;
 
-    public Note(User user, String title, String markdown, boolean closed, boolean hidden, List<Tag> tags) {
+    public Note(User user, String title, String description, String markdown, boolean closed, boolean hidden, List<Tag> tags) {
         this.user = user;
         this.title = title;
-        this.markdown = markdown;
         this.closed = closed;
         this.hidden = hidden;
+        if (description != null) this.description = description;
+        if (markdown != null) this.markdown = markdown;
         if (tags != null) this.tags = tags;
     }
 

@@ -13,6 +13,7 @@ import java.util.UUID;
 public record LowDetailNoteRES(
         UUID id,
         String title,
+        String description,
         List<String> tags,
         DetailUserRES user,
         String created_at,
@@ -27,6 +28,7 @@ public record LowDetailNoteRES(
         this(
                 note.getId(),
                 note.getTitle(),
+                note.getDescription(),
                 note.getTags().stream().map(Tag::getName).toList(),
                 note.getUser() != null ? new DetailUserRES(note.getUser()) : null,
                 note.getCreatedAt().atZone(ZoneId.of("America/Sao_Paulo")).format(DateTimeFormatter.ofPattern("d/M/yy HH:mm", Locale.of("pt-BR"))),

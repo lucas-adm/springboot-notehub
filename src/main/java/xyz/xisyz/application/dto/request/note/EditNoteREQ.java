@@ -1,5 +1,6 @@
 package xyz.xisyz.application.dto.request.note;
 
+import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
@@ -15,7 +16,14 @@ public record EditNoteREQ(
         @Size(min = 4, max = 48, message = "Tamanho inválido")
         String title,
 
-        @Size(max = 12, message = "Capacidade máxima excedida")
+        @Pattern(
+                regexp = "^(?!.*[\\u00A0\\u2007\\u202F]).*$",
+                message = "👀"
+        )
+        @Max(value = 255, message = "Além do limite")
+        String description,
+
+        @Max(value = 12, message = "Além do limite")
         List<
                 @NotBlank(message = "Não pode ser vazio")
                 @Pattern(
