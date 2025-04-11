@@ -1,11 +1,14 @@
 package xyz.xisyz.domain.flame;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
 import xyz.xisyz.domain.note.Note;
 import xyz.xisyz.domain.user.User;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -16,6 +19,26 @@ public interface FlameRepository extends JpaRepository<Flame, UUID> {
 
     boolean existsByUserAndNote(User user, Note note);
 
-    List<Flame> findAllByUserId(UUID id);
+    @Query("""
+            SELECT DISTINCT f FROM Flame f
+            LEFT JOIN FETCH f.user u
+            LEFT JOIN FETCH f.note n
+            LEFT JOIN FETCH n.user nu
+            LEFT JOIN FETCH n.tags t
+            WHERE u.username = :username
+            AND n.hidden = false
+            AND (
+                (:q IS NULL OR LOWER(nu.username) LIKE LOWER(CONCAT('%', CAST(:q AS text), '%')))
+                OR (:q IS NULL OR LOWER(nu.displayName) LIKE LOWER(CONCAT('%', CAST(:q AS text), '%')))
+                OR (:q IS NULL OR LOWER(n.title) LIKE LOWER(CONCAT('%', CAST(:q AS text), '%')))
+                OR (:q IS NULL OR EXISTS (
+                    SELECT 1 FROM Tag t
+                    JOIN t.notes tn
+                    WHERE tn.id = n.id
+                    AND LOWER(t.name) LIKE LOWER(CONCAT('%', CAST(:q AS text), '%'))
+                   ))
+            )
+            """)
+    Page<Flame> getUserFlames(Pageable pageable, @Param("username") String username, @Param("q") String q);
 
 }

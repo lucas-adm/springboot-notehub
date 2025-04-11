@@ -10,12 +10,18 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.core.annotations.ParameterObject;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import xyz.xisyz.application.dto.response.flame.DetailFlameRES;
+import xyz.xisyz.application.dto.response.page.PageRES;
 import xyz.xisyz.domain.flame.FlameService;
 
-import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -70,18 +76,24 @@ public class FlameController {
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
-    @Operation(summary = "Get user inflamed notes", description = "Retrieves a list of flames.")
+    @Operation(summary = "Get user inflamed notes", description = "Retrieves a page of flames.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Replies retrieved successfully."),
+            @ApiResponse(responseCode = "200", description = "Page results retrieved successfully."),
+            @ApiResponse(responseCode = "400", description = "Invalid pageable criteria.", content = @Content(examples = {})),
             @ApiResponse(responseCode = "403", description = "Invalid token.", content = @Content(examples = {})),
+            @ApiResponse(responseCode = "404", description = "User not found.", content = @Content(examples = {})),
             @ApiResponse(responseCode = "500", description = "Internal server error.", content = @Content(examples = {}))
     })
-    @GetMapping
-    public ResponseEntity<List<UUID>> getFlames(
-            @Parameter(hidden = true) @RequestHeader("Authorization") String accessToken
+    @GetMapping("/{username}")
+    public ResponseEntity<PageRES<DetailFlameRES>> getFlames(
+            @Parameter(hidden = true) @RequestHeader("Authorization") String accessToken,
+            @ParameterObject @PageableDefault(page = 0, size = 25, sort = {"createdAt"}, direction = Sort.Direction.DESC) Pageable pageable,
+            @PathVariable("username") String username,
+            @RequestParam(required = false) String q
     ) {
-        List<UUID> flames = service.getUserInflamedNotes(getSubject(accessToken));
-        return ResponseEntity.status(HttpStatus.OK).body(flames);
+        UUID idFromToken = getSubject(accessToken);
+        Page<DetailFlameRES> page = service.getUserFlames(idFromToken, pageable, username, q).map(DetailFlameRES::new);
+        return ResponseEntity.status(HttpStatus.OK).body(new PageRES<>(page));
     }
 
 }

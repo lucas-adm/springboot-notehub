@@ -179,7 +179,7 @@ public class NoteServiceImpl implements NoteService {
         User requesting = userRepository.findById(idFromToken).orElseThrow(EntityNotFoundException::new);
         User requested = userRepository.findByUsername(username).orElseThrow(EntityNotFoundException::new);
         if (requested.isProfilePrivate()) validateBidirectionalFollowAccess(requesting, requested);
-        if (Objects.equals(type, "hidden") || type == null) validateUser(idFromToken, requested.getId());
+        if (Objects.equals(type, "hidden")) validateUser(idFromToken, requested.getId());
         return repository.searchUserNotesBySpecs(pageable, username, q, tag, type);
     }
 

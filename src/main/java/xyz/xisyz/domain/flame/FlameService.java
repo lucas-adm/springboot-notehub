@@ -1,8 +1,9 @@
 package xyz.xisyz.domain.flame;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -12,6 +13,6 @@ public interface FlameService {
 
     void deflame(UUID userIdFromToken, UUID noteIdFromPath);
 
-    List<UUID> getUserInflamedNotes(UUID userIdFromToken);
+    Page<Flame> getUserFlames(UUID userIdFromToken, Pageable pageable, String username, String q);
 
 }
