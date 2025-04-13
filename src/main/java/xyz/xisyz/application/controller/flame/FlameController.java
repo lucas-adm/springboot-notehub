@@ -20,6 +20,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import xyz.xisyz.application.dto.response.flame.DetailFlameRES;
 import xyz.xisyz.application.dto.response.page.PageRES;
+import xyz.xisyz.domain.flame.Flame;
 import xyz.xisyz.domain.flame.FlameService;
 
 import java.util.UUID;
@@ -49,13 +50,13 @@ public class FlameController {
     })
     @PostMapping("/{id}")
     @Transactional
-    public ResponseEntity<Void> inflameNote(
+    public ResponseEntity<DetailFlameRES> inflameNote(
             @Parameter(hidden = true) @RequestHeader("Authorization") String accessToken,
             @PathVariable("id") UUID idFromPath
     ) {
         UUID idFromToken = getSubject(accessToken);
-        service.inflame(idFromToken, idFromPath);
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+        Flame flame = service.inflame(idFromToken, idFromPath);
+        return ResponseEntity.status(HttpStatus.CREATED).body(new DetailFlameRES(flame));
     }
 
     @Operation(summary = "Delete flame", description = "Deflames a note.")

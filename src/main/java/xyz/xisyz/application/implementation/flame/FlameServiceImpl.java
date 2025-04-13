@@ -42,13 +42,14 @@ public class FlameServiceImpl implements FlameService {
     }
 
     @Override
-    public void inflame(UUID userIdFromToken, UUID noteIdFromPath) {
+    public Flame inflame(UUID userIdFromToken, UUID noteIdFromPath) {
         User user = userRepository.findById(userIdFromToken).orElseThrow(EntityNotFoundException::new);
         Note note = noteRepository.findById(noteIdFromPath).orElseThrow(EntityNotFoundException::new);
         if (repository.existsByUserAndNote(user, note)) throw new EntityExistsException();
         Flame flame = repository.save(new Flame(user, note));
         counter.updateFlamesCount(note, true);
         notifier.notify(note.getUser(), user, MessageNotification.of(flame));
+        return flame;
     }
 
     @Override

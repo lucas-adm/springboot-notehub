@@ -9,7 +9,7 @@ import java.util.UUID;
 @Service
 public interface FlameService {
 
-    void inflame(UUID userIdFromToken, UUID noteIdFromPath);
+    Flame inflame(UUID userIdFromToken, UUID noteIdFromPath);
 
     void deflame(UUID userIdFromToken, UUID noteIdFromPath);
 
