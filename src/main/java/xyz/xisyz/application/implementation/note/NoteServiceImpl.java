@@ -6,6 +6,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import xyz.xisyz.application.dto.request.note.CreateNoteREQ;
 import xyz.xisyz.domain.note.Note;
 import xyz.xisyz.domain.note.NoteRepository;
@@ -150,7 +151,15 @@ public class NoteServiceImpl implements NoteService {
     }
 
     @Override
-    public List<String> getAllUserTags(UUID idFromToken) {
+    public List<String> getAllPublicUserTags(UUID idFromToken, String username) {
+        User requesting = userRepository.findById(idFromToken).orElseThrow(EntityNotFoundException::new);
+        User requested = userRepository.findByUsername(username).orElseThrow(EntityNotFoundException::new);
+        if (requested.isProfilePrivate()) validateBidirectionalFollowAccess(requesting, requested);
+        return tagRepository.findAllByNotesUserUsernameAndNotesHiddenFalseOrderByNameAsc(username).stream().map(Tag::getName).toList();
+    }
+
+    @Override
+    public List<String> getAllPrivateUserTags(UUID idFromToken) {
         return tagRepository.findAllByNotesUserId(idFromToken).stream().map(Tag::getName).toList();
     }
 
@@ -174,6 +183,7 @@ public class NoteServiceImpl implements NoteService {
         return repository.searchPrivateNotesByTag(pageable, idFromToken, tag);
     }
 
+    @Transactional(readOnly = true)
     @Override
     public Page<Note> findUserNotesBySpecs(UUID idFromToken, Pageable pageable, String username, String q, String tag, String type) {
         User requesting = userRepository.findById(idFromToken).orElseThrow(EntityNotFoundException::new);

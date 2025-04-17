@@ -240,11 +240,28 @@ public class NoteController {
             @ApiResponse(responseCode = "500", description = "Internal server error.", content = @Content(examples = {}))
     })
     @GetMapping("/private/tags")
-    public ResponseEntity<List<String>> getAllUserTags(
+    public ResponseEntity<List<String>> findAllPrivateUserTags(
             @Parameter(hidden = true) @RequestHeader("Authorization") String accessToken
     ) {
         UUID idFromToken = getSubject(accessToken);
-        List<String> tags = service.getAllUserTags(idFromToken);
+        List<String> tags = service.getAllPrivateUserTags(idFromToken);
+        return ResponseEntity.status(HttpStatus.OK).body(tags);
+    }
+
+    @Operation(summary = "Get all tags used by username", description = "Retrieves a paginated list of all used tags by username.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Used tags by user retrieved successfully."),
+            @ApiResponse(responseCode = "400", description = "Invalid pageable criteria.", content = @Content(examples = {})),
+            @ApiResponse(responseCode = "403", description = "Invalid token.", content = @Content(examples = {})),
+            @ApiResponse(responseCode = "500", description = "Internal server error.", content = @Content(examples = {}))
+    })
+    @GetMapping("/{username}/tags")
+    public ResponseEntity<List<String>> findAllPublicUserTags(
+            @Parameter(hidden = true) @RequestHeader("Authorization") String accessToken,
+            @PathVariable("username") String username
+    ) {
+        UUID idFromToken = getSubject(accessToken);
+        List<String> tags = service.getAllPublicUserTags(idFromToken, username);
         return ResponseEntity.status(HttpStatus.OK).body(tags);
     }
 

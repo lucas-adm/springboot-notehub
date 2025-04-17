@@ -33,7 +33,9 @@ public interface NoteService {
 
     List<String> getAllTags();
 
-    List<String> getAllUserTags(UUID idFromToken);
+    List<String> getAllPublicUserTags(UUID idFromToken, String username);
+
+    List<String> getAllPrivateUserTags(UUID idFromToken);
 
     Page<Note> findPublicNotes(Pageable pageable, String q);
 

@@ -102,7 +102,10 @@ public interface NoteRepository extends JpaRepository<Note, UUID> {
             LEFT JOIN FETCH n.user u
             LEFT JOIN FETCH n.tags t
             WHERE u.username = :username
-            AND (:q IS NULL OR LOWER(n.title) LIKE LOWER(CONCAT('%', CAST(:q AS text), '%')))
+            AND (
+                :q IS NULL OR LOWER(n.title) LIKE LOWER(CONCAT('%', CAST(:q AS text), '%')) OR
+                :q IS NULL OR LOWER(n.description) LIKE LOWER(CONCAT('%', CAST(:q AS text), '%'))
+            )
             AND (:tag IS NULL OR EXISTS (
                 SELECT 1 FROM Tag t
                 JOIN t.notes tn
