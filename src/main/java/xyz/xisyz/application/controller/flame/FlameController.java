@@ -36,6 +36,7 @@ public class FlameController {
     private final FlameService service;
 
     private UUID getSubject(String bearerToken) {
+        if (bearerToken == null) return null;
         String idFromToken = JWT.decode(bearerToken.replace("Bearer ", "")).getSubject();
         return UUID.fromString(idFromToken);
     }
@@ -87,7 +88,7 @@ public class FlameController {
     })
     @GetMapping("/{username}")
     public ResponseEntity<PageRES<DetailFlameRES>> getFlames(
-            @Parameter(hidden = true) @RequestHeader("Authorization") String accessToken,
+            @Parameter(hidden = true) @RequestHeader(required = false, value = "Authorization") String accessToken,
             @ParameterObject @PageableDefault(page = 0, size = 25, sort = {"createdAt"}, direction = Sort.Direction.DESC) Pageable pageable,
             @PathVariable("username") String username,
             @RequestParam(required = false) String q

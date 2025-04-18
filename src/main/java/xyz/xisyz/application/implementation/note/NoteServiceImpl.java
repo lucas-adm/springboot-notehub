@@ -1,5 +1,6 @@
 package xyz.xisyz.application.implementation.note;
 
+import jakarta.annotation.Nullable;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -29,23 +30,20 @@ public class NoteServiceImpl implements NoteService {
     private final TagRepository tagRepository;
     private final NoteRepository repository;
 
-    private void validateAccess(UUID idFromToken, Note note) {
-        if (!Objects.equals(idFromToken, note.getUser().getId())) {
+    private void validateAccess(@Nullable UUID idFromToken, UUID idFromRequested) {
+        if (idFromToken == null) throw new AccessDeniedException("Usuário sem permissão.");
+        if (!Objects.equals(idFromToken, idFromRequested)) {
             throw new AccessDeniedException("Usuário sem permissão.");
         }
     }
 
-    private void validateUser(UUID idFromToken, UUID idFromRequested) {
-        if (!Objects.equals(idFromToken, idFromRequested)) {
-            throw new AccessDeniedException("Usuário sem permissão");
-        }
-    }
-
-    private void validateBidirectionalFollowAccess(User requesting, User requested) {
-        if (!Objects.equals(requesting.getUsername(), requested.getUsername())
-                && !requested.getFollowing().contains(requesting)
-                && !requesting.getFollowers().contains(requested)
-        ) {
+    private void validateBidirectionalFollowAccess(@Nullable User requesting, User requested) {
+        if (!requested.isProfilePrivate()) return;
+        if (requesting == null) throw new AccessDeniedException("Não há vínculo bidirecional entre os usuários.");
+        boolean isSameUser = Objects.equals(requesting.getUsername(), requested.getUsername());
+        boolean requestedContainsRequesting = requested.getFollowing().contains(requesting);
+        boolean requestingContainsRequested = requesting.getFollowing().contains(requested);
+        if (!isSameUser && (!requestedContainsRequesting || !requestingContainsRequested)) {
             throw new AccessDeniedException("Não há vínculo bidirecional entre os usuários.");
         }
     }
@@ -70,7 +68,7 @@ public class NoteServiceImpl implements NoteService {
 
     private void changeField(UUID idFromToken, UUID idFromPath, Consumer<Note> setter) {
         Note note = repository.findById(idFromPath).orElseThrow(EntityNotFoundException::new);
-        validateAccess(idFromToken, note);
+        validateAccess(idFromToken, note.getUser().getId());
         setter.accept(note);
         note.setModifiedAt(Instant.now());
         note.setModified(true);
@@ -139,7 +137,7 @@ public class NoteServiceImpl implements NoteService {
     @Override
     public void delete(UUID idFromToken, UUID idFromPath) {
         Note note = repository.findById(idFromPath).orElseThrow(EntityNotFoundException::new);
-        validateAccess(idFromToken, note);
+        validateAccess(idFromToken, note.getUser().getId());
         List<String> oldTagNames = note.getTags().stream().map(Tag::getName).toList();
         deleteNoteAndFlush(note);
         removeOrphanTags(oldTagNames);
@@ -150,11 +148,12 @@ public class NoteServiceImpl implements NoteService {
         return tagRepository.findAll().stream().map(Tag::getName).toList();
     }
 
+    @Transactional(readOnly = true)
     @Override
     public List<String> getAllPublicUserTags(UUID idFromToken, String username) {
-        User requesting = userRepository.findById(idFromToken).orElseThrow(EntityNotFoundException::new);
+        User requesting = (idFromToken != null) ? userRepository.findById(idFromToken).orElseThrow(EntityNotFoundException::new) : null;
         User requested = userRepository.findByUsername(username).orElseThrow(EntityNotFoundException::new);
-        if (requested.isProfilePrivate()) validateBidirectionalFollowAccess(requesting, requested);
+        validateBidirectionalFollowAccess(requesting, requested);
         return tagRepository.findAllByNotesUserUsernameAndNotesHiddenFalseOrderByNameAsc(username).stream().map(Tag::getName).toList();
     }
 
@@ -186,10 +185,10 @@ public class NoteServiceImpl implements NoteService {
     @Transactional(readOnly = true)
     @Override
     public Page<Note> findUserNotesBySpecs(UUID idFromToken, Pageable pageable, String username, String q, String tag, String type) {
-        User requesting = userRepository.findById(idFromToken).orElseThrow(EntityNotFoundException::new);
+        User requesting = (idFromToken != null) ? userRepository.findById(idFromToken).orElseThrow(EntityNotFoundException::new) : null;
         User requested = userRepository.findByUsername(username).orElseThrow(EntityNotFoundException::new);
-        if (requested.isProfilePrivate()) validateBidirectionalFollowAccess(requesting, requested);
-        if (Objects.equals(type, "hidden")) validateUser(idFromToken, requested.getId());
+        validateBidirectionalFollowAccess(requesting, requested);
+        if (Objects.equals(type, "hidden")) validateAccess(idFromToken, requested.getId());
         return repository.searchUserNotesBySpecs(pageable, username, q, tag, type);
     }
 
@@ -201,7 +200,7 @@ public class NoteServiceImpl implements NoteService {
     @Override
     public Note getPrivateNote(UUID idFromToken, UUID idFromPath) {
         Note note = repository.findByIdWithUserAndTags(idFromPath).orElseThrow(EntityNotFoundException::new);
-        validateAccess(idFromToken, note);
+        validateAccess(idFromToken, note.getUser().getId());
         return note;
     }
 

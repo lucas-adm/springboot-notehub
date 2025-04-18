@@ -1,5 +1,6 @@
 package xyz.xisyz.application.implementation.flame;
 
+import jakarta.annotation.Nullable;
 import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -32,11 +33,13 @@ public class FlameServiceImpl implements FlameService {
     private final NotificationService notifier;
     private final Counter counter;
 
-    private void validateBidirectionalFollowAccess(User requesting, User requested) {
-        if (!Objects.equals(requesting.getUsername(), requested.getUsername())
-                && !requested.getFollowing().contains(requesting)
-                && !requesting.getFollowers().contains(requested)
-        ) {
+    private void validateBidirectionalFollowAccess(@Nullable User requesting, User requested) {
+        if (!requested.isProfilePrivate()) return;
+        if (requesting == null) throw new AccessDeniedException("Não há vínculo bidirecional entre os usuários.");
+        boolean isSameUser = Objects.equals(requesting.getUsername(), requested.getUsername());
+        boolean requestedContainsRequesting = requested.getFollowing().contains(requesting);
+        boolean requestingContainsRequested = requesting.getFollowing().contains(requested);
+        if (!isSameUser && (!requestedContainsRequesting || !requestingContainsRequested)) {
             throw new AccessDeniedException("Não há vínculo bidirecional entre os usuários.");
         }
     }
@@ -62,9 +65,9 @@ public class FlameServiceImpl implements FlameService {
     @Transactional(readOnly = true)
     @Override
     public Page<Flame> getUserFlames(UUID userIdFromToken, Pageable pageable, String username, String q) {
-        User requesting = userRepository.findById(userIdFromToken).orElseThrow(EntityNotFoundException::new);
+        User requesting = (userIdFromToken != null) ? userRepository.findById(userIdFromToken).orElseThrow(EntityNotFoundException::new) : null;
         User requested = userRepository.findByUsername(username).orElseThrow(EntityNotFoundException::new);
-        if (requested.isProfilePrivate()) validateBidirectionalFollowAccess(requesting, requested);
+        validateBidirectionalFollowAccess(requesting, requested);
         return repository.getUserFlames(pageable, username, q);
     }
 

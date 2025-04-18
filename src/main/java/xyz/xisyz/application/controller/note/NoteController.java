@@ -42,6 +42,7 @@ public class NoteController {
     private final NoteService service;
 
     private UUID getSubject(String bearerToken) {
+        if (bearerToken == null) return null;
         String idFromToken = JWT.decode(bearerToken.replace("Bearer ", "")).getSubject();
         return UUID.fromString(idFromToken);
     }
@@ -248,7 +249,7 @@ public class NoteController {
         return ResponseEntity.status(HttpStatus.OK).body(tags);
     }
 
-    @Operation(summary = "Get all tags used by username", description = "Retrieves a paginated list of all used tags by username.")
+    @Operation(summary = "Get all tags used by username", description = "Retrieves a list of all used tags by username.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Used tags by user retrieved successfully."),
             @ApiResponse(responseCode = "400", description = "Invalid pageable criteria.", content = @Content(examples = {})),
@@ -257,7 +258,7 @@ public class NoteController {
     })
     @GetMapping("/{username}/tags")
     public ResponseEntity<List<String>> findAllPublicUserTags(
-            @Parameter(hidden = true) @RequestHeader("Authorization") String accessToken,
+            @Parameter(hidden = true) @RequestHeader(required = false, value = "Authorization") String accessToken,
             @PathVariable("username") String username
     ) {
         UUID idFromToken = getSubject(accessToken);
@@ -351,7 +352,7 @@ public class NoteController {
     })
     @GetMapping("/{username}/specs")
     public ResponseEntity<PageRES<LowDetailNoteRES>> searchUserNotesBySpecs(
-            @Parameter(hidden = true) @RequestHeader("Authorization") String accessToken,
+            @Parameter(hidden = true) @RequestHeader(required = false, value = "Authorization") String accessToken,
             @ParameterObject @PageableDefault(page = 0, size = 25, sort = {"modifiedAt"}, direction = Sort.Direction.DESC) Pageable pageable,
             @PathVariable("username") String username,
             @RequestParam(required = false) String q,
