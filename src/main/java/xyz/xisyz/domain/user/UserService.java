@@ -47,9 +47,9 @@ public interface UserService {
 
     User getUser(String username);
 
-    Page<User> getUserFollowing(Pageable pageable, UUID idFromToken, String username);
+    Page<User> getUserFollowing(Pageable pageable, String q, UUID idFromToken, String username);
 
-    Page<User> getUserFollowers(Pageable pageable, UUID idFromToken, String username);
+    Page<User> getUserFollowers(Pageable pageable, String q, UUID idFromToken, String username);
 
     Set<String> getUserMutualConnections(UUID id);
 

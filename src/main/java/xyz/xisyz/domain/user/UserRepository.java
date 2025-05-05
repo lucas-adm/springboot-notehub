@@ -50,6 +50,14 @@ public interface UserRepository extends JpaRepository<User, UUID> {
     List<User> findUsersWithExpiredActivationTime(@Param("nowMinus7Days") Instant nowMinus7Days);
 
     @EntityGraph(attributePaths = {"followers", "following"})
-    Page<User> findAllByIdIn(Pageable pageable, List<UUID> ids);
+    @Query("""
+            SELECT DISTINCT u FROM User u
+            WHERE u.id IN :ids
+            AND (
+                :q IS NULL OR LOWER(u.username) LIKE LOWER(CONCAT('%', CAST(:q AS text), '%')) OR
+                :q IS NULL OR LOWER(u.displayName) LIKE LOWER(CONCAT('%', CAST(:q AS text), '%'))
+            )
+            """)
+    Page<User> findAllByIdIn(Pageable pageable, @Param("q") String q, @Param("ids") List<UUID> ids);
 
 }

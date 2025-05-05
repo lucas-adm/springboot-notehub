@@ -1,5 +1,6 @@
 package xyz.xisyz.application.implementation.user;
 
+import jakarta.annotation.Nullable;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -81,22 +82,23 @@ public class UserServiceImpl implements UserService {
         if (!active) throw new EntityNotFoundException();
     }
 
-    private void validateBidirectionalFollowAccess(User requesting, User requested) {
-        if (requested.isProfilePrivate()
-                && !Objects.equals(requesting.getUsername(), requested.getUsername())
-                && !requested.getFollowing().contains(requesting)
-                && !requesting.getFollowers().contains(requested)
-        ) {
+    private void validateBidirectionalFollowAccess(@Nullable User requesting, User requested) {
+        if (!requested.isProfilePrivate()) return;
+        if (requesting == null) throw new AccessDeniedException("Não há vínculo bidirecional entre os usuários.");
+        boolean isSameUser = Objects.equals(requesting.getUsername(), requested.getUsername());
+        boolean requestedContainsRequesting = requested.getFollowing().contains(requesting);
+        boolean requestingContainsRequested = requesting.getFollowing().contains(requested);
+        if (!isSameUser && (!requestedContainsRequesting || !requestingContainsRequested)) {
             throw new AccessDeniedException("Não há vínculo bidirecional entre os usuários.");
         }
     }
 
-    private Page<User> getUserConnections(Pageable pageable, UUID userRequestingId, String userRequestedUsername, Function<User, Set<User>> getter) {
-        User requesting = repository.findById(userRequestingId).orElseThrow(EntityNotFoundException::new);
+    private Page<User> getUserConnections(Pageable pageable, String q, UUID userRequestingId, String userRequestedUsername, Function<User, Set<User>> getter) {
+        User requesting = (userRequestingId != null) ? repository.findById(userRequestingId).orElseThrow(EntityNotFoundException::new) : null;
         User requested = repository.findByUsername(userRequestedUsername).orElseThrow(EntityNotFoundException::new);
         validateBidirectionalFollowAccess(requesting, requested);
         List<UUID> ids = getter.apply(requested).stream().map(User::getId).toList();
-        return repository.findAllByIdIn(pageable, ids);
+        return repository.findAllByIdIn(pageable, q, ids);
     }
 
     private boolean isFollowing(User follower, User following) {
@@ -233,13 +235,13 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Page<User> getUserFollowing(Pageable pageable, UUID idFromToken, String username) {
-        return getUserConnections(pageable, idFromToken, username, User::getFollowing);
+    public Page<User> getUserFollowing(Pageable pageable, String q, UUID idFromToken, String username) {
+        return getUserConnections(pageable, q, idFromToken, username, User::getFollowing);
     }
 
     @Override
-    public Page<User> getUserFollowers(Pageable pageable, UUID idFromToken, String username) {
-        return getUserConnections(pageable, idFromToken, username, User::getFollowers);
+    public Page<User> getUserFollowers(Pageable pageable, String q, UUID idFromToken, String username) {
+        return getUserConnections(pageable, q, idFromToken, username, User::getFollowers);
     }
 
     @Override

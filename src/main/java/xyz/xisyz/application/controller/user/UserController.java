@@ -48,6 +48,7 @@ public class UserController {
     private final MailProducer producer;
 
     private UUID getSubject(String bearerToken) {
+        if (bearerToken == null) return null;
         String idFromToken = JWT.decode(bearerToken.replace("Bearer ", "")).getSubject();
         return UUID.fromString(idFromToken);
     }
@@ -366,12 +367,13 @@ public class UserController {
     @GetMapping("/{username}/following")
     @Transactional
     public ResponseEntity<PageRES<DetailUserRES>> getFollowing(
-            @Parameter(hidden = true) @RequestHeader("Authorization") String accessToken,
-            @ParameterObject @PageableDefault(page = 0, size = 10, sort = {"followersCount"}, direction = Sort.Direction.ASC) Pageable pageable,
-            @PathVariable("username") String username
+            @Parameter(hidden = true) @RequestHeader(required = false, value = "Authorization") String accessToken,
+            @ParameterObject @PageableDefault(page = 0, size = 25, sort = {"followersCount"}, direction = Sort.Direction.DESC) Pageable pageable,
+            @PathVariable("username") String username,
+            @RequestParam(required = false) String q
     ) {
         UUID idFromToken = getSubject(accessToken);
-        Page<DetailUserRES> page = service.getUserFollowing(pageable, idFromToken, username).map(DetailUserRES::new);
+        Page<DetailUserRES> page = service.getUserFollowing(pageable, q, idFromToken, username).map(DetailUserRES::new);
         return ResponseEntity.status(HttpStatus.OK).body(new PageRES<>(page));
     }
 
@@ -392,12 +394,13 @@ public class UserController {
     @GetMapping("/{username}/followers")
     @Transactional
     public ResponseEntity<PageRES<DetailUserRES>> getFollowers(
-            @Parameter(hidden = true) @RequestHeader("Authorization") String accessToken,
-            @ParameterObject @PageableDefault(page = 0, size = 10, sort = {"followersCount"}, direction = Sort.Direction.ASC) Pageable pageable,
-            @PathVariable("username") String username
+            @Parameter(hidden = true) @RequestHeader(required = false, value = "Authorization") String accessToken,
+            @ParameterObject @PageableDefault(page = 0, size = 25, sort = {"followersCount"}, direction = Sort.Direction.DESC) Pageable pageable,
+            @PathVariable("username") String username,
+            @RequestParam(required = false) String q
     ) {
         UUID idFromToken = getSubject(accessToken);
-        Page<DetailUserRES> page = service.getUserFollowers(pageable, idFromToken, username).map(DetailUserRES::new);
+        Page<DetailUserRES> page = service.getUserFollowers(pageable, q, idFromToken, username).map(DetailUserRES::new);
         return ResponseEntity.status(HttpStatus.OK).body(new PageRES<>(page));
     }
 
