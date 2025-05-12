@@ -41,9 +41,7 @@ public interface UserService {
 
     void delete(UUID idFromToken);
 
-    Page<User> getAllActiveUsers(Pageable pageable);
-
-    Page<User> findUser(Pageable pageable, String q);
+    Page<User> findAll(Pageable pageable, String q);
 
     User getUser(String username);
 

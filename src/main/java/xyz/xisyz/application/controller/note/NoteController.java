@@ -266,7 +266,7 @@ public class NoteController {
         return ResponseEntity.status(HttpStatus.OK).body(tags);
     }
 
-    @Operation(summary = "Search for notes", description = "Searches notes by title or tag.")
+    @Operation(summary = "Search for notes", description = "Searches notes by title or description.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Search results retrieved successfully."),
             @ApiResponse(responseCode = "400", description = "Invalid search criteria.", content = @Content(mediaType = "application/json")),
@@ -274,8 +274,8 @@ public class NoteController {
     })
     @GetMapping("/search")
     public ResponseEntity<PageRES<LowDetailNoteRES>> searchPublicNotes(
-            @ParameterObject @PageableDefault(page = 0, size = 10, sort = {"flamesCount"}, direction = Sort.Direction.DESC) Pageable pageable,
-            @NotBlank @RequestParam String q
+            @ParameterObject @PageableDefault(page = 0, size = 25, sort = {"flamesCount"}, direction = Sort.Direction.DESC) Pageable pageable,
+            @RequestParam(required = false) String q
     ) {
         Page<LowDetailNoteRES> page = service.findPublicNotes(pageable, q).map(LowDetailNoteRES::new);
         return ResponseEntity.status(HttpStatus.OK).body(new PageRES<>(page));
@@ -308,8 +308,8 @@ public class NoteController {
     })
     @GetMapping("/search/tag")
     public ResponseEntity<PageRES<LowDetailNoteRES>> searchPublicNotesByTag(
-            @ParameterObject @PageableDefault(page = 0, size = 10, sort = {"flamesCount"}, direction = Sort.Direction.DESC) Pageable pageable,
-            @NotBlank @RequestParam String q
+            @ParameterObject @PageableDefault(page = 0, size = 25, sort = {"flamesCount"}, direction = Sort.Direction.DESC) Pageable pageable,
+            @RequestParam(required = false) String q
     ) {
         Page<LowDetailNoteRES> page = service.findPublicNotesByTag(pageable, q).map(LowDetailNoteRES::new);
         return ResponseEntity.status(HttpStatus.OK).body(new PageRES<>(page));

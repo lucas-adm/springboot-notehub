@@ -164,7 +164,7 @@ public class NoteServiceImpl implements NoteService {
 
     @Override
     public Page<Note> findPublicNotes(Pageable pageable, String q) {
-        return repository.searchPublicNotesByTitleOrTag(pageable, q);
+        return repository.searchPublicNotesByTitleOrDescription(pageable, q);
     }
 
     @Override

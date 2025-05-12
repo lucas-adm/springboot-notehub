@@ -218,12 +218,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Page<User> getAllActiveUsers(Pageable pageable) {
-        return repository.findAllByActiveTrue(pageable);
-    }
-
-    @Override
-    public Page<User> findUser(Pageable pageable, String q) {
+    public Page<User> findAll(Pageable pageable, String q) {
         return repository.findAllActiveUsersByUsernameOrDisplayName(pageable, q);
     }
 

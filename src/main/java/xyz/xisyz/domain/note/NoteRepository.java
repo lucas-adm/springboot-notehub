@@ -38,16 +38,11 @@ public interface NoteRepository extends JpaRepository<Note, UUID> {
             WHERE (u IS NULL OR u.profilePrivate = false)
             AND n.hidden = false
             AND (
-                LOWER(n.title) LIKE LOWER(CONCAT('%', :q, '%'))
-                OR
-                EXISTS (
-                    SELECT 1 FROM Tag tag
-                    JOIN tag.notes note
-                    WHERE note.id = n.id AND LOWER(tag.name) LIKE LOWER(CONCAT('%', :q, '%'))
-                )
+                :q IS NULL OR LOWER(n.title) LIKE LOWER(CONCAT('%', CAST(:q AS text), '%')) OR
+                :q IS NULL OR LOWER(n.description) LIKE LOWER(CONCAT('%', CAST(:q AS text), '%'))
             )
             """)
-    Page<Note> searchPublicNotesByTitleOrTag(Pageable pageable, @Param("q") String q);
+    Page<Note> searchPublicNotesByTitleOrDescription(Pageable pageable, @Param("q") String q);
 
     @Query("""
             SELECT DISTINCT n FROM Note n
@@ -59,11 +54,15 @@ public interface NoteRepository extends JpaRepository<Note, UUID> {
                 EXISTS (
                     SELECT 1 FROM Tag tag
                     JOIN tag.notes note
-                    WHERE note.id = n.id AND LOWER(tag.name) LIKE LOWER(CONCAT('%', :q, '%'))
+                    WHERE note.id = n.id
+                    AND (
+                    :q IS NULL OR
+                    LOWER(tag.name) LIKE LOWER(CONCAT('%', CAST(:q AS text), '%'))
+                    )
                 )
             )
             """)
-    Page<Note> searchPublicNotesByTag(Pageable pageable, String q);
+    Page<Note> searchPublicNotesByTag(Pageable pageable, @Param("q") String q);
 
     @Query("""
             SELECT DISTINCT n FROM Note n

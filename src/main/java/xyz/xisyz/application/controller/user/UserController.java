@@ -307,32 +307,18 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
-    @Operation(summary = "Get users", description = "Retrieves a paginated list of all active users.")
+    @Operation(summary = "Find users", description = "Retrieves a paginated list of all active users by username or display name.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Users retrieved successfully."),
             @ApiResponse(responseCode = "400", description = "Invalid pageable criteria.", content = @Content(examples = {})),
             @ApiResponse(responseCode = "500", description = "Internal server error.", content = @Content(examples = {}))
     })
     @GetMapping
-    public ResponseEntity<PageRES<DetailUserRES>> getUsers(
-            @ParameterObject @PageableDefault(page = 0, size = 10, sort = {"followersCount"}, direction = Sort.Direction.ASC) Pageable pageable
+    public ResponseEntity<PageRES<DetailUserRES>> findUsers(
+            @ParameterObject @PageableDefault(page = 0, size = 25, sort = {"followersCount"}, direction = Sort.Direction.DESC) Pageable pageable,
+            @RequestParam(required = false) String q
     ) {
-        PageRES<DetailUserRES> page = new PageRES<>(service.getAllActiveUsers(pageable).map(DetailUserRES::new));
-        return ResponseEntity.status(HttpStatus.OK).body(page);
-    }
-
-    @Operation(summary = "Search users", description = "Searches users by username or display name.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Search results retrieved successfully."),
-            @ApiResponse(responseCode = "400", description = "Invalid search criteria.", content = @Content(mediaType = "application/json")),
-            @ApiResponse(responseCode = "500", description = "Internal server error.", content = @Content(examples = {}))
-    })
-    @GetMapping("/search")
-    public ResponseEntity<PageRES<DetailUserRES>> searchUser(
-            @ParameterObject @PageableDefault(page = 0, size = 10, sort = {"followersCount"}, direction = Sort.Direction.ASC) Pageable pageable,
-            @RequestParam String q
-    ) {
-        PageRES<DetailUserRES> page = new PageRES<>(service.findUser(pageable, q).map(DetailUserRES::new));
+        PageRES<DetailUserRES> page = new PageRES<>(service.findAll(pageable, q).map(DetailUserRES::new));
         return ResponseEntity.status(HttpStatus.OK).body(page);
     }
 
