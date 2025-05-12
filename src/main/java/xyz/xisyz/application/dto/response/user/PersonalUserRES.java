@@ -15,6 +15,7 @@ public record PersonalUserRES(
         boolean profile_private,
         boolean sponsor,
         Long score,
+        int notes_count,
         int followers_count,
         int following_count,
         long notifications

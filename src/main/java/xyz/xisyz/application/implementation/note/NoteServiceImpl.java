@@ -8,6 +8,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import xyz.xisyz.application.counter.Counter;
 import xyz.xisyz.application.dto.request.note.CreateNoteREQ;
 import xyz.xisyz.domain.note.Note;
 import xyz.xisyz.domain.note.NoteRepository;
@@ -29,6 +30,7 @@ public class NoteServiceImpl implements NoteService {
     private final UserRepository userRepository;
     private final TagRepository tagRepository;
     private final NoteRepository repository;
+    private final Counter counter;
 
     private void validateAccess(@Nullable UUID idFromToken, UUID idFromRequested) {
         if (idFromToken == null) throw new AccessDeniedException("Usuário sem permissão.");
@@ -84,7 +86,9 @@ public class NoteServiceImpl implements NoteService {
 
     @Override
     public Note create(Note note) {
-        return repository.save(note);
+        repository.save(note);
+        counter.updateNotesCount(note.getUser(), true);
+        return note;
     }
 
     @Override
@@ -141,6 +145,7 @@ public class NoteServiceImpl implements NoteService {
         List<String> oldTagNames = note.getTags().stream().map(Tag::getName).toList();
         deleteNoteAndFlush(note);
         removeOrphanTags(oldTagNames);
+        counter.updateNotesCount(note.getUser(), false);
     }
 
     @Override

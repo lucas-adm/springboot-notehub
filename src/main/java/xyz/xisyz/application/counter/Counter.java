@@ -1,13 +1,13 @@
 package xyz.xisyz.application.counter;
 
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 import xyz.xisyz.domain.comment.Comment;
 import xyz.xisyz.domain.comment.CommentRepository;
 import xyz.xisyz.domain.note.Note;
 import xyz.xisyz.domain.note.NoteRepository;
 import xyz.xisyz.domain.user.User;
 import xyz.xisyz.domain.user.UserRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
@@ -16,6 +16,16 @@ public class Counter {
     private final UserRepository userRepository;
     private final NoteRepository noteRepository;
     private final CommentRepository commentRepository;
+
+    public void updateNotesCount(User user, boolean increment) {
+        int notesCount = user.getNotesCount();
+        if (increment) {
+            user.setNotesCount(notesCount + 1);
+        } else {
+            user.setNotesCount(notesCount - 1);
+        }
+        userRepository.save(user);
+    }
 
     public void updateFollowersAndFollowingCount(User follower, User following, boolean increment) {
         if (increment) {
