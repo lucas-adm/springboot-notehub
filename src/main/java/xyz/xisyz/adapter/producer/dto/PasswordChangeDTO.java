@@ -5,14 +5,15 @@ import org.springframework.core.io.ClassPathResource;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
-public record RecoveryDTO(
+public record PasswordChangeDTO(
         String mailTo,
         String subject,
         String text
 ) {
+
     public static String text(String client, String token) {
         try {
-            ClassPathResource resource = new ClassPathResource("template/mail/recovery.html");
+            ClassPathResource resource = new ClassPathResource("template/mail/password-change.html");
             String template = new String(resource.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
             return template
                     .replace("{token}", token)
@@ -22,11 +23,12 @@ public record RecoveryDTO(
         }
     }
 
-    public static RecoveryDTO of(String client, String mailTo, String token) {
-        return new RecoveryDTO(
+    public static PasswordChangeDTO of(String client, String mailTo, String token) {
+        return new PasswordChangeDTO(
                 mailTo,
-                "Redefina a sua senha",
+                "Redefina sua senha",
                 text(client, token)
         );
     }
+
 }

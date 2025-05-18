@@ -1,7 +1,8 @@
 package xyz.xisyz.adapter.producer;
 
 import xyz.xisyz.adapter.producer.dto.ActivationDTO;
-import xyz.xisyz.adapter.producer.dto.RecoveryDTO;
+import xyz.xisyz.adapter.producer.dto.EmailChangeDTO;
+import xyz.xisyz.adapter.producer.dto.PasswordChangeDTO;
 import xyz.xisyz.domain.user.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -15,8 +16,11 @@ public class MailProducer {
     @Value("${broker.queue.activation.name}")
     private String activationRoutingKey;
 
-    @Value("${broker.queue.recovery.name}")
-    private String recoveryRoutingKey;
+    @Value("${broker.queue.password.name}")
+    private String passwordRoutingKey;
+
+    @Value("${broker.queue.email.name}")
+    private String emailRoutingKey;
 
     @Value("${api.client.host}")
     private String client;
@@ -28,9 +32,14 @@ public class MailProducer {
         rabbitTemplate.convertAndSend("", activationRoutingKey, message);
     }
 
-    public void publishAccountRecoveryMessage(String mailTo, String token) {
-        var message = RecoveryDTO.of(client, mailTo, token);
-        rabbitTemplate.convertAndSend("", recoveryRoutingKey, message);
+    public void publishAccountPasswordChangeMessage(String mailTo, String token) {
+        var message = PasswordChangeDTO.of(client, mailTo, token);
+        rabbitTemplate.convertAndSend("", passwordRoutingKey, message);
+    }
+
+    public void publishAccountEmailChangeMessage(String mailTo, String token) {
+        var message = EmailChangeDTO.of(client, mailTo, token);
+        rabbitTemplate.convertAndSend("", emailRoutingKey, message);
     }
 
 }

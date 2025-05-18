@@ -14,10 +14,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import xyz.xisyz.adapter.producer.MailProducer;
+import xyz.xisyz.application.dto.request.token.AuthChangeREQ;
 import xyz.xisyz.application.dto.request.token.AuthREQ;
 import xyz.xisyz.application.dto.request.token.OAuth2GoogleREQ;
 import xyz.xisyz.application.dto.request.token.OAuthGitHubREQ;
-import xyz.xisyz.application.dto.request.token.RecoverPasswordREQ;
 import xyz.xisyz.application.dto.response.token.AuthRES;
 import xyz.xisyz.domain.token.TokenService;
 
@@ -33,22 +33,6 @@ public class AuthController {
 
     private final TokenService service;
     private final MailProducer producer;
-
-    @Operation(summary = "Recover password", description = "Generates a token for password recovery and sends it via email.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Recovery email sent successfully."),
-            @ApiResponse(responseCode = "400", description = "Invalid input data.", content = @Content(mediaType = "application/json")),
-            @ApiResponse(responseCode = "404", description = "Account not found.", content = @Content(examples = {})),
-            @ApiResponse(responseCode = "500", description = "Internal server error.", content = @Content(examples = {}))
-    })
-    @PostMapping("/recover-password")
-    public ResponseEntity<String> recoverPassword(
-            @Valid @RequestBody RecoverPasswordREQ dto
-    ) {
-        String jwt = service.generateChangePasswordToken(dto.email());
-        producer.publishAccountRecoveryMessage(dto.email(), jwt);
-        return ResponseEntity.status(HttpStatus.OK).build();
-    }
 
     @Operation(summary = "Login user", description = "Authenticates a user with username and password.")
     @ApiResponses(value = {
@@ -128,6 +112,38 @@ public class AuthController {
         String accessToken = bearerToken.replace("Bearer ", "");
         service.logout(accessToken);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+
+    @Operation(summary = "Request user password change", description = "Generates a token for password change and sends it via email.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Email sent successfully."),
+            @ApiResponse(responseCode = "400", description = "Invalid input data.", content = @Content(mediaType = "application/json")),
+            @ApiResponse(responseCode = "404", description = "Account not found.", content = @Content(examples = {})),
+            @ApiResponse(responseCode = "500", description = "Internal server error.", content = @Content(examples = {}))
+    })
+    @PostMapping("/change-password")
+    public ResponseEntity<String> requestPasswordChange(
+            @Valid @RequestBody AuthChangeREQ dto
+    ) {
+        String jwt = service.generatePasswordChangeToken(dto.email());
+        producer.publishAccountPasswordChangeMessage(dto.email(), jwt);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    @Operation(summary = "Request user email change", description = "Generates a token for email change and sends it via email.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Email sent successfully."),
+            @ApiResponse(responseCode = "400", description = "Invalid input data.", content = @Content(mediaType = "application/json")),
+            @ApiResponse(responseCode = "404", description = "Account not found.", content = @Content(examples = {})),
+            @ApiResponse(responseCode = "500", description = "Internal server error.", content = @Content(examples = {}))
+    })
+    @PostMapping("/change-email")
+    public ResponseEntity<String> requestEmailChange(
+            @Valid @RequestBody AuthChangeREQ dto
+    ) {
+        String jwt = service.generateEmailChangeToken(dto.email());
+        producer.publishAccountEmailChangeMessage(dto.email(), jwt);
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 
 }

@@ -1,6 +1,6 @@
 package xyz.xisyz.adapter.consumer.dto;
 
-public record RecoveryDTO(
+public record EmailChangeDTO(
         String mailTo,
         String subject,
         String text

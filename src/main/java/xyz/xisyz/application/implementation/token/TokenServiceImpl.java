@@ -116,7 +116,22 @@ public class TokenServiceImpl implements TokenService {
     }
 
     @Override
-    public String generateChangePasswordToken(String email) {
+    public String generatePasswordChangeToken(String email) {
+        userRepository.findByEmail(email).orElseThrow(EntityNotFoundException::new);
+        try {
+            Algorithm algorithm = Algorithm.HMAC256(secret);
+            return JWT.create()
+                    .withIssuer("XYZ")
+                    .withSubject(email)
+                    .withExpiresAt(getExpirationTime("access"))
+                    .sign(algorithm);
+        } catch (JWTCreationException exception) {
+            throw new JWTCreationException("👀", exception);
+        }
+    }
+
+    @Override
+    public String generateEmailChangeToken(String email) {
         userRepository.findByEmail(email).orElseThrow(EntityNotFoundException::new);
         try {
             Algorithm algorithm = Algorithm.HMAC256(secret);

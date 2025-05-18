@@ -17,7 +17,9 @@ public interface TokenService {
 
     String generateActivationToken(User user);
 
-    String generateChangePasswordToken(String email);
+    String generatePasswordChangeToken(String email);
+
+    String generateEmailChangeToken(String email);
 
     String validateToken(String accessToken);
 

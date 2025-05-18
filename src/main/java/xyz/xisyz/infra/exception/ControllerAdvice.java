@@ -162,6 +162,20 @@ public class ControllerAdvice {
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(errors.stream().map(CustomResponse::new).toList());
     }
 
+    @ExceptionHandler(CustomExceptions.SamePasswordException.class)
+    private ResponseEntity<List<CustomResponse>> handleSamePasswordException(CustomExceptions.SamePasswordException ex) {
+        List<FieldError> errors = new ArrayList<>();
+        errors.add(new FieldError("user", "password", ex.getMessage()));
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors.stream().map(CustomResponse::new).toList());
+    }
+
+    @ExceptionHandler(CustomExceptions.SameEmailExpection.class)
+    private ResponseEntity<List<CustomResponse>> handleSameEmailExpection(CustomExceptions.SameEmailExpection ex) {
+        List<FieldError> errors = new ArrayList<>();
+        errors.add(new FieldError("user", "email", ex.getMessage()));
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors.stream().map(CustomResponse::new).toList());
+    }
+
     @ExceptionHandler(CustomExceptions.SelfFollowException.class)
     private ResponseEntity<List<CustomResponse>> handleSelfFollowException(CustomExceptions.SelfFollowException ex) {
         List<FieldError> errors = new ArrayList<>();

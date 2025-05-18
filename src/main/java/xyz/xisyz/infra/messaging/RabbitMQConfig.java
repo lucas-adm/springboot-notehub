@@ -13,8 +13,11 @@ public class RabbitMQConfig {
     @Value("${broker.queue.activation.name}")
     private String activation;
 
-    @Value("${broker.queue.recovery.name}")
-    private String recovery;
+    @Value("${broker.queue.password.name}")
+    private String password;
+
+    @Value("${broker.queue.email.name}")
+    private String email;
 
     @Bean
     public Queue activationQueue() {
@@ -22,8 +25,13 @@ public class RabbitMQConfig {
     }
 
     @Bean
-    public Queue recoveryQueue() {
-        return new Queue(recovery, true);
+    public Queue passwordQueue() {
+        return new Queue(password, true);
+    }
+
+    @Bean
+    public Queue emailQueue() {
+        return new Queue(email, true);
     }
 
     @Bean

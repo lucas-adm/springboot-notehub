@@ -82,6 +82,45 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
+    @Operation(summary = "Reset user password", description = "Resets the user's password using the provided token.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "202", description = "User's password updated successfully."),
+            @ApiResponse(responseCode = "400", description = "Invalid or same password."),
+            @ApiResponse(responseCode = "403", description = "Invalid token."),
+            @ApiResponse(responseCode = "404", description = "User not found."),
+            @ApiResponse(responseCode = "500", description = "Internal server error.")
+    })
+    @PatchMapping("/change-password")
+    @Transactional
+    public ResponseEntity<Void> patchPassword(
+            @Parameter(hidden = true) @RequestHeader("Authorization") String token,
+            @Valid @RequestBody ChangePasswordREQ dto
+    ) {
+        String emailFromToken = JWT.decode(token.replace("Bearer ", "")).getSubject();
+        service.changePassword(emailFromToken, dto.password());
+        return ResponseEntity.status(HttpStatus.ACCEPTED).build();
+    }
+
+    @Operation(summary = "Update email", description = "Updates the user's email address.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "202", description = "Email updated successfully."),
+            @ApiResponse(responseCode = "400", description = "Invalid or same email."),
+            @ApiResponse(responseCode = "403", description = "Invalid token."),
+            @ApiResponse(responseCode = "404", description = "User not found."),
+            @ApiResponse(responseCode = "406", description = "Email already exists."),
+            @ApiResponse(responseCode = "500", description = "Internal server error.")
+    })
+    @PatchMapping("/change-email")
+    @Transactional
+    public ResponseEntity<Void> patchEmail(
+            @Parameter(hidden = true) @RequestHeader("Authorization") String token,
+            @Valid @RequestBody ChangeEmailREQ dto
+    ) {
+        String emailFromToken = JWT.decode(token.replace("Bearer ", "")).getSubject();
+        service.changeEmail(emailFromToken, dto.email());
+        return ResponseEntity.status(HttpStatus.ACCEPTED).build();
+    }
+
     @Operation(summary = "Update user profile", description = "Updates the user's profile information based on the provided data.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "202", description = "User profile updated successfully."),
@@ -117,26 +156,6 @@ public class UserController {
         UUID idFromToken = getSubject(accessToken);
         service.changeProfileVisibility(idFromToken);
         return ResponseEntity.status(HttpStatus.OK).build();
-    }
-
-    @Operation(summary = "Update email", description = "Updates the user's email address.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "202", description = "Email updated successfully."),
-            @ApiResponse(responseCode = "400", description = "Invalid email."),
-            @ApiResponse(responseCode = "403", description = "Invalid token."),
-            @ApiResponse(responseCode = "404", description = "User not found."),
-            @ApiResponse(responseCode = "406", description = "Email already exists."),
-            @ApiResponse(responseCode = "500", description = "Internal server error.")
-    })
-    @PatchMapping("/profile/email")
-    @Transactional
-    public ResponseEntity<Void> patchEmail(
-            @Parameter(hidden = true) @RequestHeader("Authorization") String accessToken,
-            @Valid @RequestBody ChangeEmailREQ dto
-    ) {
-        UUID idFromToken = getSubject(accessToken);
-        service.changeEmail(idFromToken, dto.email());
-        return ResponseEntity.status(HttpStatus.ACCEPTED).build();
     }
 
     @Operation(summary = "Update username", description = "Updates the user's username.")
@@ -232,25 +251,6 @@ public class UserController {
     ) {
         UUID idFromToken = getSubject(accessToken);
         service.changeMessage(idFromToken, dto.message());
-        return ResponseEntity.status(HttpStatus.ACCEPTED).build();
-    }
-
-    @Operation(summary = "Reset user password", description = "Resets the user's password using the provided token.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "202", description = "User's password updated successfully."),
-            @ApiResponse(responseCode = "400", description = "Invalid password."),
-            @ApiResponse(responseCode = "403", description = "Invalid token."),
-            @ApiResponse(responseCode = "404", description = "User not found."),
-            @ApiResponse(responseCode = "500", description = "Internal server error.")
-    })
-    @PatchMapping("/profile/reset-password")
-    @Transactional
-    public ResponseEntity<Void> patchPassword(
-            @Parameter(hidden = true) @RequestHeader("Authorization") String token,
-            @Valid @RequestBody ChangePasswordREQ dto
-    ) {
-        String emailFromToken = JWT.decode(token.replace("Bearer ", "")).getSubject();
-        service.changePassword(emailFromToken, dto.password());
         return ResponseEntity.status(HttpStatus.ACCEPTED).build();
     }
 

@@ -17,11 +17,13 @@ public interface UserService {
 
     void activate(UUID idFromToken);
 
+    void changePassword(String email, String newPassword);
+
+    void changeEmail(String oldEmail, String newEmail);
+
     User edit(UUID idFromToken, User user);
 
     void changeProfileVisibility(UUID idFromToken);
-
-    void changeEmail(UUID idFromToken, String email);
 
     void changeUsername(UUID idFromToken, String username);
 
@@ -32,8 +34,6 @@ public interface UserService {
     void changeBanner(UUID idFromToken, String banner);
 
     void changeMessage(UUID idFromToken, String message);
-
-    void changePassword(String email, String password);
 
     void follow(UUID idFromToken, String username);
 

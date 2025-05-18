@@ -1,7 +1,5 @@
 package xyz.xisyz.adapter.consumer;
 
-import xyz.xisyz.adapter.consumer.dto.ActivationDTO;
-import xyz.xisyz.adapter.consumer.dto.RecoveryDTO;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
@@ -11,6 +9,9 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Component;
+import xyz.xisyz.adapter.consumer.dto.ActivationDTO;
+import xyz.xisyz.adapter.consumer.dto.EmailChangeDTO;
+import xyz.xisyz.adapter.consumer.dto.PasswordChangeDTO;
 
 @Component
 @RequiredArgsConstructor
@@ -34,7 +35,17 @@ public class MailConsumer {
         mailSender.send(message);
     }
 
-    public void sendRecoveryMail(RecoveryDTO dto) throws MessagingException {
+    public void sendPasswordChangeMail(PasswordChangeDTO dto) throws MessagingException {
+        MimeMessage message = mailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(message, false, "utf-8");
+        helper.setFrom(String.format("%s <%s>", friendlyName, mailFrom));
+        helper.setTo(dto.mailTo());
+        helper.setSubject(dto.subject());
+        helper.setText(dto.text(), true);
+        mailSender.send(message);
+    }
+
+    public void sendEmailChangeMail(EmailChangeDTO dto) throws MessagingException {
         MimeMessage message = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message, false, "utf-8");
         helper.setFrom(String.format("%s <%s>", friendlyName, mailFrom));
@@ -53,10 +64,19 @@ public class MailConsumer {
         }
     }
 
-    @RabbitListener(queues = "${broker.queue.recovery.name}")
-    public void recoveryQueueListenner(@Payload RecoveryDTO dto) throws MessagingException {
+    @RabbitListener(queues = "${broker.queue.password.name}")
+    public void passwordQueueListenner(@Payload PasswordChangeDTO dto) throws MessagingException {
         try {
-            sendRecoveryMail(dto);
+            sendPasswordChangeMail(dto);
+        } catch (MessagingException exception) {
+            System.out.println(exception.getMessage());
+        }
+    }
+
+    @RabbitListener(queues = "${broker.queue.email.name}")
+    public void emailQueueListenner(@Payload EmailChangeDTO dto) throws MessagingException {
+        try {
+            sendEmailChangeMail(dto);
         } catch (MessagingException exception) {
             System.out.println(exception.getMessage());
         }

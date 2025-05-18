@@ -56,14 +56,15 @@ public class UserServiceImpl implements UserService {
         historian.setHistory(user, field, String.valueOf(oldValue), newValue.toString());
     }
 
-    private void validateEmail(UUID idFromToken, String email) {
-        repository.findByEmail(email).ifPresent((stored) -> {
-            repository.findById(idFromToken).ifPresent((user) -> {
-                        if (!Objects.equals(stored, user)) {
-                            throw new DataIntegrityViolationException("email");
-                        }
-                    }
-            );
+    private String validatePassword(String oldPassword, String newPassword) {
+        if (encoder.matches(newPassword, oldPassword)) throw new CustomExceptions.SamePasswordException();
+        return encoder.encode(newPassword);
+    }
+
+    private void validateEmail(String oldEmail, String newEmail) {
+        repository.findByEmail(newEmail).ifPresent(user -> {
+            if (Objects.equals(oldEmail, newEmail)) throw new CustomExceptions.SameEmailExpection();
+            throw new DataIntegrityViolationException("email");
         });
     }
 
@@ -110,11 +111,11 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User create(User user) {
-        if (repository.findByEmail(user.getEmail()).isPresent() && repository.findByUsername(user.getUsername()).isPresent()) {
-            throw new DataIntegrityViolationException("both");
-        }
-        validateEmail(null, user.getEmail());
-        validateUsername(null, user.getUsername());
+        boolean existsByEmail = repository.existsByEmail(user.getEmail());
+        boolean existsByUsername = repository.existsByUsername(user.getUsername());
+        if (existsByEmail && existsByUsername) throw new DataIntegrityViolationException("both");
+        if (existsByEmail) throw new DataIntegrityViolationException("email");
+        if (existsByUsername) throw new DataIntegrityViolationException("username");
         user.setPassword(encoder.encode(user.getPassword()));
         return repository.save(user);
     }
@@ -127,6 +128,20 @@ public class UserServiceImpl implements UserService {
     @Override
     public void activate(UUID idFromToken) {
         changeField(idFromToken, "active", User::isActive, user -> user.setActive(true));
+    }
+
+    @Override
+    public void changePassword(String email, String newPassword) {
+        User entity = repository.findByEmail(email).orElseThrow(EntityNotFoundException::new);
+        String password = validatePassword(entity.getPassword(), newPassword);
+        changeField(entity.getId(), "password", User::getPassword, user -> user.setPassword(password));
+    }
+
+    @Override
+    public void changeEmail(String oldEmail, String newEmail) {
+        validateEmail(oldEmail, newEmail);
+        UUID id = repository.findByEmail(oldEmail).orElseThrow(EntityNotFoundException::new).getId();
+        changeField(id, "email", User::getEmail, user -> user.setEmail(newEmail.toLowerCase()));
     }
 
     @Override
@@ -144,12 +159,6 @@ public class UserServiceImpl implements UserService {
     @Override
     public void changeProfileVisibility(UUID idFromToken) {
         changeField(idFromToken, "profile_private", User::isProfilePrivate, user -> user.setProfilePrivate(!user.isProfilePrivate()));
-    }
-
-    @Override
-    public void changeEmail(UUID idFromToken, String email) {
-        validateEmail(idFromToken, email);
-        changeField(idFromToken, "email", User::getEmail, user -> user.setEmail(email.toLowerCase()));
     }
 
     @Override
@@ -176,12 +185,6 @@ public class UserServiceImpl implements UserService {
     @Override
     public void changeMessage(UUID idFromToken, String message) {
         changeField(idFromToken, "message", User::getMessage, user -> user.setMessage(message));
-    }
-
-    @Override
-    public void changePassword(String email, String password) {
-        UUID id = repository.findByEmail(email).orElseThrow(EntityNotFoundException::new).getId();
-        changeField(id, "password", User::getPassword, user -> user.setPassword(encoder.encode(password)));
     }
 
     @Override
