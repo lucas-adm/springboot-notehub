@@ -39,7 +39,7 @@ public interface UserService {
 
     void unfollow(UUID idFromToken, String username);
 
-    void delete(UUID idFromToken);
+    void delete(UUID idFromToken, String password);
 
     Page<User> findAll(Pageable pageable, String q);
 

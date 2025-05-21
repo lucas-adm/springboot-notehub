@@ -293,6 +293,8 @@ public class UserController {
     @Operation(summary = "Delete user account", description = "Deletes the user's account.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "User account deleted successfully."),
+            @ApiResponse(responseCode = "400", description = "Invalid input data.", content = @Content(mediaType = "application/json")),
+            @ApiResponse(responseCode = "401", description = "Invalid password.", content = @Content(mediaType = "application/json")),
             @ApiResponse(responseCode = "403", description = "Invalid token.", content = @Content(examples = {})),
             @ApiResponse(responseCode = "404", description = "User not found.", content = @Content(examples = {})),
             @ApiResponse(responseCode = "500", description = "Internal server error.", content = @Content(examples = {}))
@@ -300,10 +302,11 @@ public class UserController {
     @DeleteMapping("/delete")
     @Transactional
     public ResponseEntity<Void> deleteUser(
-            @Parameter(hidden = true) @RequestHeader("Authorization") String accessToken
+            @Parameter(hidden = true) @RequestHeader("Authorization") String accessToken,
+            @Valid @RequestBody DeleteUserREQ dto
     ) {
         UUID idFromToken = getSubject(accessToken);
-        service.delete(idFromToken);
+        service.delete(idFromToken, dto.password());
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 

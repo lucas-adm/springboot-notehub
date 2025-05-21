@@ -8,6 +8,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import xyz.xisyz.application.counter.Counter;
@@ -205,8 +206,10 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void delete(UUID idFromToken) {
+    public void delete(UUID idFromToken, String password) {
         User user = repository.findById(idFromToken).orElseThrow(EntityNotFoundException::new);
+        boolean matches = encoder.matches(password, user.getPassword());
+        if (!matches) throw new BadCredentialsException("password");
         user.getFollowing().forEach(following -> {
             following.getFollowers().remove(user);
             following.setFollowersCount(following.getFollowersCount() - 1);
