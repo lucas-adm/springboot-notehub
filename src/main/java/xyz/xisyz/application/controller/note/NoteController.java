@@ -21,7 +21,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import xyz.xisyz.application.dto.request.note.*;
-import xyz.xisyz.application.dto.response.note.CreateNoteRES;
 import xyz.xisyz.application.dto.response.note.DetailNoteRES;
 import xyz.xisyz.application.dto.response.note.LowDetailNoteRES;
 import xyz.xisyz.application.dto.response.page.PageRES;
@@ -56,13 +55,13 @@ public class NoteController {
     })
     @PostMapping("/new-note")
     @Transactional
-    public ResponseEntity<CreateNoteRES> createNote(
+    public ResponseEntity<LowDetailNoteRES> createNote(
             @Parameter(hidden = true) @RequestHeader("Authorization") String accessToken,
             @Valid @RequestBody CreateNoteREQ dto
     ) {
         UUID idFromToken = getSubject(accessToken);
         Note note = service.create(service.mapToNote(idFromToken, dto));
-        return ResponseEntity.status(HttpStatus.CREATED).body(new CreateNoteRES(note));
+        return ResponseEntity.status(HttpStatus.CREATED).body(new LowDetailNoteRES(note));
     }
 
     @Operation(summary = "Edit note fields", description = "Updates note.")
@@ -364,54 +363,20 @@ public class NoteController {
         return ResponseEntity.status(HttpStatus.OK).body(new PageRES<>(page));
     }
 
-    @Operation(summary = "Get a public note details", description = "Retrieves detailed information about a note by their uuid.")
+    @Operation(summary = "Get a note details", description = "Retrieves detailed information about a note by their uuid.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Search results retrieved successfully."),
-            @ApiResponse(responseCode = "404", description = "Note not found", content = @Content(examples = {})),
+            @ApiResponse(responseCode = "403", description = "Access denied.", content = @Content(mediaType = "application/json")),
+            @ApiResponse(responseCode = "404", description = "Note not found.", content = @Content(examples = {})),
             @ApiResponse(responseCode = "500", description = "Internal server error.", content = @Content(examples = {}))
     })
     @GetMapping("/{id}")
     public ResponseEntity<DetailNoteRES> getPublicNote(
-            @PathVariable("id") UUID idFromPath
-    ) {
-        Note note = service.getPublicNote(idFromPath);
-        return ResponseEntity.status(HttpStatus.OK).body(new DetailNoteRES(note));
-    }
-
-    @Operation(summary = "Get a private note details", description = "Retrieves detailed information about a note by their uuid.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Search results retrieved successfully."),
-            @ApiResponse(responseCode = "403", description = "Invalid token.", content = @Content(examples = {})),
-            @ApiResponse(responseCode = "404", description = "Note not found", content = @Content(examples = {})),
-            @ApiResponse(responseCode = "500", description = "Internal server error.", content = @Content(examples = {}))
-    })
-    @GetMapping("/private/{id}")
-    public ResponseEntity<DetailNoteRES> getPrivateNote(
-            @Parameter(hidden = true) @RequestHeader("Authorization") String accessToken,
+            @Parameter(hidden = true) @RequestHeader(required = false, value = "Authorization") String accessToken,
             @PathVariable("id") UUID idFromPath
     ) {
         UUID idFromToken = getSubject(accessToken);
-        Note note = service.getPrivateNote(idFromToken, idFromPath);
-        return ResponseEntity.status(HttpStatus.OK).body(new DetailNoteRES(note));
-    }
-
-    @Operation(
-            summary = "Get details of a note created by a private profile user",
-            description = "Both the requester and the note's owner must follow each other to access the note."
-    )
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Note details retrieved successfully."),
-            @ApiResponse(responseCode = "403", description = "No bidirectional follow relationship between users or invalid token.", content = @Content(examples = {})),
-            @ApiResponse(responseCode = "404", description = "Note not found", content = @Content(examples = {})),
-            @ApiResponse(responseCode = "500", description = "Internal server error.", content = @Content(examples = {}))
-    })
-    @GetMapping("/private/mutual/{id}")
-    public ResponseEntity<DetailNoteRES> getPrivateFollowingUserNote(
-            @Parameter(hidden = true) @RequestHeader("Authorization") String accessToken,
-            @PathVariable("id") UUID idFromPath
-    ) {
-        UUID idFromToken = getSubject(accessToken);
-        Note note = service.getPrivateFollowingUserNote(idFromToken, idFromPath);
+        Note note = service.getNote(idFromToken, idFromPath);
         return ResponseEntity.status(HttpStatus.OK).body(new DetailNoteRES(note));
     }
 

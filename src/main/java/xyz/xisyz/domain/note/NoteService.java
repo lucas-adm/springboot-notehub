@@ -47,11 +47,7 @@ public interface NoteService {
 
     Page<Note> findUserNotesBySpecs(UUID idFromToken, Pageable pageable, String username, String q, String tag, String type);
 
-    Note getPublicNote(UUID idFromPath);
-
-    Note getPrivateNote(UUID idFromToken, UUID idFromPath);
-
-    Note getPrivateFollowingUserNote(UUID idFromToken, UUID idFromPath);
+    Note getNote(UUID idFromToken, UUID idFromPath);
 
     Page<Note> getAllUserNotesByUsername(Pageable pageable, String username);
 

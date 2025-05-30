@@ -22,10 +22,6 @@ public record CreateNoteREQ(
         @Size(max = 255, message = "Além do limite")
         String description,
 
-        @Pattern(
-                regexp = "^(?!.*[\\u00A0\\u2007\\u202F]).*$",
-                message = "👀"
-        )
         String markdown,
 
         boolean closed,

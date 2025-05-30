@@ -197,25 +197,14 @@ public class NoteServiceImpl implements NoteService {
         return repository.searchUserNotesBySpecs(pageable, username, q, tag, type);
     }
 
+    @Transactional(readOnly = true)
     @Override
-    public Note getPublicNote(UUID idFromPath) {
-        return repository.findByIdAndHiddenFalseAndUserProfilePrivateFalse(idFromPath).orElseThrow(EntityNotFoundException::new);
-    }
-
-    @Override
-    public Note getPrivateNote(UUID idFromToken, UUID idFromPath) {
-        Note note = repository.findByIdWithUserAndTags(idFromPath).orElseThrow(EntityNotFoundException::new);
-        validateAccess(idFromToken, note.getUser().getId());
-        return note;
-    }
-
-    @Override
-    public Note getPrivateFollowingUserNote(UUID idFromToken, UUID idFromPath) {
-        Note note = repository.findByIdAndHiddenFalseWithUserAndTags(idFromPath).orElseThrow(EntityNotFoundException::new);
-        User requesting = userRepository.findByIdWithFollowersAndFollowing(idFromToken).orElseThrow(EntityNotFoundException::new);
-        User requested = userRepository.findByIdWithFollowersAndFollowing(note.getUser().getId()).orElseThrow(EntityNotFoundException::new);
-        validateBidirectionalFollowAccess(requesting, requested);
-        return note;
+    public Note getNote(UUID idFromToken, UUID idFromPath) {
+        User requesting = (idFromToken != null) ? userRepository.findById(idFromToken).orElseThrow(EntityNotFoundException::new) : null;
+        Note requested = repository.findNote(idFromPath).orElseThrow(EntityNotFoundException::new);
+        validateBidirectionalFollowAccess(requesting, requested.getUser());
+        if (requested.isHidden()) validateAccess(idFromToken, requested.getUser().getId());
+        return requested;
     }
 
     @Override
