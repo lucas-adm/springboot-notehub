@@ -13,7 +13,7 @@ public record DetailReplyRES(
         String created_at,
         String text,
         boolean modified,
-        String toUser,
+        String to_user,
         DetailUserRES user
 ) {
     public DetailReplyRES(Reply reply) {

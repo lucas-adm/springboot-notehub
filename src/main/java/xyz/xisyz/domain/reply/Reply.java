@@ -66,7 +66,7 @@ public class Reply {
         this.user = user;
         this.comment = comment;
         this.toReply = reply;
-        this.toUser = reply.getUser().getDisplayName();
+        this.toUser = reply.getUser().getUsername();
         this.text = text;
     }
 

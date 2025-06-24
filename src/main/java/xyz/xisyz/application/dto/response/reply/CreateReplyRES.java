@@ -12,6 +12,7 @@ public record CreateReplyRES(
         UUID id,
         String created_at,
         String text,
+        String to_user,
         DetailUserRES user
 ) {
     public CreateReplyRES(Reply reply) {
@@ -19,6 +20,7 @@ public record CreateReplyRES(
                 reply.getId(),
                 reply.getCreatedAt().atZone(ZoneId.of("America/Sao_Paulo")).format(DateTimeFormatter.ofPattern("d/M/yy HH:mm", Locale.of("pt-BR"))),
                 reply.getText(),
+                reply.getToUser(),
                 new DetailUserRES(reply.getUser())
         );
     }

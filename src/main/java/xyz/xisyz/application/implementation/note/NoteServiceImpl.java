@@ -62,10 +62,11 @@ public class NoteServiceImpl implements NoteService {
 
     private List<Tag> findOrCreateTags(List<String> tags) {
         if (tags == null) return null;
-        return tags.stream()
+        List<Tag> immutableList = tags.stream()
                 .map(String::toLowerCase).distinct()
                 .map(tag -> tagRepository.findByName(tag).orElseGet(() -> new Tag(tag.toLowerCase())))
                 .toList();
+        return new ArrayList<>(immutableList);
     }
 
     private void changeField(UUID idFromToken, UUID idFromPath, Consumer<Note> setter) {
