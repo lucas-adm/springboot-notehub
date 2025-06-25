@@ -1,9 +1,9 @@
 package xyz.xisyz.domain.reply;
 
-import xyz.xisyz.application.dto.request.reply.CreateReplyREQ;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import xyz.xisyz.application.dto.request.reply.CreateReplyREQ;
 
 import java.util.UUID;
 
@@ -20,6 +20,6 @@ public interface ReplyService {
 
     void delete(UUID idFromToken, UUID idFromPath);
 
-    Page<Reply> getReplies(Pageable pageable, UUID commentIdFromPath);
+    Page<Reply> getReplies(Pageable pageable, UUID idFromToken, UUID commentIdFromPath);
 
 }

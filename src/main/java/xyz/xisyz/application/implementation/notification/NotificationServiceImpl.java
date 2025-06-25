@@ -1,5 +1,6 @@
 package xyz.xisyz.application.implementation.notification;
 
+import jakarta.annotation.Nullable;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -22,7 +23,8 @@ public class NotificationServiceImpl implements NotificationService {
     private final NotificationRepository repository;
 
     @Override
-    public void notify(User toUser, User user, MessageNotification message) {
+    public void notify(@Nullable User toUser, User user, MessageNotification message) {
+        if (toUser == null) return;
         if (Objects.equals(toUser.getId(), user.getId())) return;
         repository.save(new Notification(toUser, user, message.info()));
     }

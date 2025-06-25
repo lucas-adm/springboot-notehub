@@ -1,7 +1,5 @@
 package xyz.xisyz.domain.reply;
 
-import xyz.xisyz.domain.comment.Comment;
-import xyz.xisyz.domain.user.User;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.Data;
@@ -10,6 +8,8 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
+import xyz.xisyz.domain.comment.Comment;
+import xyz.xisyz.domain.user.User;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -66,8 +66,9 @@ public class Reply {
         this.user = user;
         this.comment = comment;
         this.toReply = reply;
-        this.toUser = reply.getUser().getUsername();
         this.text = text;
+        if (reply.getUser() != null) this.toUser = reply.getUser().getUsername();
+        if (reply.getUser() == null) this.toUser = "user";
     }
 
 }

@@ -39,6 +39,7 @@ public class CommentController {
     private final CommentService service;
 
     private UUID getSubject(String bearerToken) {
+        if (bearerToken == null) return null;
         String idFromToken = JWT.decode(bearerToken.replace("Bearer ", "")).getSubject();
         return UUID.fromString(idFromToken);
     }
@@ -109,10 +110,12 @@ public class CommentController {
     })
     @GetMapping("/{id}/comments")
     public ResponseEntity<PageRES<DetailCommentRES>> getComments(
+            @Parameter(hidden = true) @RequestHeader(required = false, value = "Authorization") String accessToken,
             @ParameterObject @PageableDefault(page = 0, size = 10, sort = {"repliesCount"}, direction = Sort.Direction.DESC) Pageable pageable,
             @PathVariable("id") UUID idFromPath
     ) {
-        Page<DetailCommentRES> page = service.getComments(pageable, idFromPath).map(DetailCommentRES::new);
+        UUID idFromToken = getSubject(accessToken);
+        Page<DetailCommentRES> page = service.getComments(pageable, idFromToken, idFromPath).map(DetailCommentRES::new);
         return ResponseEntity.status(HttpStatus.OK).body(new PageRES<>(page));
     }
 

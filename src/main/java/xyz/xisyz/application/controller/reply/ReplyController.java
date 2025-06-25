@@ -39,6 +39,7 @@ public class ReplyController {
     private final ReplyService service;
 
     private UUID getSubject(String bearerToken) {
+        if (bearerToken == null) return null;
         String idFromToken = JWT.decode(bearerToken.replace("Bearer ", "")).getSubject();
         return UUID.fromString(idFromToken);
     }
@@ -129,10 +130,12 @@ public class ReplyController {
     })
     @GetMapping("/{id}/replies")
     public ResponseEntity<PageRES<DetailReplyRES>> getReplies(
+            @Parameter(hidden = true) @RequestHeader(required = false, value = "Authorization") String accessToken,
             @ParameterObject @PageableDefault(page = 0, size = 10, sort = {"createdAt"}, direction = Sort.Direction.ASC) Pageable pageable,
             @PathVariable("id") UUID idFromPath
     ) {
-        Page<DetailReplyRES> page = service.getReplies(pageable, idFromPath).map(DetailReplyRES::new);
+        UUID idFromToken = getSubject(accessToken);
+        Page<DetailReplyRES> page = service.getReplies(pageable, idFromToken, idFromPath).map(DetailReplyRES::new);
         return ResponseEntity.status(HttpStatus.OK).body(new PageRES<>(page));
     }
 

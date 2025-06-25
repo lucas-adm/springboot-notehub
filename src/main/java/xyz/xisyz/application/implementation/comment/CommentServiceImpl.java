@@ -1,5 +1,13 @@
 package xyz.xisyz.application.implementation.comment;
 
+import jakarta.annotation.Nullable;
+import jakarta.persistence.EntityNotFoundException;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import xyz.xisyz.application.counter.Counter;
 import xyz.xisyz.application.dto.notification.MessageNotification;
 import xyz.xisyz.application.dto.request.comment.CreateCommentREQ;
@@ -11,12 +19,6 @@ import xyz.xisyz.domain.note.NoteRepository;
 import xyz.xisyz.domain.notification.NotificationService;
 import xyz.xisyz.domain.user.User;
 import xyz.xisyz.domain.user.UserRepository;
-import jakarta.persistence.EntityNotFoundException;
-import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.security.access.AccessDeniedException;
-import org.springframework.stereotype.Component;
 
 import java.time.Instant;
 import java.util.Objects;
@@ -32,9 +34,20 @@ public class CommentServiceImpl implements CommentService {
     private final NotificationService notifier;
     private final Counter counter;
 
-    private void validateAccess(UUID idFromToken, Comment comment) {
-        if (!Objects.equals(idFromToken, comment.getUser().getId())) {
+    private void validateAccess(@Nullable UUID idFromToken, UUID idFromRequested) {
+        if (idFromToken == null) throw new AccessDeniedException("Usuário sem permissão.");
+        if (!Objects.equals(idFromToken, idFromRequested)) {
             throw new AccessDeniedException("Usuário sem permissão.");
+        }
+    }
+
+    private void validateBidirectionalFollowAccess(@Nullable User requesting, User requested) {
+        if (requesting == null) throw new AccessDeniedException("Não há vínculo bidirecional entre os usuários.");
+        boolean isSameUser = Objects.equals(requesting.getUsername(), requested.getUsername());
+        boolean requestedContainsRequesting = requested.getFollowing().contains(requesting);
+        boolean requestingContainsRequested = requesting.getFollowing().contains(requested);
+        if (!isSameUser && (!requestedContainsRequesting || !requestingContainsRequested)) {
+            throw new AccessDeniedException("Não há vínculo bidirecional entre os usuários.");
         }
     }
 
@@ -61,7 +74,7 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public void edit(UUID idFromToken, UUID idFromPath, String text) {
         Comment comment = repository.findById(idFromPath).orElseThrow(EntityNotFoundException::new);
-        validateAccess(idFromToken, comment);
+        validateAccess(idFromToken, comment.getUser().getId());
         assertNoteIsNotClosed(comment);
         comment.setText(text);
         comment.setModified(true);
@@ -72,14 +85,22 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public void delete(UUID idFromToken, UUID idFromPath) {
         Comment comment = repository.findById(idFromPath).orElseThrow(EntityNotFoundException::new);
-        validateAccess(idFromToken, comment);
+        validateAccess(idFromToken, comment.getUser().getId());
         repository.delete(comment);
         counter.updateCommentsCount(comment.getNote(), false);
     }
 
+    @Transactional(readOnly = true)
     @Override
-    public Page<Comment> getComments(Pageable pageable, UUID noteIdFromPath) {
-        return repository.findAllByNoteId(pageable, noteIdFromPath);
+    public Page<Comment> getComments(Pageable pageable, UUID idFromToken, UUID noteIdFromPath) {
+        User requesting = (idFromToken != null) ? userRepository.findById(idFromToken).orElseThrow(EntityNotFoundException::new) : null;
+        Note requested = noteRepository.findById(noteIdFromPath).orElseThrow(EntityNotFoundException::new);
+        User author = requested.getUser();
+        if (author != null) {
+            if (requested.isHidden()) validateAccess(idFromToken, author.getId());
+            if (author.isProfilePrivate()) validateBidirectionalFollowAccess(requesting, author);
+        }
+        return repository.findAllByNoteId(pageable, requested.getId());
     }
 
 }

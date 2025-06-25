@@ -1,9 +1,9 @@
 package xyz.xisyz.domain.comment;
 
-import xyz.xisyz.application.dto.request.comment.CreateCommentREQ;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import xyz.xisyz.application.dto.request.comment.CreateCommentREQ;
 
 import java.util.UUID;
 
@@ -18,6 +18,6 @@ public interface CommentService {
 
     void delete(UUID idFromToken, UUID idFromPath);
 
-    Page<Comment> getComments(Pageable pageable, UUID noteIdFromPath);
+    Page<Comment> getComments(Pageable pageable, UUID idFromToken, UUID noteIdFromPath);
 
 }
