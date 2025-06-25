@@ -4,6 +4,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import xyz.xisyz.application.dto.request.note.CreateNoteREQ;
+import xyz.xisyz.domain.user.User;
 
 import java.util.List;
 import java.util.UUID;
@@ -30,6 +31,10 @@ public interface NoteService {
     void changeTags(UUID idFromToken, UUID idFromPath, List<String> tags);
 
     void delete(UUID idFromToken, UUID idFromPath);
+
+    void deleteAllUserNotes(User user);
+
+    void deleteAllUserHiddenNotes(User user);
 
     List<String> getAllTags();
 

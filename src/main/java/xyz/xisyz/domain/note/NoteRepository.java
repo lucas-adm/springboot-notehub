@@ -132,4 +132,8 @@ public interface NoteRepository extends JpaRepository<Note, UUID> {
     @EntityGraph(attributePaths = {"user", "tags"})
     Page<Note> findAllByUserUsernameAndHiddenFalse(Pageable pageable, String username);
 
+    void deleteAllByUserId(UUID uuid);
+
+    void deleteAllByUserIdAndHiddenTrue(UUID uuid);
+
 }

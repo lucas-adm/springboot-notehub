@@ -11,9 +11,11 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import xyz.xisyz.application.counter.Counter;
 import xyz.xisyz.application.dto.notification.MessageNotification;
 import xyz.xisyz.domain.history.UserHistoryService;
+import xyz.xisyz.domain.note.NoteService;
 import xyz.xisyz.domain.notification.NotificationService;
 import xyz.xisyz.domain.token.TokenService;
 import xyz.xisyz.domain.user.User;
@@ -40,6 +42,7 @@ public class UserServiceImpl implements UserService {
     private final UserHistoryService historian;
     private final NotificationService notifier;
     private final TokenService tokenService;
+    private final NoteService noteService;
     private final PasswordEncoder encoder;
     private final Counter counter;
 
@@ -205,6 +208,7 @@ public class UserServiceImpl implements UserService {
         counter.updateFollowersAndFollowingCount(follower, following, false);
     }
 
+    @Transactional
     @Override
     public void delete(UUID idFromToken, String password) {
         User user = repository.findById(idFromToken).orElseThrow(EntityNotFoundException::new);
@@ -220,6 +224,8 @@ public class UserServiceImpl implements UserService {
             follower.setFollowingCount(follower.getFollowingCount() - 1);
             repository.save(follower);
         });
+        if (user.isProfilePrivate()) noteService.deleteAllUserNotes(user);
+        else noteService.deleteAllUserHiddenNotes(user);
         repository.delete(user);
     }
 

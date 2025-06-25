@@ -210,7 +210,6 @@ public class NoteController {
             @ApiResponse(responseCode = "500", description = "Internal server error.", content = @Content(examples = {}))
     })
     @DeleteMapping("/{id}/delete")
-    @Transactional
     public ResponseEntity<Void> deleteNote(
             @Parameter(hidden = true) @RequestHeader("Authorization") String accessToken,
             @PathVariable("id") UUID idFromPath

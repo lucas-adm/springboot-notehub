@@ -300,7 +300,6 @@ public class UserController {
             @ApiResponse(responseCode = "500", description = "Internal server error.", content = @Content(examples = {}))
     })
     @DeleteMapping("/delete")
-    @Transactional
     public ResponseEntity<Void> deleteUser(
             @Parameter(hidden = true) @RequestHeader("Authorization") String accessToken,
             @Valid @RequestBody DeleteUserREQ dto
