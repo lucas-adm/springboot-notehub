@@ -44,7 +44,7 @@ public record AuthRES(
                         token.getUser().getNotesCount(),
                         token.getUser().getFollowersCount(),
                         token.getUser().getFollowingCount(),
-                        token.getUser().getNotificationsToUser().stream().filter(notification -> !notification.isRead()).count()
+                        token.getUser().getNotifications().stream().filter(notification -> !notification.isRead()).count()
                 )
         );
     }

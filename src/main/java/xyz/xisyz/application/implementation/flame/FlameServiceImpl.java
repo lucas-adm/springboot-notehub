@@ -51,7 +51,7 @@ public class FlameServiceImpl implements FlameService {
         if (repository.existsByUserAndNote(user, note)) throw new EntityExistsException();
         Flame flame = repository.save(new Flame(user, note));
         counter.updateFlamesCount(note, true);
-        notifier.notify(note.getUser(), user, MessageNotification.of(flame));
+        notifier.notify(note.getUser(), MessageNotification.of(flame));
         return flame;
     }
 

@@ -1,6 +1,5 @@
 package xyz.xisyz.application.dto.response.notification;
 
-import xyz.xisyz.application.dto.response.user.DetailUserRES;
 import xyz.xisyz.domain.notification.Notification;
 
 import java.time.ZoneId;
@@ -13,7 +12,6 @@ public record DetailNotificationRES(
         UUID id,
         boolean read,
         String created_at,
-        DetailUserRES from_user,
         Map<String, Object> info
 ) {
     public DetailNotificationRES(Notification notification) {
@@ -23,7 +21,6 @@ public record DetailNotificationRES(
                 notification.getCreatedAt()
                         .atZone(ZoneId.of("America/Sao_Paulo"))
                         .format(DateTimeFormatter.ofPattern("d/M/yy HH:mm", Locale.of("pt-BR"))),
-                new DetailUserRES(notification.getFromUser()),
                 notification.getInfo()
         );
     }

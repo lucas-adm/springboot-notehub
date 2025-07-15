@@ -197,7 +197,7 @@ public class UserServiceImpl implements UserService {
         User following = repository.findByUsernameWithFollowersAndFollowing(username).orElseThrow(EntityNotFoundException::new);
         if (isFollowing(follower, following)) throw new CustomExceptions.AlreadyFollowingException();
         counter.updateFollowersAndFollowingCount(follower, following, true);
-        notifier.notify(following, follower, MessageNotification.of(follower));
+        notifier.notify(following, MessageNotification.of(follower, following));
     }
 
     @Override
