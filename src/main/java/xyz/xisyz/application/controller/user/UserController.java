@@ -54,7 +54,7 @@ public class UserController {
 
     @Operation(summary = "Register a new user", description = "Creates a new user account and sends an activation email.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "User registered successfully."),
+            @ApiResponse(responseCode = "202", description = "User registered successfully."),
             @ApiResponse(responseCode = "400", description = "Invalid input data.", content = @Content(mediaType = "application/json")),
             @ApiResponse(responseCode = "406", description = "Input data already exists.", content = @Content(mediaType = "application/json")),
             @ApiResponse(responseCode = "500", description = "Internal server error.", content = @Content(examples = {}))
@@ -66,7 +66,7 @@ public class UserController {
         User user = service.create(dto.toUser());
         String jwt = service.generateActivationToken(user);
         producer.publishAccountActivationMessage(jwt, user);
-        return ResponseEntity.status(HttpStatus.CREATED).body(new CreateUserRES(user));
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(new CreateUserRES(user));
     }
 
     @Hidden
@@ -76,12 +76,12 @@ public class UserController {
     ) {
         UUID idFromToken = getSubject(accessToken);
         service.activate(idFromToken);
-        return ResponseEntity.status(HttpStatus.OK).build();
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     @Operation(summary = "Reset user password", description = "Resets the user's password using the provided token.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "202", description = "User's password updated successfully."),
+            @ApiResponse(responseCode = "204", description = "User's password updated successfully."),
             @ApiResponse(responseCode = "400", description = "Invalid or same password."),
             @ApiResponse(responseCode = "403", description = "Invalid token."),
             @ApiResponse(responseCode = "404", description = "User not found."),
@@ -94,12 +94,12 @@ public class UserController {
     ) {
         String emailFromToken = JWT.decode(token.replace("Bearer ", "")).getSubject();
         service.changePassword(emailFromToken, dto.password());
-        return ResponseEntity.status(HttpStatus.ACCEPTED).build();
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     @Operation(summary = "Update email", description = "Updates the user's email address.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "202", description = "Email updated successfully."),
+            @ApiResponse(responseCode = "204", description = "Email updated successfully."),
             @ApiResponse(responseCode = "400", description = "Invalid or same email."),
             @ApiResponse(responseCode = "403", description = "Invalid token."),
             @ApiResponse(responseCode = "404", description = "User not found."),
@@ -113,12 +113,12 @@ public class UserController {
     ) {
         String emailFromToken = JWT.decode(token.replace("Bearer ", "")).getSubject();
         service.changeEmail(emailFromToken, dto.email());
-        return ResponseEntity.status(HttpStatus.ACCEPTED).build();
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     @Operation(summary = "Update user profile", description = "Updates the user's profile information based on the provided data.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "202", description = "User profile updated successfully."),
+            @ApiResponse(responseCode = "200", description = "User profile updated successfully."),
             @ApiResponse(responseCode = "400", description = "Invalid input data.", content = @Content(mediaType = "application/json")),
             @ApiResponse(responseCode = "403", description = "Invalid token.", content = @Content(mediaType = "application/json")),
             @ApiResponse(responseCode = "404", description = "User not found.", content = @Content(mediaType = "application/json")),
@@ -132,12 +132,12 @@ public class UserController {
     ) {
         UUID idFromToken = getSubject(accessToken);
         User user = service.edit(idFromToken, dto.toUser());
-        return ResponseEntity.status(HttpStatus.ACCEPTED).body(new DetailUserRES(user));
+        return ResponseEntity.status(HttpStatus.OK).body(new DetailUserRES(user));
     }
 
     @Operation(summary = "Change profile visibility", description = "Changes the visibility of the user's profile.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Profile visibility changed successfully."),
+            @ApiResponse(responseCode = "204", description = "Profile visibility changed successfully."),
             @ApiResponse(responseCode = "403", description = "Invalid token."),
             @ApiResponse(responseCode = "404", description = "User not found."),
             @ApiResponse(responseCode = "500", description = "Internal server error.")
@@ -148,12 +148,12 @@ public class UserController {
     ) {
         UUID idFromToken = getSubject(accessToken);
         service.changeProfileVisibility(idFromToken);
-        return ResponseEntity.status(HttpStatus.OK).build();
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     @Operation(summary = "Update username", description = "Updates the user's username.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "202", description = "Username updated successfully."),
+            @ApiResponse(responseCode = "204", description = "Username updated successfully."),
             @ApiResponse(responseCode = "400", description = "Invalid username."),
             @ApiResponse(responseCode = "403", description = "Invalid token."),
             @ApiResponse(responseCode = "404", description = "User not found."),
@@ -167,12 +167,12 @@ public class UserController {
     ) {
         UUID idFromToken = getSubject(accessToken);
         service.changeUsername(idFromToken, dto.username());
-        return ResponseEntity.status(HttpStatus.ACCEPTED).build();
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     @Operation(summary = "Update display name", description = "Updates the user's display name.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "202", description = "Dispaly name updated successfully."),
+            @ApiResponse(responseCode = "204", description = "Dispaly name updated successfully."),
             @ApiResponse(responseCode = "400", description = "Invalid display name."),
             @ApiResponse(responseCode = "403", description = "Invalid token."),
             @ApiResponse(responseCode = "404", description = "User not found."),
@@ -185,12 +185,12 @@ public class UserController {
     ) {
         UUID idFromToken = getSubject(accessToken);
         service.changeDisplayName(idFromToken, dto.displayName());
-        return ResponseEntity.status(HttpStatus.ACCEPTED).build();
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     @Operation(summary = "Update profile picture", description = "Updates the user's profile picture.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "202", description = "Profile picture updated successfully."),
+            @ApiResponse(responseCode = "204", description = "Profile picture updated successfully."),
             @ApiResponse(responseCode = "400", description = "Invalid profile picture."),
             @ApiResponse(responseCode = "403", description = "Invalid token."),
             @ApiResponse(responseCode = "404", description = "User not found."),
@@ -203,12 +203,12 @@ public class UserController {
     ) {
         UUID idFromToken = getSubject(accessToken);
         service.changeAvatar(idFromToken, dto.avatar());
-        return ResponseEntity.status(HttpStatus.ACCEPTED).build();
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     @Operation(summary = "Update profile banner", description = "Updates the user's profile banner.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "202", description = "Profile banner updated successfully."),
+            @ApiResponse(responseCode = "204", description = "Profile banner updated successfully."),
             @ApiResponse(responseCode = "400", description = "Invalid banner."),
             @ApiResponse(responseCode = "403", description = "Invalid token."),
             @ApiResponse(responseCode = "404", description = "User not found."),
@@ -221,12 +221,12 @@ public class UserController {
     ) {
         UUID idFromToken = getSubject(accessToken);
         service.changeBanner(idFromToken, dto.banner());
-        return ResponseEntity.status(HttpStatus.ACCEPTED).build();
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     @Operation(summary = "Update user message", description = "Updates the user's message.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "202", description = "User's message updated successfully."),
+            @ApiResponse(responseCode = "204", description = "User's message updated successfully."),
             @ApiResponse(responseCode = "400", description = "Invalid message.", content = @Content(examples = {})),
             @ApiResponse(responseCode = "403", description = "Invalid token.", content = @Content(examples = {})),
             @ApiResponse(responseCode = "404", description = "User not found.", content = @Content(examples = {})),
@@ -239,12 +239,12 @@ public class UserController {
     ) {
         UUID idFromToken = getSubject(accessToken);
         service.changeMessage(idFromToken, dto.message());
-        return ResponseEntity.status(HttpStatus.ACCEPTED).build();
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     @Operation(summary = "Follow a user.", description = "Allows the requesting user to follow the specified user.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "User followed successfully."),
+            @ApiResponse(responseCode = "204", description = "User followed successfully."),
             @ApiResponse(responseCode = "403", description = "Invalid token.", content = @Content(examples = {})),
             @ApiResponse(responseCode = "404", description = "User not found", content = @Content(examples = {})),
             @ApiResponse(responseCode = "500", description = "Internal server error.", content = @Content(examples = {}))
@@ -256,7 +256,7 @@ public class UserController {
     ) {
         UUID idFromToken = getSubject(accessToken);
         service.follow(idFromToken, userToFollow);
-        return ResponseEntity.status(HttpStatus.OK).build();
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     @Operation(summary = "Unfollow a user.", description = "Allows the requesting user to unfollow the specified user.")

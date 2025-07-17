@@ -64,7 +64,7 @@ public class NoteController {
 
     @Operation(summary = "Edit note fields", description = "Updates note.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "202", description = "Note updated successfully."),
+            @ApiResponse(responseCode = "204", description = "Note updated successfully."),
             @ApiResponse(responseCode = "400", description = "Invalid input data.", content = @Content(mediaType = "application/json")),
             @ApiResponse(responseCode = "403", description = "Invalid token."),
             @ApiResponse(responseCode = "404", description = "Note not found."),
@@ -78,12 +78,12 @@ public class NoteController {
     ) {
         UUID idFromToken = getSubject(accessToken);
         service.edit(idFromToken, idFromPath, dto.title(), dto.description(), dto.tags(), dto.closed(), dto.hidden());
-        return ResponseEntity.status(HttpStatus.ACCEPTED).build();
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     @Operation(summary = "Change note title", description = "Changes the note title.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "202", description = "Note updated successfully."),
+            @ApiResponse(responseCode = "204", description = "Note updated successfully."),
             @ApiResponse(responseCode = "400", description = "Invalid input data.", content = @Content(mediaType = "application/json")),
             @ApiResponse(responseCode = "403", description = "Invalid token."),
             @ApiResponse(responseCode = "404", description = "Note not found."),
@@ -97,12 +97,12 @@ public class NoteController {
     ) {
         UUID idFromToken = getSubject(accessToken);
         service.changeTitle(idFromToken, idFromPath, dto.title());
-        return ResponseEntity.status(HttpStatus.ACCEPTED).build();
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     @Operation(summary = "Change note description", description = "Changes the note description.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "202", description = "Note updated successfully."),
+            @ApiResponse(responseCode = "204", description = "Note updated successfully."),
             @ApiResponse(responseCode = "400", description = "Invalid input data.", content = @Content(mediaType = "application/json")),
             @ApiResponse(responseCode = "403", description = "Invalid token."),
             @ApiResponse(responseCode = "404", description = "Note not found."),
@@ -116,12 +116,12 @@ public class NoteController {
     ) {
         UUID idFromToken = getSubject(accessToken);
         service.changeDescription(idFromToken, idFromPath, dto.description());
-        return ResponseEntity.status(HttpStatus.OK).build();
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     @Operation(summary = "Change note content", description = "Changes the note markdown content.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "202", description = "Note markdown changed successfully."),
+            @ApiResponse(responseCode = "204", description = "Note markdown changed successfully."),
             @ApiResponse(responseCode = "400", description = "Invalid input data.", content = @Content(mediaType = "application/json")),
             @ApiResponse(responseCode = "403", description = "Invalid token."),
             @ApiResponse(responseCode = "404", description = "Note not found."),
@@ -135,12 +135,12 @@ public class NoteController {
     ) {
         UUID idFromToken = getSubject(accessToken);
         service.changeMarkdown(idFromToken, idFromPath, dto.markdown());
-        return ResponseEntity.status(HttpStatus.ACCEPTED).build();
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     @Operation(summary = "Change note status", description = "Set note status to closed true or false depending on current value.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "202", description = "Note status changed successfully."),
+            @ApiResponse(responseCode = "204", description = "Note status changed successfully."),
             @ApiResponse(responseCode = "400", description = "Invalid input data.", content = @Content(mediaType = "application/json")),
             @ApiResponse(responseCode = "403", description = "Invalid token."),
             @ApiResponse(responseCode = "404", description = "Note not found."),
@@ -153,12 +153,12 @@ public class NoteController {
     ) {
         UUID idFromToken = getSubject(accessToken);
         service.changeClosed(idFromToken, idFromPath);
-        return ResponseEntity.status(HttpStatus.ACCEPTED).build();
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     @Operation(summary = "Change note visibility", description = "Set note hidden to true or false depending on current value.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "202", description = "Note visibility changed successfully."),
+            @ApiResponse(responseCode = "204", description = "Note visibility changed successfully."),
             @ApiResponse(responseCode = "400", description = "Invalid input data.", content = @Content(mediaType = "application/json")),
             @ApiResponse(responseCode = "403", description = "Invalid token."),
             @ApiResponse(responseCode = "404", description = "Note not found."),
@@ -171,12 +171,12 @@ public class NoteController {
     ) {
         UUID idFromToken = getSubject(accessToken);
         service.changeHidden(idFromToken, idFromPath);
-        return ResponseEntity.status(HttpStatus.ACCEPTED).build();
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     @Operation(summary = "Change note tags", description = "Set a array of strings as new tag names to user's note")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "202", description = "Note tags updated successfully."),
+            @ApiResponse(responseCode = "204", description = "Note tags updated successfully."),
             @ApiResponse(responseCode = "400", description = "Invalid input data.", content = @Content(mediaType = "application/json")),
             @ApiResponse(responseCode = "403", description = "Invalid token."),
             @ApiResponse(responseCode = "404", description = "Note not found."),
@@ -190,7 +190,7 @@ public class NoteController {
     ) {
         UUID idFromToken = getSubject(accessToken);
         service.changeTags(idFromToken, idFromPath, dto.tags());
-        return ResponseEntity.status(HttpStatus.ACCEPTED).build();
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     @Operation(summary = "Delete note", description = "Deletes a note permanently.")

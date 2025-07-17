@@ -64,7 +64,7 @@ public class CommentController {
 
     @Operation(summary = "Change comment text", description = "Updates comment text field.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "202", description = "Comment text updated successfully."),
+            @ApiResponse(responseCode = "204", description = "Comment text updated successfully."),
             @ApiResponse(responseCode = "400", description = "Invalid input data.", content = @Content(mediaType = "application/json")),
             @ApiResponse(responseCode = "403", description = "Invalid token or Note is closed.", content = @Content(examples = {})),
             @ApiResponse(responseCode = "404", description = "Comment note found."),
@@ -78,7 +78,7 @@ public class CommentController {
     ) {
         UUID idFromToken = getSubject(accessToken);
         service.edit(idFromToken, idFromPath, dto.text());
-        return ResponseEntity.status(HttpStatus.ACCEPTED).build();
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     @Operation(summary = "Delete comment", description = "Removes a comment permanently.")

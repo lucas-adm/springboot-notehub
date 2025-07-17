@@ -38,7 +38,7 @@ public class NotificationController {
             description = "Fetch a paginated list of user notifications, ordered by unread notifications first and sorted by creation date."
     )
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "202", description = "Notifications retrieved successfully."),
+            @ApiResponse(responseCode = "200", description = "Notifications retrieved successfully."),
             @ApiResponse(responseCode = "400", description = "Invalid pageable criteria.", content = @Content(examples = {})),
             @ApiResponse(responseCode = "403", description = "Invalid token.", content = @Content(examples = {})),
             @ApiResponse(responseCode = "404", description = "User not found.", content = @Content(examples = {})),
@@ -51,7 +51,7 @@ public class NotificationController {
     ) {
         UUID idFromToken = UUID.fromString(JWT.decode(accessToken.replace("Bearer ", "")).getSubject());
         Page<DetailNotificationRES> page = service.getNotifications(pageable, idFromToken).map(DetailNotificationRES::new);
-        return ResponseEntity.status(HttpStatus.ACCEPTED).body(new PageRES<>(page));
+        return ResponseEntity.status(HttpStatus.OK).body(new PageRES<>(page));
     }
 
 }

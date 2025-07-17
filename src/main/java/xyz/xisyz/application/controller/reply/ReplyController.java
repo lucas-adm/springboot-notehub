@@ -83,7 +83,7 @@ public class ReplyController {
 
     @Operation(summary = "Change reply text", description = "Updates reply text field.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "202", description = "Reply text updated successfully."),
+            @ApiResponse(responseCode = "204", description = "Reply text updated successfully."),
             @ApiResponse(responseCode = "400", description = "Invalid input data.", content = @Content(mediaType = "application/json")),
             @ApiResponse(responseCode = "403", description = "Invalid token or Note is closed.", content = @Content(examples = {})),
             @ApiResponse(responseCode = "404", description = "Reply note found."),
@@ -97,7 +97,7 @@ public class ReplyController {
     ) {
         UUID idFromToken = getSubject(accessToken);
         service.edit(idFromToken, idFromPath, dto.text());
-        return ResponseEntity.status(HttpStatus.ACCEPTED).build();
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     @Operation(summary = "Delete reply", description = "Removes a reply permanently.")
