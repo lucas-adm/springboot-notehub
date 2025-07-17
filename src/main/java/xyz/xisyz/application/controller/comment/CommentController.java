@@ -8,7 +8,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
@@ -53,7 +52,6 @@ public class CommentController {
             @ApiResponse(responseCode = "500", description = "Internal server error.", content = @Content(examples = {}))
     })
     @PostMapping("/{id}/comments/new")
-    @Transactional
     public ResponseEntity<CreateCommentRES> createComment(
             @Parameter(hidden = true) @RequestHeader("Authorization") String accessToken,
             @PathVariable("id") UUID idFromPath,
@@ -73,7 +71,6 @@ public class CommentController {
             @ApiResponse(responseCode = "500", description = "Internal server error.", content = @Content(examples = {}))
     })
     @PatchMapping("/comments/{id}/edit")
-    @Transactional
     public ResponseEntity<Void> editComment(
             @Parameter(hidden = true) @RequestHeader("Authorization") String accessToken,
             @PathVariable("id") UUID idFromPath,
@@ -92,7 +89,6 @@ public class CommentController {
             @ApiResponse(responseCode = "500", description = "Internal server error.", content = @Content(examples = {}))
     })
     @DeleteMapping("/comments/{id}/delete")
-    @Transactional
     public ResponseEntity<Void> deleteComment(
             @Parameter(hidden = true) @RequestHeader("Authorization") String accessToken,
             @PathVariable("id") UUID idFromPath

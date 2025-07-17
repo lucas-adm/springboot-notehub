@@ -8,7 +8,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
@@ -50,7 +49,6 @@ public class FlameController {
             @ApiResponse(responseCode = "500", description = "Internal server error.", content = @Content(examples = {}))
     })
     @PostMapping("/{id}")
-    @Transactional
     public ResponseEntity<DetailFlameRES> inflameNote(
             @Parameter(hidden = true) @RequestHeader("Authorization") String accessToken,
             @PathVariable("id") UUID idFromPath
@@ -68,7 +66,6 @@ public class FlameController {
             @ApiResponse(responseCode = "500", description = "Internal server error.", content = @Content(examples = {}))
     })
     @DeleteMapping("/{id}")
-    @Transactional
     public ResponseEntity<Void> deflameNote(
             @Parameter(hidden = true) @RequestHeader("Authorization") String accessToken,
             @PathVariable("id") UUID idFromPath

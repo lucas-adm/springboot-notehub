@@ -7,7 +7,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -43,7 +42,6 @@ public class AuthController {
             @ApiResponse(responseCode = "500", description = "Internal server error.", content = @Content(examples = {}))
     })
     @PostMapping("/login")
-    @Transactional
     public ResponseEntity<AuthRES> loginUser(
             @Valid @RequestBody AuthREQ dto
     ) {
@@ -58,7 +56,6 @@ public class AuthController {
             @ApiResponse(responseCode = "500", description = "Internal server error.", content = @Content(examples = {}))
     })
     @PostMapping("/login/google")
-    @Transactional
     public ResponseEntity<AuthRES> loginGoogleUser(
             @Valid @RequestBody OAuth2GoogleREQ dto
     ) {
@@ -73,7 +70,6 @@ public class AuthController {
             @ApiResponse(responseCode = "500", description = "Internal server error.", content = @Content(examples = {}))
     })
     @PostMapping("/login/github")
-    @Transactional
     public ResponseEntity<AuthRES> loginGitHubUser(
             @Valid @RequestBody OAuthGitHubREQ dto
     ) {
@@ -89,7 +85,6 @@ public class AuthController {
             @ApiResponse(responseCode = "500", description = "Internal server error.", content = @Content(examples = {}))
     })
     @GetMapping("/refresh")
-    @Transactional
     public ResponseEntity<AuthRES> refreshToken(
             @RequestParam("token") UUID refreshToken
     ) {
@@ -105,7 +100,6 @@ public class AuthController {
             @ApiResponse(responseCode = "500", description = "Internal server error.")
     })
     @DeleteMapping("/logout")
-    @Transactional
     public ResponseEntity<Void> logoutUser(
             @Parameter(hidden = true) @RequestHeader("Authorization") String bearerToken
     ) {

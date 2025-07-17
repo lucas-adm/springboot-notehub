@@ -113,6 +113,7 @@ public class UserServiceImpl implements UserService {
         return following.getFollowers().contains(follower);
     }
 
+    @Transactional
     @Override
     public User create(User user) {
         boolean existsByEmail = repository.existsByEmail(user.getEmail());
@@ -129,11 +130,13 @@ public class UserServiceImpl implements UserService {
         return tokenService.generateActivationToken(user);
     }
 
+    @Transactional
     @Override
     public void activate(UUID idFromToken) {
         changeField(idFromToken, "active", User::isActive, user -> user.setActive(true));
     }
 
+    @Transactional
     @Override
     public void changePassword(String email, String newPassword) {
         User entity = repository.findByEmail(email).orElseThrow(EntityNotFoundException::new);
@@ -141,6 +144,7 @@ public class UserServiceImpl implements UserService {
         changeField(entity.getId(), "password", User::getPassword, user -> user.setPassword(password));
     }
 
+    @Transactional
     @Override
     public void changeEmail(String oldEmail, String newEmail) {
         validateEmail(oldEmail, newEmail);
@@ -148,6 +152,7 @@ public class UserServiceImpl implements UserService {
         changeField(id, "email", User::getEmail, user -> user.setEmail(newEmail.toLowerCase()));
     }
 
+    @Transactional
     @Override
     public User edit(UUID idFromToken, User user) {
         validateUsername(idFromToken, user.getUsername());
@@ -160,37 +165,44 @@ public class UserServiceImpl implements UserService {
         return user;
     }
 
+    @Transactional
     @Override
     public void changeProfileVisibility(UUID idFromToken) {
         changeField(idFromToken, "profile_private", User::isProfilePrivate, user -> user.setProfilePrivate(!user.isProfilePrivate()));
     }
 
+    @Transactional
     @Override
     public void changeUsername(UUID idFromToken, String username) {
         validateUsername(idFromToken, username);
         changeField(idFromToken, "username", User::getUsername, user -> user.setUsername(username.toLowerCase()));
     }
 
+    @Transactional
     @Override
     public void changeDisplayName(UUID idFromToken, String displayName) {
         changeField(idFromToken, "display_name", User::getDisplayName, user -> user.setDisplayName(displayName));
     }
 
+    @Transactional
     @Override
     public void changeAvatar(UUID idFromToken, String avatar) {
         changeField(idFromToken, "avatar", User::getAvatar, user -> user.setAvatar(avatar));
     }
 
+    @Transactional
     @Override
     public void changeBanner(UUID idFromToken, String banner) {
         changeField(idFromToken, "banner", User::getBanner, user -> user.setBanner(banner));
     }
 
+    @Transactional
     @Override
     public void changeMessage(UUID idFromToken, String message) {
         changeField(idFromToken, "message", User::getMessage, user -> user.setMessage(message));
     }
 
+    @Transactional
     @Override
     public void follow(UUID idFromToken, String username) {
         User follower = repository.findByIdWithFollowersAndFollowing(idFromToken).orElseThrow(EntityNotFoundException::new);
@@ -200,6 +212,7 @@ public class UserServiceImpl implements UserService {
         notifier.notify(following, MessageNotification.of(follower, following));
     }
 
+    @Transactional
     @Override
     public void unfollow(UUID idFromToken, String username) {
         User follower = repository.findByIdWithFollowersAndFollowing(idFromToken).orElseThrow(EntityNotFoundException::new);
@@ -241,11 +254,13 @@ public class UserServiceImpl implements UserService {
         return user;
     }
 
+    @Transactional(readOnly = true)
     @Override
     public Page<User> getUserFollowing(Pageable pageable, String q, UUID idFromToken, String username) {
         return getUserConnections(pageable, q, idFromToken, username, User::getFollowing);
     }
 
+    @Transactional(readOnly = true)
     @Override
     public Page<User> getUserFollowers(Pageable pageable, String q, UUID idFromToken, String username) {
         return getUserConnections(pageable, q, idFromToken, username, User::getFollowers);
@@ -267,6 +282,7 @@ public class UserServiceImpl implements UserService {
         return historian.getLastFiveUserDisplayName(user);
     }
 
+    @Transactional
     @Override
     public void cleanUsersWithExpiredActivationTime() {
         Instant nowMinus7Days = Instant.now().minus(7, ChronoUnit.DAYS);

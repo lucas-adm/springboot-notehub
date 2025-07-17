@@ -44,6 +44,7 @@ public class FlameServiceImpl implements FlameService {
         }
     }
 
+    @Transactional
     @Override
     public Flame inflame(UUID userIdFromToken, UUID noteIdFromPath) {
         User user = userRepository.findById(userIdFromToken).orElseThrow(EntityNotFoundException::new);
@@ -55,6 +56,7 @@ public class FlameServiceImpl implements FlameService {
         return flame;
     }
 
+    @Transactional
     @Override
     public void deflame(UUID userIdFromToken, UUID noteIdFromPath) {
         Flame flame = repository.findByUserIdAndNoteId(userIdFromToken, noteIdFromPath).orElseThrow(EntityNotFoundException::new);

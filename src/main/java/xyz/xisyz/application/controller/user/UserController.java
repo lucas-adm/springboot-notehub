@@ -9,7 +9,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
@@ -61,7 +60,6 @@ public class UserController {
             @ApiResponse(responseCode = "500", description = "Internal server error.", content = @Content(examples = {}))
     })
     @PostMapping("/register")
-    @Transactional
     public ResponseEntity<CreateUserRES> createUser(
             @Valid @RequestBody CreateUserREQ dto
     ) {
@@ -73,7 +71,6 @@ public class UserController {
 
     @Hidden
     @GetMapping("/activate")
-    @Transactional
     public ResponseEntity<Void> activeUser(
             @Parameter(hidden = true) @RequestHeader("Authorization") String accessToken
     ) {
@@ -91,7 +88,6 @@ public class UserController {
             @ApiResponse(responseCode = "500", description = "Internal server error.")
     })
     @PatchMapping("/change-password")
-    @Transactional
     public ResponseEntity<Void> patchPassword(
             @Parameter(hidden = true) @RequestHeader("Authorization") String token,
             @Valid @RequestBody ChangePasswordREQ dto
@@ -111,7 +107,6 @@ public class UserController {
             @ApiResponse(responseCode = "500", description = "Internal server error.")
     })
     @PatchMapping("/change-email")
-    @Transactional
     public ResponseEntity<Void> patchEmail(
             @Parameter(hidden = true) @RequestHeader("Authorization") String token,
             @Valid @RequestBody ChangeEmailREQ dto
@@ -131,7 +126,6 @@ public class UserController {
             @ApiResponse(responseCode = "500", description = "Internal server error.", content = @Content(examples = {}))
     })
     @PutMapping("/profile")
-    @Transactional
     public ResponseEntity<DetailUserRES> editUser(
             @Parameter(hidden = true) @RequestHeader("Authorization") String accessToken,
             @Valid @RequestBody ChangeUserREQ dto
@@ -149,7 +143,6 @@ public class UserController {
             @ApiResponse(responseCode = "500", description = "Internal server error.")
     })
     @PatchMapping("/profile/visibility")
-    @Transactional
     public ResponseEntity<Void> changeProfileVisibility(
             @Parameter(hidden = true) @RequestHeader("Authorization") String accessToken
     ) {
@@ -168,7 +161,6 @@ public class UserController {
             @ApiResponse(responseCode = "500", description = "Internal server error.")
     })
     @PatchMapping("/profile/username")
-    @Transactional
     public ResponseEntity<Void> patchUsername(
             @Parameter(hidden = true) @RequestHeader("Authorization") String accessToken,
             @Valid @RequestBody ChangeUsernameREQ dto
@@ -187,7 +179,6 @@ public class UserController {
             @ApiResponse(responseCode = "500", description = "Internal server error.")
     })
     @PatchMapping("/profile/display-name")
-    @Transactional
     public ResponseEntity<Void> patchDisplayName(
             @Parameter(hidden = true) @RequestHeader("Authorization") String accessToken,
             @Valid @RequestBody ChangeDisplayNameREQ dto
@@ -206,7 +197,6 @@ public class UserController {
             @ApiResponse(responseCode = "500", description = "Internal server error.")
     })
     @PatchMapping("/profile/avatar")
-    @Transactional
     public ResponseEntity<Void> patchAvatar(
             @Parameter(hidden = true) @RequestHeader("Authorization") String accessToken,
             @Valid @RequestBody ChangeAvatarREQ dto
@@ -225,7 +215,6 @@ public class UserController {
             @ApiResponse(responseCode = "500", description = "Internal server error.")
     })
     @PatchMapping("/profile/banner")
-    @Transactional
     public ResponseEntity<Void> patchBanner(
             @Parameter(hidden = true) @RequestHeader("Authorization") String accessToken,
             @Valid @RequestBody ChangeBannerREQ dto
@@ -244,7 +233,6 @@ public class UserController {
             @ApiResponse(responseCode = "500", description = "Internal server error.", content = @Content(examples = {}))
     })
     @PatchMapping("/profile/message")
-    @Transactional
     public ResponseEntity<Void> patchMessage(
             @Parameter(hidden = true) @RequestHeader("Authorization") String accessToken,
             @Valid @RequestBody ChangeMessageREQ dto
@@ -262,7 +250,6 @@ public class UserController {
             @ApiResponse(responseCode = "500", description = "Internal server error.", content = @Content(examples = {}))
     })
     @PostMapping("/{username}/follow")
-    @Transactional
     public ResponseEntity<Void> followUser(
             @Parameter(hidden = true) @RequestHeader("Authorization") String accessToken,
             @PathVariable("username") String userToFollow
@@ -280,7 +267,6 @@ public class UserController {
             @ApiResponse(responseCode = "500", description = "Internal server error.", content = @Content(examples = {}))
     })
     @DeleteMapping("/{username}/unfollow")
-    @Transactional
     public ResponseEntity<Void> unfollowUser(
             @Parameter(hidden = true) @RequestHeader("Authorization") String accessToken,
             @PathVariable("username") String userToFollow
@@ -353,7 +339,6 @@ public class UserController {
             @ApiResponse(responseCode = "500", description = "Internal server error.", content = @Content(examples = {}))
     })
     @GetMapping("/{username}/following")
-    @Transactional
     public ResponseEntity<PageRES<DetailUserRES>> getFollowing(
             @Parameter(hidden = true) @RequestHeader(required = false, value = "Authorization") String accessToken,
             @ParameterObject @PageableDefault(page = 0, size = 25, sort = {"followersCount"}, direction = Sort.Direction.DESC) Pageable pageable,
@@ -380,7 +365,6 @@ public class UserController {
             @ApiResponse(responseCode = "500", description = "Internal server error.", content = @Content(examples = {}))
     })
     @GetMapping("/{username}/followers")
-    @Transactional
     public ResponseEntity<PageRES<DetailUserRES>> getFollowers(
             @Parameter(hidden = true) @RequestHeader(required = false, value = "Authorization") String accessToken,
             @ParameterObject @PageableDefault(page = 0, size = 25, sort = {"followersCount"}, direction = Sort.Direction.DESC) Pageable pageable,

@@ -17,6 +17,7 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 import xyz.xisyz.domain.token.Token;
 import xyz.xisyz.domain.token.TokenRepository;
@@ -164,6 +165,7 @@ public class TokenServiceImpl implements TokenService {
         repository.flush();
     }
 
+    @Transactional
     @Override
     public Token auth(String username, String password) throws BadCredentialsException {
         User user = userRepository.findByUsername(username.toLowerCase()).orElseThrow(() -> new BadCredentialsException("username"));
@@ -179,6 +181,7 @@ public class TokenServiceImpl implements TokenService {
         return repository.save(new Token(user, accessToken, expiresAt));
     }
 
+    @Transactional
     @Override
     public Token authWithGoogleAcc(String token) {
         try {
@@ -203,6 +206,7 @@ public class TokenServiceImpl implements TokenService {
         }
     }
 
+    @Transactional
     @Override
     public Token authWithGitHubAcc(String code) {
         Map info = getUserInfoFromGitHub(code);
@@ -222,6 +226,7 @@ public class TokenServiceImpl implements TokenService {
         return repository.save(new Token(user, accessToken, expiresAt));
     }
 
+    @Transactional
     @Override
     public Token recreateToken(UUID refreshToken) throws TokenExpiredException {
         Token token = repository.findById(refreshToken).orElseThrow(EntityNotFoundException::new);
@@ -239,6 +244,7 @@ public class TokenServiceImpl implements TokenService {
         return repository.save(new Token(user, jwt, expiresAt));
     }
 
+    @Transactional
     @Override
     public void logout(String accessToken) {
         repository.findByAccessToken(accessToken).ifPresent(repository::delete);

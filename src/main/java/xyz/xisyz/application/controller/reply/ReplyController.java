@@ -8,7 +8,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
@@ -53,7 +52,6 @@ public class ReplyController {
             @ApiResponse(responseCode = "500", description = "Internal server error.", content = @Content(examples = {}))
     })
     @PostMapping("/{id}/replies/new")
-    @Transactional
     public ResponseEntity<CreateReplyRES> createReply(
             @Parameter(hidden = true) @RequestHeader("Authorization") String accessToken,
             @PathVariable("id") UUID idFromPath,
@@ -73,7 +71,6 @@ public class ReplyController {
             @ApiResponse(responseCode = "500", description = "Internal server error.", content = @Content(examples = {}))
     })
     @PostMapping("/replies/{id}/new")
-    @Transactional
     public ResponseEntity<CreateReplyRES> createSelfReferenceReply(
             @Parameter(hidden = true) @RequestHeader("Authorization") String accessToken,
             @PathVariable("id") UUID idFromPath,
@@ -93,7 +90,6 @@ public class ReplyController {
             @ApiResponse(responseCode = "500", description = "Internal server error.", content = @Content(examples = {}))
     })
     @PatchMapping("/replies/{id}/edit")
-    @Transactional
     public ResponseEntity<Void> editReply(
             @Parameter(hidden = true) @RequestHeader("Authorization") String accessToken,
             @PathVariable("id") UUID idFromPath,
@@ -112,7 +108,6 @@ public class ReplyController {
             @ApiResponse(responseCode = "500", description = "Internal server error.", content = @Content(examples = {}))
     })
     @DeleteMapping("/replies/{id}/delete")
-    @Transactional
     public ResponseEntity<Void> deleteReply(
             @Parameter(hidden = true) @RequestHeader("Authorization") String accessToken,
             @PathVariable("id") UUID idFromPath

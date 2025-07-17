@@ -8,7 +8,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
@@ -54,7 +53,6 @@ public class NoteController {
             @ApiResponse(responseCode = "500", description = "Internal server error.", content = @Content(examples = {}))
     })
     @PostMapping("/new-note")
-    @Transactional
     public ResponseEntity<LowDetailNoteRES> createNote(
             @Parameter(hidden = true) @RequestHeader("Authorization") String accessToken,
             @Valid @RequestBody CreateNoteREQ dto
@@ -73,7 +71,6 @@ public class NoteController {
             @ApiResponse(responseCode = "500", description = "Internal server error.")
     })
     @PutMapping("/{id}/edit-note")
-    @Transactional
     public ResponseEntity<Void> editNote(
             @Parameter(hidden = true) @RequestHeader("Authorization") String accessToken,
             @PathVariable("id") UUID idFromPath,
@@ -93,7 +90,6 @@ public class NoteController {
             @ApiResponse(responseCode = "500", description = "Internal server error.")
     })
     @PatchMapping("/{id}/change-title")
-    @Transactional
     public ResponseEntity<Void> changeNoteTitle(
             @Parameter(hidden = true) @RequestHeader("Authorization") String accessToken,
             @PathVariable("id") UUID idFromPath,
@@ -113,7 +109,6 @@ public class NoteController {
             @ApiResponse(responseCode = "500", description = "Internal server error.")
     })
     @PatchMapping("/{id}/change-description")
-    @Transactional
     public ResponseEntity<Void> changeNoteDescription(
             @Parameter(hidden = true) @RequestHeader("Authorization") String accessToken,
             @PathVariable("id") UUID idFromPath,
@@ -133,7 +128,6 @@ public class NoteController {
             @ApiResponse(responseCode = "500", description = "Internal server error.")
     })
     @PatchMapping("/{id}/change-markdown")
-    @Transactional
     public ResponseEntity<Void> changeNoteMarkdown(
             @Parameter(hidden = true) @RequestHeader("Authorization") String accessToken,
             @PathVariable("id") UUID idFromPath,
@@ -153,7 +147,6 @@ public class NoteController {
             @ApiResponse(responseCode = "500", description = "Internal server error.")
     })
     @PatchMapping("/{id}/change-status")
-    @Transactional
     public ResponseEntity<Void> changeNoteStatus(
             @Parameter(hidden = true) @RequestHeader("Authorization") String accessToken,
             @PathVariable("id") UUID idFromPath
@@ -172,7 +165,6 @@ public class NoteController {
             @ApiResponse(responseCode = "500", description = "Internal server error.")
     })
     @PatchMapping("/{id}/change-visibility")
-    @Transactional
     public ResponseEntity<Void> changeNoteVisibility(
             @Parameter(hidden = true) @RequestHeader("Authorization") String accessToken,
             @PathVariable("id") UUID idFromPath
@@ -191,7 +183,6 @@ public class NoteController {
             @ApiResponse(responseCode = "500", description = "Internal server error.")
     })
     @PatchMapping("/{id}/change-tags")
-    @Transactional
     public ResponseEntity<Void> changeNoteTags(
             @Parameter(hidden = true) @RequestHeader("Authorization") String accessToken,
             @PathVariable("id") UUID idFromPath,

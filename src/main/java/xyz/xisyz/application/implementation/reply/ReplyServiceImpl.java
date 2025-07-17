@@ -71,6 +71,7 @@ public class ReplyServiceImpl implements ReplyService {
         return new Reply(user, comment, reply, req.text());
     }
 
+    @Transactional
     @Override
     public Reply create(Reply reply) {
         assertNoteIsNotClosed(reply);
@@ -81,6 +82,7 @@ public class ReplyServiceImpl implements ReplyService {
         return reply;
     }
 
+    @Transactional
     @Override
     public void edit(UUID idFromToken, UUID idFromPath, String text) {
         Reply reply = repository.findById(idFromPath).orElseThrow(EntityNotFoundException::new);
@@ -92,6 +94,7 @@ public class ReplyServiceImpl implements ReplyService {
         repository.save(reply);
     }
 
+    @Transactional
     @Override
     public void delete(UUID idFromToken, UUID idFromPath) {
         Reply reply = repository.findById(idFromPath).orElseThrow(EntityNotFoundException::new);

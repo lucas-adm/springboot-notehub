@@ -6,6 +6,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import xyz.xisyz.application.dto.notification.MessageNotification;
 import xyz.xisyz.domain.notification.Notification;
 import xyz.xisyz.domain.notification.NotificationRepository;
@@ -36,6 +37,7 @@ public class NotificationServiceImpl implements NotificationService {
         repository.save(notification);
     }
 
+    @Transactional
     @Override
     public Page<Notification> getNotifications(Pageable pageable, UUID idFromToken) {
         Page<Notification> notifications = repository.findAllByUserId(pageable, idFromToken);

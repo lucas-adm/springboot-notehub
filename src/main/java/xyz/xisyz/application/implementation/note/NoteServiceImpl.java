@@ -84,6 +84,7 @@ public class NoteServiceImpl implements NoteService {
         return new Note(user, req.title(), req.description(), req.markdown(), req.closed(), req.hidden(), tags);
     }
 
+    @Transactional
     @Override
     public Note create(Note note) {
         repository.save(note);
@@ -91,6 +92,7 @@ public class NoteServiceImpl implements NoteService {
         return note;
     }
 
+    @Transactional
     @Override
     public void edit(UUID idFromToken, UUID idFromPath, String title, String description, List<String> tags, boolean closed, boolean hidden) {
         changeField(idFromToken, idFromPath, note -> {
@@ -104,31 +106,37 @@ public class NoteServiceImpl implements NoteService {
         });
     }
 
+    @Transactional
     @Override
     public void changeTitle(UUID idFromToken, UUID idFromPath, String title) {
         changeField(idFromToken, idFromPath, note -> note.setTitle(title));
     }
 
+    @Transactional
     @Override
     public void changeDescription(UUID idFromToken, UUID idFromPath, String description) {
         changeField(idFromToken, idFromPath, note -> note.setDescription(description));
     }
 
+    @Transactional
     @Override
     public void changeMarkdown(UUID idFromToken, UUID idFromPath, String markdown) {
         changeField(idFromToken, idFromPath, note -> note.setMarkdown(markdown));
     }
 
+    @Transactional
     @Override
     public void changeClosed(UUID idFromToken, UUID idFromPath) {
         changeField(idFromToken, idFromPath, note -> note.setClosed(!note.isClosed()));
     }
 
+    @Transactional
     @Override
     public void changeHidden(UUID idFromToken, UUID idFromPath) {
         changeField(idFromToken, idFromPath, note -> note.setHidden(!note.isHidden()));
     }
 
+    @Transactional
     @Override
     public void changeTags(UUID idFromToken, UUID idFromPath, List<String> tags) {
         changeField(idFromToken, idFromPath, note -> {

@@ -62,6 +62,7 @@ public class CommentServiceImpl implements CommentService {
         return new Comment(user, note, req.text());
     }
 
+    @Transactional
     @Override
     public Comment create(Comment comment) {
         assertNoteIsNotClosed(comment);
@@ -71,6 +72,7 @@ public class CommentServiceImpl implements CommentService {
         return comment;
     }
 
+    @Transactional
     @Override
     public void edit(UUID idFromToken, UUID idFromPath, String text) {
         Comment comment = repository.findById(idFromPath).orElseThrow(EntityNotFoundException::new);
@@ -82,6 +84,7 @@ public class CommentServiceImpl implements CommentService {
         repository.save(comment);
     }
 
+    @Transactional
     @Override
     public void delete(UUID idFromToken, UUID idFromPath) {
         Comment comment = repository.findById(idFromPath).orElseThrow(EntityNotFoundException::new);
