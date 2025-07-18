@@ -11,6 +11,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import xyz.xisyz.application.counter.Counter;
 import xyz.xisyz.application.dto.notification.MessageNotification;
+import xyz.xisyz.application.dto.response.flame.DetailFlameRES;
+import xyz.xisyz.application.dto.response.page.PageRES;
 import xyz.xisyz.domain.flame.Flame;
 import xyz.xisyz.domain.flame.FlameRepository;
 import xyz.xisyz.domain.flame.FlameService;
@@ -46,14 +48,14 @@ public class FlameServiceImpl implements FlameService {
 
     @Transactional
     @Override
-    public Flame inflame(UUID userIdFromToken, UUID noteIdFromPath) {
+    public DetailFlameRES inflame(UUID userIdFromToken, UUID noteIdFromPath) {
         User user = userRepository.findById(userIdFromToken).orElseThrow(EntityNotFoundException::new);
         Note note = noteRepository.findById(noteIdFromPath).orElseThrow(EntityNotFoundException::new);
         if (repository.existsByUserAndNote(user, note)) throw new EntityExistsException();
         Flame flame = repository.save(new Flame(user, note));
         counter.updateFlamesCount(note, true);
         notifier.notify(note.getUser(), MessageNotification.of(flame));
-        return flame;
+        return new DetailFlameRES(flame);
     }
 
     @Transactional
@@ -66,11 +68,12 @@ public class FlameServiceImpl implements FlameService {
 
     @Transactional(readOnly = true)
     @Override
-    public Page<Flame> getUserFlames(UUID userIdFromToken, Pageable pageable, String username, String q) {
+    public PageRES<DetailFlameRES> getUserFlames(UUID userIdFromToken, Pageable pageable, String username, String q) {
         User requesting = (userIdFromToken != null) ? userRepository.findById(userIdFromToken).orElseThrow(EntityNotFoundException::new) : null;
         User requested = userRepository.findByUsername(username).orElseThrow(EntityNotFoundException::new);
         validateBidirectionalFollowAccess(requesting, requested);
-        return repository.getUserFlames(pageable, username, q);
+        Page<DetailFlameRES> page = repository.getUserFlames(pageable, username, q).map(DetailFlameRES::new);
+        return new PageRES<>(page);
     }
 
 }

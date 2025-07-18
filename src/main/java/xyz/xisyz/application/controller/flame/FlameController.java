@@ -10,7 +10,6 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -19,7 +18,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import xyz.xisyz.application.dto.response.flame.DetailFlameRES;
 import xyz.xisyz.application.dto.response.page.PageRES;
-import xyz.xisyz.domain.flame.Flame;
 import xyz.xisyz.domain.flame.FlameService;
 
 import java.util.UUID;
@@ -54,8 +52,8 @@ public class FlameController {
             @PathVariable("id") UUID idFromPath
     ) {
         UUID idFromToken = getSubject(accessToken);
-        Flame flame = service.inflame(idFromToken, idFromPath);
-        return ResponseEntity.status(HttpStatus.CREATED).body(new DetailFlameRES(flame));
+        DetailFlameRES flame = service.inflame(idFromToken, idFromPath);
+        return ResponseEntity.status(HttpStatus.CREATED).body(flame);
     }
 
     @Operation(summary = "Delete flame", description = "Deflames a note.")
@@ -91,8 +89,8 @@ public class FlameController {
             @RequestParam(required = false) String q
     ) {
         UUID idFromToken = getSubject(accessToken);
-        Page<DetailFlameRES> page = service.getUserFlames(idFromToken, pageable, username, q).map(DetailFlameRES::new);
-        return ResponseEntity.status(HttpStatus.OK).body(new PageRES<>(page));
+        PageRES<DetailFlameRES> page = service.getUserFlames(idFromToken, pageable, username, q);
+        return ResponseEntity.status(HttpStatus.OK).body(page);
     }
 
 }

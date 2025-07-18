@@ -11,7 +11,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -22,7 +21,6 @@ import xyz.xisyz.application.dto.request.reply.CreateReplyREQ;
 import xyz.xisyz.application.dto.response.page.PageRES;
 import xyz.xisyz.application.dto.response.reply.CreateReplyRES;
 import xyz.xisyz.application.dto.response.reply.DetailReplyRES;
-import xyz.xisyz.domain.reply.Reply;
 import xyz.xisyz.domain.reply.ReplyService;
 
 import java.util.UUID;
@@ -58,8 +56,8 @@ public class ReplyController {
             @RequestBody @Valid CreateReplyREQ dto
     ) {
         UUID idFromToken = getSubject(accessToken);
-        Reply reply = service.create(service.mapToReply(idFromToken, idFromPath, dto));
-        return ResponseEntity.status(HttpStatus.CREATED).body(new CreateReplyRES(reply));
+        CreateReplyRES reply = service.create(idFromToken, idFromPath, false, dto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(reply);
     }
 
     @Operation(summary = "Register a new reply to a another reply", description = "Creates a new reply.")
@@ -77,8 +75,8 @@ public class ReplyController {
             @RequestBody @Valid CreateReplyREQ dto
     ) {
         UUID idFromToken = getSubject(accessToken);
-        Reply reply = service.create(service.mapToSelfReference(idFromToken, idFromPath, dto));
-        return ResponseEntity.status(HttpStatus.CREATED).body(new CreateReplyRES(reply));
+        CreateReplyRES reply = service.create(idFromToken, idFromPath, true, dto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(reply);
     }
 
     @Operation(summary = "Change reply text", description = "Updates reply text field.")
@@ -130,8 +128,8 @@ public class ReplyController {
             @PathVariable("id") UUID idFromPath
     ) {
         UUID idFromToken = getSubject(accessToken);
-        Page<DetailReplyRES> page = service.getReplies(pageable, idFromToken, idFromPath).map(DetailReplyRES::new);
-        return ResponseEntity.status(HttpStatus.OK).body(new PageRES<>(page));
+        PageRES<DetailReplyRES> page = service.getReplies(pageable, idFromToken, idFromPath);
+        return ResponseEntity.status(HttpStatus.OK).body(page);
     }
 
 }

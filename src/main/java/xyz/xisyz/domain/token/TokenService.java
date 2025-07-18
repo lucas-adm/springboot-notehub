@@ -3,6 +3,7 @@ package xyz.xisyz.domain.token;
 import com.auth0.jwt.exceptions.TokenExpiredException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Service;
+import xyz.xisyz.application.dto.response.token.AuthRES;
 import xyz.xisyz.domain.user.User;
 
 import java.time.Instant;
@@ -23,13 +24,13 @@ public interface TokenService {
 
     String validateToken(String accessToken);
 
-    Token auth(String username, String password) throws BadCredentialsException;
+    AuthRES auth(String username, String password) throws BadCredentialsException;
 
-    Token authWithGoogleAcc(String token);
+    AuthRES authWithGoogleAcc(String token);
 
-    Token authWithGitHubAcc(String code);
+    AuthRES authWithGitHubAcc(String code);
 
-    Token recreateToken(UUID refreshToken) throws TokenExpiredException;
+    AuthRES recreateToken(UUID refreshToken) throws TokenExpiredException;
 
     void logout(String accessToken);
 

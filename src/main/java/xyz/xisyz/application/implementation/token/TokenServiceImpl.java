@@ -19,6 +19,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
+import xyz.xisyz.application.dto.response.token.AuthRES;
 import xyz.xisyz.domain.token.Token;
 import xyz.xisyz.domain.token.TokenRepository;
 import xyz.xisyz.domain.token.TokenService;
@@ -167,7 +168,7 @@ public class TokenServiceImpl implements TokenService {
 
     @Transactional
     @Override
-    public Token auth(String username, String password) throws BadCredentialsException {
+    public AuthRES auth(String username, String password) throws BadCredentialsException {
         User user = userRepository.findByUsername(username.toLowerCase()).orElseThrow(() -> new BadCredentialsException("username"));
         if (!user.isActive()) throw new DisabledException("Email não confirmado");
 
@@ -178,12 +179,12 @@ public class TokenServiceImpl implements TokenService {
 
         String accessToken = generateToken(user);
         Instant expiresAt = getExpirationTime("refresh");
-        return repository.save(new Token(user, accessToken, expiresAt));
+        return new AuthRES(repository.save(new Token(user, accessToken, expiresAt)));
     }
 
     @Transactional
     @Override
-    public Token authWithGoogleAcc(String token) {
+    public AuthRES authWithGoogleAcc(String token) {
         try {
             Map info = getUserInfoFromGoogle(token);
             String id = (String) info.get("id");
@@ -200,7 +201,7 @@ public class TokenServiceImpl implements TokenService {
             String accessToken = generateToken(user);
             Instant expiresAt = getExpirationTime("refresh");
 
-            return repository.save(new Token(user, accessToken, expiresAt));
+            return new AuthRES(repository.save(new Token(user, accessToken, expiresAt)));
         } catch (JWTDecodeException exception) {
             throw new JWTDecodeException("Formato inválido");
         }
@@ -208,7 +209,7 @@ public class TokenServiceImpl implements TokenService {
 
     @Transactional
     @Override
-    public Token authWithGitHubAcc(String code) {
+    public AuthRES authWithGitHubAcc(String code) {
         Map info = getUserInfoFromGitHub(code);
         Integer id = (Integer) info.get("id");
         String login = (String) info.get("login");
@@ -223,12 +224,12 @@ public class TokenServiceImpl implements TokenService {
         String accessToken = generateToken(user);
         Instant expiresAt = getExpirationTime("refresh");
 
-        return repository.save(new Token(user, accessToken, expiresAt));
+        return new AuthRES(repository.save(new Token(user, accessToken, expiresAt)));
     }
 
     @Transactional
     @Override
-    public Token recreateToken(UUID refreshToken) throws TokenExpiredException {
+    public AuthRES recreateToken(UUID refreshToken) throws TokenExpiredException {
         Token token = repository.findById(refreshToken).orElseThrow(EntityNotFoundException::new);
 
         Instant now = LocalDateTime.now().toInstant(ZoneOffset.of("-03:00"));
@@ -241,7 +242,7 @@ public class TokenServiceImpl implements TokenService {
         Instant expiresAt = getExpirationTime("refresh");
 
         deleteAndFlush(token);
-        return repository.save(new Token(user, jwt, expiresAt));
+        return new AuthRES(repository.save(new Token(user, jwt, expiresAt)));
     }
 
     @Transactional

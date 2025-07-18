@@ -1,9 +1,11 @@
 package xyz.xisyz.domain.note;
 
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import xyz.xisyz.application.dto.request.note.CreateNoteREQ;
+import xyz.xisyz.application.dto.response.note.DetailNoteRES;
+import xyz.xisyz.application.dto.response.note.LowDetailNoteRES;
+import xyz.xisyz.application.dto.response.page.PageRES;
 import xyz.xisyz.domain.user.User;
 
 import java.util.List;
@@ -12,9 +14,7 @@ import java.util.UUID;
 @Service
 public interface NoteService {
 
-    Note mapToNote(UUID idFromToken, CreateNoteREQ req);
-
-    Note create(Note note);
+    LowDetailNoteRES create(UUID idFromToken, CreateNoteREQ req);
 
     void edit(UUID idFromToken, UUID idFromPath, String title, String description, List<String> tags, boolean closed, boolean hidden);
 
@@ -42,24 +42,24 @@ public interface NoteService {
 
     List<String> getAllPrivateUserTags(UUID idFromToken);
 
-    Page<Note> findPublicNotes(Pageable pageable, String q);
+    PageRES<LowDetailNoteRES> findPublicNotes(Pageable pageable, String q);
 
-    Page<Note> findPrivateNotes(Pageable pageable, UUID idFromToken, String q);
+    PageRES<LowDetailNoteRES> findPrivateNotes(Pageable pageable, UUID idFromToken, String q);
 
-    Page<Note> findPublicNotesByTag(Pageable pageable, String tag);
+    PageRES<LowDetailNoteRES> findPublicNotesByTag(Pageable pageable, String tag);
 
-    Page<Note> findPrivateNotesByTag(Pageable pageable, UUID idFromToken, String tag);
+    PageRES<LowDetailNoteRES> findPrivateNotesByTag(Pageable pageable, UUID idFromToken, String tag);
 
-    Page<Note> findUserNotesBySpecs(UUID idFromToken, Pageable pageable, String username, String q, String tag, String type);
+    PageRES<LowDetailNoteRES> findUserNotesBySpecs(UUID idFromToken, Pageable pageable, String username, String q, String tag, String type);
 
-    Note getNote(UUID idFromToken, UUID idFromPath);
+    DetailNoteRES getNote(UUID idFromToken, UUID idFromPath);
 
-    Page<Note> getAllUserNotesByUsername(Pageable pageable, String username);
+    PageRES<LowDetailNoteRES> getAllUserNotesByUsername(Pageable pageable, String username);
 
-    Page<Note> getAllUserNotesById(Pageable pageable, UUID idFromToken);
+    PageRES<LowDetailNoteRES> getAllUserNotesById(Pageable pageable, UUID idFromToken);
 
-    Page<Note> getAllFollowedUsersNotes(Pageable pageable, UUID idFromToken);
+    PageRES<LowDetailNoteRES> getAllFollowedUsersNotes(Pageable pageable, UUID idFromToken);
 
-    Page<Note> getAllFollowedUserNotes(Pageable pageable, UUID idFromToken, String username);
+    PageRES<LowDetailNoteRES> getAllFollowedUserNotes(Pageable pageable, UUID idFromToken, String username);
 
 }

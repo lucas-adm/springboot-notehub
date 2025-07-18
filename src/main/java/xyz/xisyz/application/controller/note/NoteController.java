@@ -12,7 +12,6 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -23,7 +22,6 @@ import xyz.xisyz.application.dto.request.note.*;
 import xyz.xisyz.application.dto.response.note.DetailNoteRES;
 import xyz.xisyz.application.dto.response.note.LowDetailNoteRES;
 import xyz.xisyz.application.dto.response.page.PageRES;
-import xyz.xisyz.domain.note.Note;
 import xyz.xisyz.domain.note.NoteService;
 
 import java.util.List;
@@ -58,8 +56,8 @@ public class NoteController {
             @Valid @RequestBody CreateNoteREQ dto
     ) {
         UUID idFromToken = getSubject(accessToken);
-        Note note = service.create(service.mapToNote(idFromToken, dto));
-        return ResponseEntity.status(HttpStatus.CREATED).body(new LowDetailNoteRES(note));
+        LowDetailNoteRES note = service.create(idFromToken, dto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(note);
     }
 
     @Operation(summary = "Edit note fields", description = "Updates note.")
@@ -266,8 +264,8 @@ public class NoteController {
             @ParameterObject @PageableDefault(page = 0, size = 25, sort = {"flamesCount"}, direction = Sort.Direction.DESC) Pageable pageable,
             @RequestParam(required = false) String q
     ) {
-        Page<LowDetailNoteRES> page = service.findPublicNotes(pageable, q).map(LowDetailNoteRES::new);
-        return ResponseEntity.status(HttpStatus.OK).body(new PageRES<>(page));
+        PageRES<LowDetailNoteRES> page = service.findPublicNotes(pageable, q);
+        return ResponseEntity.status(HttpStatus.OK).body(page);
     }
 
     @Operation(summary = "Search for user notes", description = "Searches user notes by title or tag.")
@@ -285,8 +283,8 @@ public class NoteController {
             @NotBlank @RequestParam String q
     ) {
         UUID idFromToken = getSubject(accessToken);
-        Page<LowDetailNoteRES> page = service.findPrivateNotes(pageable, idFromToken, q).map(LowDetailNoteRES::new);
-        return ResponseEntity.status(HttpStatus.OK).body(new PageRES<>(page));
+        PageRES<LowDetailNoteRES> page = service.findPrivateNotes(pageable, idFromToken, q);
+        return ResponseEntity.status(HttpStatus.OK).body(page);
     }
 
     @Operation(summary = "Search for notes", description = "Searches notes by tag.")
@@ -300,8 +298,8 @@ public class NoteController {
             @ParameterObject @PageableDefault(page = 0, size = 25, sort = {"flamesCount"}, direction = Sort.Direction.DESC) Pageable pageable,
             @RequestParam(required = false) String q
     ) {
-        Page<LowDetailNoteRES> page = service.findPublicNotesByTag(pageable, q).map(LowDetailNoteRES::new);
-        return ResponseEntity.status(HttpStatus.OK).body(new PageRES<>(page));
+        PageRES<LowDetailNoteRES> page = service.findPublicNotesByTag(pageable, q);
+        return ResponseEntity.status(HttpStatus.OK).body(page);
     }
 
     @Operation(summary = "Search for user notes", description = "Searches user notes by tag.")
@@ -318,8 +316,8 @@ public class NoteController {
             @NotBlank @RequestParam String q
     ) {
         UUID idFromToken = getSubject(accessToken);
-        Page<LowDetailNoteRES> page = service.findPrivateNotesByTag(pageable, idFromToken, q).map(LowDetailNoteRES::new);
-        return ResponseEntity.status(HttpStatus.OK).body(new PageRES<>(page));
+        PageRES<LowDetailNoteRES> page = service.findPrivateNotesByTag(pageable, idFromToken, q);
+        return ResponseEntity.status(HttpStatus.OK).body(page);
     }
 
     @Operation(
@@ -349,8 +347,8 @@ public class NoteController {
             @RequestParam(required = false) String type
     ) {
         UUID idFromToken = getSubject(accessToken);
-        Page<LowDetailNoteRES> page = service.findUserNotesBySpecs(idFromToken, pageable, username, q, tag, type).map(LowDetailNoteRES::new);
-        return ResponseEntity.status(HttpStatus.OK).body(new PageRES<>(page));
+        PageRES<LowDetailNoteRES> page = service.findUserNotesBySpecs(idFromToken, pageable, username, q, tag, type);
+        return ResponseEntity.status(HttpStatus.OK).body(page);
     }
 
     @Operation(summary = "Get a note details", description = "Retrieves detailed information about a note by their uuid.")
@@ -366,8 +364,8 @@ public class NoteController {
             @PathVariable("id") UUID idFromPath
     ) {
         UUID idFromToken = getSubject(accessToken);
-        Note note = service.getNote(idFromToken, idFromPath);
-        return ResponseEntity.status(HttpStatus.OK).body(new DetailNoteRES(note));
+        DetailNoteRES note = service.getNote(idFromToken, idFromPath);
+        return ResponseEntity.status(HttpStatus.OK).body(note);
     }
 
     @Operation(summary = "Search for notes", description = "Searches notes by user username.")
@@ -381,8 +379,8 @@ public class NoteController {
             @ParameterObject @PageableDefault(page = 0, size = 10, sort = {"flamesCount"}, direction = Sort.Direction.DESC) Pageable pageable,
             @PathVariable("username") String username
     ) {
-        Page<LowDetailNoteRES> page = service.getAllUserNotesByUsername(pageable, username).map(LowDetailNoteRES::new);
-        return ResponseEntity.status(HttpStatus.OK).body(new PageRES<>(page));
+        PageRES<LowDetailNoteRES> page = service.getAllUserNotesByUsername(pageable, username);
+        return ResponseEntity.status(HttpStatus.OK).body(page);
     }
 
     @Operation(summary = "Search for notes", description = "Searches notes by user id.")
@@ -398,8 +396,8 @@ public class NoteController {
             @ParameterObject @PageableDefault(page = 0, size = 10, sort = {"modifiedAt"}, direction = Sort.Direction.DESC) Pageable pageable
     ) {
         UUID idFromToken = getSubject(accessToken);
-        Page<LowDetailNoteRES> page = service.getAllUserNotesById(pageable, idFromToken).map(LowDetailNoteRES::new);
-        return ResponseEntity.status(HttpStatus.OK).body(new PageRES<>(page));
+        PageRES<LowDetailNoteRES> page = service.getAllUserNotesById(pageable, idFromToken);
+        return ResponseEntity.status(HttpStatus.OK).body(page);
     }
 
     @Operation(
@@ -418,8 +416,8 @@ public class NoteController {
             @ParameterObject @PageableDefault(page = 0, size = 10, sort = {"createdAt"}, direction = Sort.Direction.DESC) Pageable pageable
     ) {
         UUID idFromToken = getSubject(accessToken);
-        Page<LowDetailNoteRES> page = service.getAllFollowedUsersNotes(pageable, idFromToken).map(LowDetailNoteRES::new);
-        return ResponseEntity.status(HttpStatus.OK).body(new PageRES<>(page));
+        PageRES<LowDetailNoteRES> page = service.getAllFollowedUsersNotes(pageable, idFromToken);
+        return ResponseEntity.status(HttpStatus.OK).body(page);
     }
 
     @Operation(
@@ -439,8 +437,8 @@ public class NoteController {
             @ParameterObject @PageableDefault(page = 0, size = 10, sort = {"createdAt"}, direction = Sort.Direction.DESC) Pageable pageable
     ) {
         UUID idFromToken = getSubject(accessToken);
-        Page<LowDetailNoteRES> page = service.getAllFollowedUserNotes(pageable, idFromToken, username).map(LowDetailNoteRES::new);
-        return ResponseEntity.status(HttpStatus.OK).body(new PageRES<>(page));
+        PageRES<LowDetailNoteRES> page = service.getAllFollowedUserNotes(pageable, idFromToken, username);
+        return ResponseEntity.status(HttpStatus.OK).body(page);
     }
 
 }

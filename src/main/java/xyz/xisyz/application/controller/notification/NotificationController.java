@@ -10,7 +10,6 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -50,8 +49,8 @@ public class NotificationController {
             @ParameterObject @PageableDefault(page = 0, size = 10, sort = {"createdAt"}, direction = Sort.Direction.DESC) Pageable pageable
     ) {
         UUID idFromToken = UUID.fromString(JWT.decode(accessToken.replace("Bearer ", "")).getSubject());
-        Page<DetailNotificationRES> page = service.getNotifications(pageable, idFromToken).map(DetailNotificationRES::new);
-        return ResponseEntity.status(HttpStatus.OK).body(new PageRES<>(page));
+        PageRES<DetailNotificationRES> page = service.getNotifications(pageable, idFromToken);
+        return ResponseEntity.status(HttpStatus.OK).body(page);
     }
 
 }

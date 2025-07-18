@@ -11,6 +11,9 @@ import org.springframework.transaction.annotation.Transactional;
 import xyz.xisyz.application.counter.Counter;
 import xyz.xisyz.application.dto.notification.MessageNotification;
 import xyz.xisyz.application.dto.request.reply.CreateReplyREQ;
+import xyz.xisyz.application.dto.response.page.PageRES;
+import xyz.xisyz.application.dto.response.reply.CreateReplyRES;
+import xyz.xisyz.application.dto.response.reply.DetailReplyRES;
 import xyz.xisyz.domain.comment.Comment;
 import xyz.xisyz.domain.comment.CommentRepository;
 import xyz.xisyz.domain.note.Note;
@@ -56,14 +59,12 @@ public class ReplyServiceImpl implements ReplyService {
         if (reply.getComment().getNote().isClosed()) throw new IllegalStateException("Nota fechada para novas interações.");
     }
 
-    @Override
     public Reply mapToReply(UUID idFromToken, UUID commentIdFromPath, CreateReplyREQ req) {
         User user = userRepository.findById(idFromToken).orElseThrow(EntityNotFoundException::new);
         Comment comment = commentRepository.findById(commentIdFromPath).orElseThrow(EntityNotFoundException::new);
         return new Reply(user, comment, req.text());
     }
 
-    @Override
     public Reply mapToSelfReference(UUID idFromToken, UUID replyIdFromPath, CreateReplyREQ req) {
         User user = userRepository.findById(idFromToken).orElseThrow(EntityNotFoundException::new);
         Reply reply = repository.findById(replyIdFromPath).orElseThrow(EntityNotFoundException::new);
@@ -73,13 +74,14 @@ public class ReplyServiceImpl implements ReplyService {
 
     @Transactional
     @Override
-    public Reply create(Reply reply) {
+    public CreateReplyRES create(UUID idFromToken, UUID idFromPath, boolean toReply, CreateReplyREQ req) {
+        Reply reply = toReply ? mapToSelfReference(idFromToken, idFromPath, req) : mapToReply(idFromToken, idFromPath, req);
         assertNoteIsNotClosed(reply);
         repository.save(reply);
         counter.updateRepliesCount(reply.getComment(), true);
         if (reply.getToUser() == null) notifier.notify(reply.getComment().getUser(), MessageNotification.of(reply));
         if (reply.getToUser() != null) notifier.notify(reply.getToReply().getUser(), MessageNotification.of(reply));
-        return reply;
+        return new CreateReplyRES(reply);
     }
 
     @Transactional
@@ -105,7 +107,7 @@ public class ReplyServiceImpl implements ReplyService {
 
     @Transactional(readOnly = true)
     @Override
-    public Page<Reply> getReplies(Pageable pageable, UUID idFromToken, UUID commentIdFromPath) {
+    public PageRES<DetailReplyRES> getReplies(Pageable pageable, UUID idFromToken, UUID commentIdFromPath) {
         User requesting = (idFromToken != null) ? userRepository.findById(idFromToken).orElseThrow(EntityNotFoundException::new) : null;
         Note requested = commentRepository.findById(commentIdFromPath).orElseThrow(EntityNotFoundException::new).getNote();
         User author = requested.getUser();
@@ -113,7 +115,8 @@ public class ReplyServiceImpl implements ReplyService {
             if (requested.isHidden()) validateAccess(idFromToken, author.getId());
             if (author.isProfilePrivate()) validateBidirectionalFollowAccess(requesting, author);
         }
-        return repository.findAllByCommentId(pageable, commentIdFromPath);
+        Page<DetailReplyRES> page = repository.findAllByCommentId(pageable, commentIdFromPath).map(DetailReplyRES::new);
+        return new PageRES<>(page);
     }
 
 }

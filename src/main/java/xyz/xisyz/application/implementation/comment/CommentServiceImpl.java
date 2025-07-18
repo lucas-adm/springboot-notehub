@@ -11,6 +11,9 @@ import org.springframework.transaction.annotation.Transactional;
 import xyz.xisyz.application.counter.Counter;
 import xyz.xisyz.application.dto.notification.MessageNotification;
 import xyz.xisyz.application.dto.request.comment.CreateCommentREQ;
+import xyz.xisyz.application.dto.response.comment.CreateCommentRES;
+import xyz.xisyz.application.dto.response.comment.DetailCommentRES;
+import xyz.xisyz.application.dto.response.page.PageRES;
 import xyz.xisyz.domain.comment.Comment;
 import xyz.xisyz.domain.comment.CommentRepository;
 import xyz.xisyz.domain.comment.CommentService;
@@ -55,7 +58,6 @@ public class CommentServiceImpl implements CommentService {
         if (comment.getNote().isClosed()) throw new IllegalStateException("Nota fechada para novas interações.");
     }
 
-    @Override
     public Comment mapToComment(UUID idFromToken, UUID noteIdFromPath, CreateCommentREQ req) {
         User user = userRepository.findById(idFromToken).orElseThrow(EntityNotFoundException::new);
         Note note = noteRepository.findById(noteIdFromPath).orElseThrow(EntityNotFoundException::new);
@@ -64,12 +66,13 @@ public class CommentServiceImpl implements CommentService {
 
     @Transactional
     @Override
-    public Comment create(Comment comment) {
+    public CreateCommentRES create(UUID idFromToken, UUID noteIdFromPath, CreateCommentREQ req) {
+        Comment comment = mapToComment(idFromToken, noteIdFromPath, req);
         assertNoteIsNotClosed(comment);
         repository.save(comment);
         counter.updateCommentsCount(comment.getNote(), true);
         notifier.notify(comment.getNote().getUser(), MessageNotification.of(comment));
-        return comment;
+        return new CreateCommentRES(comment);
     }
 
     @Transactional
@@ -95,7 +98,7 @@ public class CommentServiceImpl implements CommentService {
 
     @Transactional(readOnly = true)
     @Override
-    public Page<Comment> getComments(Pageable pageable, UUID idFromToken, UUID noteIdFromPath) {
+    public PageRES<DetailCommentRES> getComments(Pageable pageable, UUID idFromToken, UUID noteIdFromPath) {
         User requesting = (idFromToken != null) ? userRepository.findById(idFromToken).orElseThrow(EntityNotFoundException::new) : null;
         Note requested = noteRepository.findById(noteIdFromPath).orElseThrow(EntityNotFoundException::new);
         User author = requested.getUser();
@@ -103,7 +106,8 @@ public class CommentServiceImpl implements CommentService {
             if (requested.isHidden()) validateAccess(idFromToken, author.getId());
             if (author.isProfilePrivate()) validateBidirectionalFollowAccess(requesting, author);
         }
-        return repository.findAllByNoteId(pageable, requested.getId());
+        Page<DetailCommentRES> page = repository.findAllByNoteId(pageable, requested.getId()).map(DetailCommentRES::new);
+        return new PageRES<>(page);
     }
 
 }

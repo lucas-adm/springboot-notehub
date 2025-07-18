@@ -10,6 +10,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import xyz.xisyz.application.counter.Counter;
 import xyz.xisyz.application.dto.request.note.CreateNoteREQ;
+import xyz.xisyz.application.dto.response.note.DetailNoteRES;
+import xyz.xisyz.application.dto.response.note.LowDetailNoteRES;
+import xyz.xisyz.application.dto.response.page.PageRES;
 import xyz.xisyz.domain.note.Note;
 import xyz.xisyz.domain.note.NoteRepository;
 import xyz.xisyz.domain.note.NoteService;
@@ -77,7 +80,6 @@ public class NoteServiceImpl implements NoteService {
         repository.saveAndFlush(note);
     }
 
-    @Override
     public Note mapToNote(UUID idFromToken, CreateNoteREQ req) {
         User user = userRepository.findById(idFromToken).orElseThrow(EntityNotFoundException::new);
         List<Tag> tags = findOrCreateTags(req.tags());
@@ -86,10 +88,11 @@ public class NoteServiceImpl implements NoteService {
 
     @Transactional
     @Override
-    public Note create(Note note) {
+    public LowDetailNoteRES create(UUID idFromToken, CreateNoteREQ req) {
+        Note note = mapToNote(idFromToken, req);
         repository.save(note);
         counter.updateNotesCount(note.getUser(), true);
-        return note;
+        return new LowDetailNoteRES(note);
     }
 
     @Transactional
@@ -195,38 +198,43 @@ public class NoteServiceImpl implements NoteService {
     }
 
     @Override
-    public Page<Note> findPublicNotes(Pageable pageable, String q) {
-        return repository.searchPublicNotesByTitleOrDescription(pageable, q);
+    public PageRES<LowDetailNoteRES> findPublicNotes(Pageable pageable, String q) {
+        Page<LowDetailNoteRES> page = repository.searchPublicNotesByTitleOrDescription(pageable, q).map(LowDetailNoteRES::new);
+        return new PageRES<>(page);
     }
 
     @Override
-    public Page<Note> findPrivateNotes(Pageable pageable, UUID idFromToken, String q) {
-        return repository.searchPrivateNotesByTitleOrTag(pageable, idFromToken, q);
+    public PageRES<LowDetailNoteRES> findPrivateNotes(Pageable pageable, UUID idFromToken, String q) {
+        Page<LowDetailNoteRES> page = repository.searchPrivateNotesByTitleOrTag(pageable, idFromToken, q).map(LowDetailNoteRES::new);
+        return new PageRES<>(page);
     }
 
     @Override
-    public Page<Note> findPublicNotesByTag(Pageable pageable, String tag) {
-        return repository.searchPublicNotesByTag(pageable, tag);
+    public PageRES<LowDetailNoteRES> findPublicNotesByTag(Pageable pageable, String tag) {
+        Page<LowDetailNoteRES> page = repository.searchPublicNotesByTag(pageable, tag).map(LowDetailNoteRES::new);
+        return new PageRES<>(page);
     }
 
     @Override
-    public Page<Note> findPrivateNotesByTag(Pageable pageable, UUID idFromToken, String tag) {
-        return repository.searchPrivateNotesByTag(pageable, idFromToken, tag);
+    public PageRES<LowDetailNoteRES> findPrivateNotesByTag(Pageable pageable, UUID idFromToken, String tag) {
+        Page<LowDetailNoteRES> page = repository.searchPrivateNotesByTag(pageable, idFromToken, tag).map(LowDetailNoteRES::new);
+        return new PageRES<>(page);
     }
 
     @Transactional(readOnly = true)
     @Override
-    public Page<Note> findUserNotesBySpecs(UUID idFromToken, Pageable pageable, String username, String q, String tag, String type) {
+    public PageRES<LowDetailNoteRES> findUserNotesBySpecs(UUID idFromToken, Pageable pageable, String username, String q, String tag, String type) {
         User requesting = (idFromToken != null) ? userRepository.findById(idFromToken).orElseThrow(EntityNotFoundException::new) : null;
         User requested = userRepository.findByUsername(username).orElseThrow(EntityNotFoundException::new);
         if (Objects.equals(type, "hidden")) validateAccess(idFromToken, requested.getId());
         if (requested.isProfilePrivate()) validateBidirectionalFollowAccess(requesting, requested);
-        return repository.searchUserNotesBySpecs(pageable, username, q, tag, type);
+        Page<LowDetailNoteRES> page = repository.searchUserNotesBySpecs(pageable, username, q, tag, type).map(LowDetailNoteRES::new);
+        return new PageRES<>(page);
     }
 
     @Transactional(readOnly = true)
     @Override
-    public Note getNote(UUID idFromToken, UUID idFromPath) {
+    public DetailNoteRES getNote(UUID idFromToken, UUID idFromPath) {
         User requesting = (idFromToken != null) ? userRepository.findById(idFromToken).orElseThrow(EntityNotFoundException::new) : null;
         Note requested = repository.findNote(idFromPath).orElseThrow(EntityNotFoundException::new);
         User author = requested.getUser();
@@ -234,35 +242,40 @@ public class NoteServiceImpl implements NoteService {
             if (requested.isHidden()) validateAccess(idFromToken, author.getId());
             if (author.isProfilePrivate()) validateBidirectionalFollowAccess(requesting, author);
         }
-        return requested;
+        return new DetailNoteRES(requested);
     }
 
     @Override
-    public Page<Note> getAllUserNotesByUsername(Pageable pageable, String username) {
-        return repository.findAllByUserProfilePrivateFalseAndUserUsernameAndHiddenFalse(pageable, username.toLowerCase());
+    public PageRES<LowDetailNoteRES> getAllUserNotesByUsername(Pageable pageable, String username) {
+        Page<Note> notes = repository.findAllByUserProfilePrivateFalseAndUserUsernameAndHiddenFalse(pageable, username.toLowerCase());
+        Page<LowDetailNoteRES> page = notes.map(LowDetailNoteRES::new);
+        return new PageRES<>(page);
     }
 
     @Override
-    public Page<Note> getAllUserNotesById(Pageable pageable, UUID idFromToken) {
-        return repository.findAllByUserId(pageable, idFromToken);
+    public PageRES<LowDetailNoteRES> getAllUserNotesById(Pageable pageable, UUID idFromToken) {
+        Page<LowDetailNoteRES> page = repository.findAllByUserId(pageable, idFromToken).map(LowDetailNoteRES::new);
+        return new PageRES<>(page);
     }
 
     @Override
-    public Page<Note> getAllFollowedUsersNotes(Pageable pageable, UUID idFromToken) {
+    public PageRES<LowDetailNoteRES> getAllFollowedUsersNotes(Pageable pageable, UUID idFromToken) {
         User user = userRepository.findByIdWithFollowersAndFollowing(idFromToken).orElseThrow(EntityNotFoundException::new);
         Set<UUID> following = user.getFollowing().stream().map(User::getId).collect(Collectors.toSet());
         Set<UUID> followers = user.getFollowers().stream().map(User::getId).collect(Collectors.toSet());
         Set<UUID> mutuals = new HashSet<>(following);
         mutuals.retainAll(followers);
-        return repository.findAllForUserFeed(pageable, following, mutuals);
+        Page<LowDetailNoteRES> page = repository.findAllForUserFeed(pageable, following, mutuals).map(LowDetailNoteRES::new);
+        return new PageRES<>(page);
     }
 
     @Override
-    public Page<Note> getAllFollowedUserNotes(Pageable pageable, UUID idFromToken, String username) {
+    public PageRES<LowDetailNoteRES> getAllFollowedUserNotes(Pageable pageable, UUID idFromToken, String username) {
         User requesting = userRepository.findByIdWithFollowersAndFollowing(idFromToken).orElseThrow(EntityNotFoundException::new);
         User requested = userRepository.findByUsernameWithFollowersAndFollowing(username).orElseThrow(EntityNotFoundException::new);
         if (requested.isProfilePrivate()) validateBidirectionalFollowAccess(requesting, requested);
-        return repository.findAllByUserUsernameAndHiddenFalse(pageable, username);
+        Page<LowDetailNoteRES> page = repository.findAllByUserUsernameAndHiddenFalse(pageable, username).map(LowDetailNoteRES::new);
+        return new PageRES<>(page);
     }
 
 }

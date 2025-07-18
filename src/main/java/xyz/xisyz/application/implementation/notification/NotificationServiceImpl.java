@@ -8,6 +8,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import xyz.xisyz.application.dto.notification.MessageNotification;
+import xyz.xisyz.application.dto.response.notification.DetailNotificationRES;
+import xyz.xisyz.application.dto.response.page.PageRES;
 import xyz.xisyz.domain.notification.Notification;
 import xyz.xisyz.domain.notification.NotificationRepository;
 import xyz.xisyz.domain.notification.NotificationService;
@@ -22,6 +24,7 @@ public class NotificationServiceImpl implements NotificationService {
 
     private final NotificationRepository repository;
 
+    @Transactional
     @Override
     public void notify(User user, MessageNotification message) {
         Object from = message.info().get("from");
@@ -30,6 +33,7 @@ public class NotificationServiceImpl implements NotificationService {
         repository.save(new Notification(user, message.info()));
     }
 
+    @Transactional
     @Override
     public void readNotification(UUID id) {
         Notification notification = repository.findById(id).orElseThrow(EntityNotFoundException::new);
@@ -39,7 +43,7 @@ public class NotificationServiceImpl implements NotificationService {
 
     @Transactional
     @Override
-    public Page<Notification> getNotifications(Pageable pageable, UUID idFromToken) {
+    public PageRES<DetailNotificationRES> getNotifications(Pageable pageable, UUID idFromToken) {
         Page<Notification> notifications = repository.findAllByUserId(pageable, idFromToken);
         Page<Notification> snapshot = new PageImpl<>(
                 notifications.getContent().stream().map(Notification::new).toList(),
@@ -47,7 +51,8 @@ public class NotificationServiceImpl implements NotificationService {
                 notifications.getTotalElements()
         );
         notifications.forEach(notification -> readNotification(notification.getId()));
-        return snapshot;
+        Page<DetailNotificationRES> page = snapshot.map(DetailNotificationRES::new);
+        return new PageRES<>(page);
     }
 
 }

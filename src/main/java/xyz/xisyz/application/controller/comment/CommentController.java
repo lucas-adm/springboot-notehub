@@ -11,7 +11,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -22,7 +21,6 @@ import xyz.xisyz.application.dto.request.comment.CreateCommentREQ;
 import xyz.xisyz.application.dto.response.comment.CreateCommentRES;
 import xyz.xisyz.application.dto.response.comment.DetailCommentRES;
 import xyz.xisyz.application.dto.response.page.PageRES;
-import xyz.xisyz.domain.comment.Comment;
 import xyz.xisyz.domain.comment.CommentService;
 
 import java.util.UUID;
@@ -58,8 +56,8 @@ public class CommentController {
             @Valid @RequestBody CreateCommentREQ dto
     ) {
         UUID idFromToken = getSubject(accessToken);
-        Comment comment = service.create(service.mapToComment(idFromToken, idFromPath, dto));
-        return ResponseEntity.status(HttpStatus.CREATED).body(new CreateCommentRES(comment));
+        CreateCommentRES comment = service.create(idFromToken, idFromPath, dto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(comment);
     }
 
     @Operation(summary = "Change comment text", description = "Updates comment text field.")
@@ -111,8 +109,8 @@ public class CommentController {
             @PathVariable("id") UUID idFromPath
     ) {
         UUID idFromToken = getSubject(accessToken);
-        Page<DetailCommentRES> page = service.getComments(pageable, idFromToken, idFromPath).map(DetailCommentRES::new);
-        return ResponseEntity.status(HttpStatus.OK).body(new PageRES<>(page));
+        PageRES<DetailCommentRES> page = service.getComments(pageable, idFromToken, idFromPath);
+        return ResponseEntity.status(HttpStatus.OK).body(page);
     }
 
 }

@@ -45,7 +45,7 @@ public class AuthController {
     public ResponseEntity<AuthRES> loginUser(
             @Valid @RequestBody AuthREQ dto
     ) {
-        AuthRES token = new AuthRES(service.auth(dto.username(), dto.password()));
+        AuthRES token = service.auth(dto.username(), dto.password());
         return ResponseEntity.status(HttpStatus.OK).body(token);
     }
 
@@ -59,7 +59,7 @@ public class AuthController {
     public ResponseEntity<AuthRES> loginGoogleUser(
             @Valid @RequestBody OAuth2GoogleREQ dto
     ) {
-        AuthRES token = new AuthRES(service.authWithGoogleAcc(dto.token()));
+        AuthRES token = service.authWithGoogleAcc(dto.token());
         return ResponseEntity.status(HttpStatus.OK).body(token);
     }
 
@@ -73,7 +73,7 @@ public class AuthController {
     public ResponseEntity<AuthRES> loginGitHubUser(
             @Valid @RequestBody OAuthGitHubREQ dto
     ) {
-        AuthRES token = new AuthRES(service.authWithGitHubAcc(dto.code()));
+        AuthRES token = service.authWithGitHubAcc(dto.code());
         return ResponseEntity.status(HttpStatus.OK).body(token);
     }
 
@@ -88,7 +88,7 @@ public class AuthController {
     public ResponseEntity<AuthRES> refreshToken(
             @RequestParam("token") UUID refreshToken
     ) {
-        AuthRES token = new AuthRES(service.recreateToken(refreshToken));
+        AuthRES token = service.recreateToken(refreshToken);
         return ResponseEntity.status(HttpStatus.CREATED).body(token);
     }
 

@@ -1,12 +1,12 @@
 package xyz.xisyz.application.implementation.history;
 
-import xyz.xisyz.domain.history.UserHistoryService;
-import xyz.xisyz.domain.user.User;
-import xyz.xisyz.domain.history.UserHistory;
-import xyz.xisyz.domain.history.UserHistoryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Component;
+import xyz.xisyz.domain.history.UserHistory;
+import xyz.xisyz.domain.history.UserHistoryRepository;
+import xyz.xisyz.domain.history.UserHistoryService;
+import xyz.xisyz.domain.user.User;
 
 import java.util.List;
 
