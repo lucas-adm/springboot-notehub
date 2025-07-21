@@ -3,6 +3,7 @@ package xyz.xisyz.domain.notification;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import org.hibernate.annotations.JdbcTypeCode;
@@ -17,17 +18,26 @@ import java.util.UUID;
 @Table(name = "notifications")
 @Data
 @NoArgsConstructor
-@JsonIgnoreProperties({"user"})
-@ToString(exclude = {"user"})
+@JsonIgnoreProperties({"from", "to", "related"})
+@ToString(exclude = {"from", "to", "related"})
+@EqualsAndHashCode(exclude = {"from", "to", "related"})
 public class Notification {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "from_user_id")
     @ManyToOne(fetch = FetchType.LAZY)
-    private User user;
+    private User from;
+
+    @JoinColumn(name = "to_user_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    private User to;
+
+    @JoinColumn(name = "related_user_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    private User related;
 
     private Instant createdAt = Instant.now();
 
@@ -38,14 +48,18 @@ public class Notification {
     @Convert(converter = NotificationFieldInfoConverter.class)
     private Map<String, Object> info;
 
-    public Notification(User user, Map<String, Object> info) {
-        this.user = user;
+    public Notification(User from, User to, User related, Map<String, Object> info) {
+        this.from = from;
+        this.to = to;
+        this.related = related;
         this.info = info;
     }
 
     public Notification(Notification snapshot) {
         this.id = snapshot.id;
-        this.user = snapshot.user;
+        this.from = snapshot.from;
+        this.to = snapshot.to;
+        this.related = snapshot.related;
         this.createdAt = snapshot.createdAt;
         this.read = snapshot.read;
         this.info = snapshot.info;

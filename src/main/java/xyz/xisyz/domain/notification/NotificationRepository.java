@@ -10,6 +10,6 @@ import java.util.UUID;
 @Repository
 public interface NotificationRepository extends JpaRepository<Notification, UUID> {
 
-    Page<Notification> findAllByUserId(Pageable pageable, UUID userId);
+    Page<Notification> findAllByToId(Pageable pageable, UUID userId);
 
 }

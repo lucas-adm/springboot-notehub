@@ -71,7 +71,7 @@ public class CommentServiceImpl implements CommentService {
         assertNoteIsNotClosed(comment);
         repository.save(comment);
         counter.updateCommentsCount(comment.getNote(), true);
-        notifier.notify(comment.getNote().getUser(), MessageNotification.of(comment));
+        notifier.notify(comment.getUser(), comment.getNote().getUser(), comment.getNote().getUser(), MessageNotification.of(comment));
         return new CreateCommentRES(comment);
     }
 

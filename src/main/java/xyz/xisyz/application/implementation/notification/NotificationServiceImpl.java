@@ -26,11 +26,9 @@ public class NotificationServiceImpl implements NotificationService {
 
     @Transactional
     @Override
-    public void notify(User user, MessageNotification message) {
-        Object from = message.info().get("from");
-        Object to = message.info().get("to");
-        if (Objects.equals(from, to)) return;
-        repository.save(new Notification(user, message.info()));
+    public void notify(User from, User to, User related, MessageNotification message) {
+        if (Objects.equals(from.getId(), to.getId())) return;
+        repository.save(new Notification(from, to, related, message.info()));
     }
 
     @Transactional
@@ -44,7 +42,7 @@ public class NotificationServiceImpl implements NotificationService {
     @Transactional
     @Override
     public PageRES<DetailNotificationRES> getNotifications(Pageable pageable, UUID idFromToken) {
-        Page<Notification> notifications = repository.findAllByUserId(pageable, idFromToken);
+        Page<Notification> notifications = repository.findAllByToId(pageable, idFromToken);
         Page<Notification> snapshot = new PageImpl<>(
                 notifications.getContent().stream().map(Notification::new).toList(),
                 pageable,

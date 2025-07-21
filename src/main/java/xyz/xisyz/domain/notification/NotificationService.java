@@ -12,7 +12,7 @@ import java.util.UUID;
 @Service
 public interface NotificationService {
 
-    void notify(User user, MessageNotification message);
+    void notify(User from, User to, User related, MessageNotification message);
 
     void readNotification(UUID id);
 

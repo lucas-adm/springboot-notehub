@@ -79,8 +79,16 @@ public class ReplyServiceImpl implements ReplyService {
         assertNoteIsNotClosed(reply);
         repository.save(reply);
         counter.updateRepliesCount(reply.getComment(), true);
-        if (reply.getToUser() == null) notifier.notify(reply.getComment().getUser(), MessageNotification.of(reply));
-        if (reply.getToUser() != null) notifier.notify(reply.getToReply().getUser(), MessageNotification.of(reply));
+        if (reply.getToUser() == null) notifier.notify(
+                reply.getUser(),
+                reply.getComment().getUser(),
+                reply.getComment().getUser(),
+                MessageNotification.of(reply));
+        if (reply.getToUser() != null) notifier.notify(
+                reply.getUser(),
+                reply.getToReply().getUser(),
+                reply.getComment().getUser(),
+                MessageNotification.of(reply));
         return new CreateReplyRES(reply);
     }
 

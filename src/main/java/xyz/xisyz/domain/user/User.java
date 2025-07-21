@@ -26,9 +26,9 @@ import java.util.*;
 @Table(name = "users")
 @NoArgsConstructor
 @Data
-@JsonIgnoreProperties({"token", "history", "notes", "comments", "replies", "flames", "followers", "following", "notifications"})
-@ToString(exclude = {"token", "history", "notes", "comments", "replies", "flames", "followers", "following", "notifications"})
-@EqualsAndHashCode(exclude = {"token", "history", "notes", "comments", "replies", "flames", "followers", "following", "notifications"})
+@JsonIgnoreProperties({"token", "history", "notes", "comments", "replies", "flames", "followers", "following", "receivedNotifications", "sentNotifications", "relatedNotifications"})
+@ToString(exclude = {"token", "history", "notes", "comments", "replies", "flames", "followers", "following", "receivedNotifications", "sentNotifications", "relatedNotifications"})
+@EqualsAndHashCode(exclude = {"token", "history", "notes", "comments", "replies", "flames", "followers", "following", "receivedNotifications", "sentNotifications", "relatedNotifications"})
 public class User implements UserDetails {
 
     @Id
@@ -87,8 +87,14 @@ public class User implements UserDetails {
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, orphanRemoval = true)
     private Set<Flame> flames = new HashSet<>();
 
-    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, orphanRemoval = true)
-    private List<Notification> notifications = new ArrayList<>();
+    @OneToMany(mappedBy = "to", orphanRemoval = true)
+    private List<Notification> receivedNotifications = new ArrayList<>();
+
+    @OneToMany(mappedBy = "from", orphanRemoval = true)
+    private List<Notification> sentNotifications = new ArrayList<>();
+
+    @OneToMany(mappedBy = "related", orphanRemoval = true)
+    private List<Notification> relatedNotifications = new ArrayList<>();
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
