@@ -27,7 +27,7 @@ public record DetailNotificationRES(
                         .format(DateTimeFormatter.ofPattern("d/M/yy HH:mm", Locale.of("pt-BR"))),
                 new DetailUserRES(notification.getFrom()),
                 new DetailUserRES(notification.getTo()),
-                new DetailUserRES(notification.getRelated()),
+                notification.getRelated() != null ? new DetailUserRES(notification.getRelated()) : null,
                 notification.getInfo()
         );
     }

@@ -27,6 +27,7 @@ public class NotificationServiceImpl implements NotificationService {
     @Transactional
     @Override
     public void notify(User from, User to, User related, MessageNotification message) {
+        if (to == null) return;
         if (Objects.equals(from.getId(), to.getId())) return;
         repository.save(new Notification(from, to, related, message.info()));
     }

@@ -93,7 +93,7 @@ public class User implements UserDetails {
     @OneToMany(mappedBy = "from", orphanRemoval = true)
     private List<Notification> sentNotifications = new ArrayList<>();
 
-    @OneToMany(mappedBy = "related", orphanRemoval = true)
+    @OneToMany(mappedBy = "related")
     private List<Notification> relatedNotifications = new ArrayList<>();
 
     @ManyToMany(fetch = FetchType.LAZY)

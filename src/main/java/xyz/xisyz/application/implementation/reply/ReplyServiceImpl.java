@@ -82,12 +82,12 @@ public class ReplyServiceImpl implements ReplyService {
         if (reply.getToUser() == null) notifier.notify(
                 reply.getUser(),
                 reply.getComment().getUser(),
-                reply.getComment().getUser(),
+                reply.getComment().getNote().getUser(),
                 MessageNotification.of(reply));
         if (reply.getToUser() != null) notifier.notify(
                 reply.getUser(),
                 reply.getToReply().getUser(),
-                reply.getComment().getUser(),
+                reply.getComment().getNote().getUser(),
                 MessageNotification.of(reply));
         return new CreateReplyRES(reply);
     }
