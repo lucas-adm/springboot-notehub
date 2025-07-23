@@ -2,8 +2,8 @@
 <br>
 
 <div align="center">
-  <a href="https://xisyz.xyz">
-    <img width="20%" height="20%" src="https://github.com/lucas-adm/springboot-xyz/blob/main/src/main/resources/public/imgs/xyz.png">
+  <a href="https://notehub.com.br">
+    <img width="20%" height="20%" src="https://github.com/lucas-adm/springboot-notehub/blob/main/src/main/resources/public/imgs/logo.png">
   </a>
 </div>
 
@@ -24,7 +24,7 @@
 
 ## Documentação
 
-  - <a href="https://xisyz.xyz/docs">/docs</a>
+  - <a href="https://https://notehub.com.br/docs">/docs</a>
 
 ## Ambiente de Desenvolvimento
 

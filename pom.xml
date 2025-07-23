@@ -8,11 +8,11 @@
         <version>3.3.2</version>
         <relativePath/>
     </parent>
-    <groupId>xyz.xisyz</groupId>
-    <artifactId>XYZ</artifactId>
+    <groupId>br.com.notehub</groupId>
+    <artifactId>NoteHub</artifactId>
     <version>1.0.0</version>
-    <name>XYZ</name>
-    <description>https://xisyz.xyz</description>
+    <name>NoteHub</name>
+    <description>https://notehub.com.br</description>
     <url/>
     <licenses>
         <license/>
