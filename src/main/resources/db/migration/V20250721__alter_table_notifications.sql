@@ -11,7 +11,7 @@ ALTER TABLE notifications
     ADD COLUMN related_user_id UUID NOT NULL;
 
 ALTER TABLE notifications
-    ADD CONSTRAINT fk_notifications_to_user FOREIGN KEY (to_user_id) REFERENCES users(id) ON DELETE CASCADE;
+    ADD CONSTRAINT fk_notifications_to_user FOREIGN KEY (to_user_id) REFERENCES users(id) ON DELETE CASCADE,
     ADD CONSTRAINT fk_notifications_from_user FOREIGN KEY (from_user_id) REFERENCES users(id) ON DELETE CASCADE,
     ADD CONSTRAINT fk_notifications_related_user FOREIGN KEY (related_user_id) REFERENCES users(id) ON DELETE CASCADE;
 
