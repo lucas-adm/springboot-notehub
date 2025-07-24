@@ -10,7 +10,7 @@ public record ChangeTitleREQ(
                 message = "👀"
         )
         @NotBlank(message = "Não pode ser vazio")
-        @Size(min = 4, max = 48, message = "Tamanho inválido")
+        @Size(min = 2, max = 48, message = "Tamanho inválido")
         String title
 ) {
 }

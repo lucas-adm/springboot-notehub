@@ -4,7 +4,7 @@ import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
 public record ChangeMessageREQ(
-        @Size(max = 48, message = "Tamanho inválido")
+        @Size(max = 144, message = "Tamanho inválido")
         @Pattern(
                 regexp = "^(?!.*[\\u00A0\\u2007\\u202F]).*$",
                 message = "👀"
