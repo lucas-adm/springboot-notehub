@@ -38,4 +38,10 @@ public class CustomExceptions {
         }
     }
 
+    public static class HostNotAllowedException extends BusinessException {
+        public HostNotAllowedException() {
+            super("Host não autorizado.");
+        }
+    }
+
 }

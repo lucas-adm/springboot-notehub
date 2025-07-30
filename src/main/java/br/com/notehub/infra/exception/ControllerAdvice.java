@@ -20,7 +20,6 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.HandlerMethodValidationException;
 
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -155,13 +154,6 @@ public class ControllerAdvice {
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(errors.stream().map(CustomResponse::new).toList());
     }
 
-    @ExceptionHandler(UnknownHostException.class)
-    private ResponseEntity<List<CustomResponse>> handleUnknownHostException(UnknownHostException ex) {
-        List<FieldError> errors = new ArrayList<>();
-        errors.add(new FieldError("user", "host", ex.getMessage()));
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(errors.stream().map(CustomResponse::new).toList());
-    }
-
     @ExceptionHandler(CustomExceptions.SamePasswordException.class)
     private ResponseEntity<List<CustomResponse>> handleSamePasswordException(CustomExceptions.SamePasswordException ex) {
         List<FieldError> errors = new ArrayList<>();
@@ -184,7 +176,7 @@ public class ControllerAdvice {
     }
 
     @ExceptionHandler(CustomExceptions.AlreadyFollowingException.class)
-    private ResponseEntity<List<CustomResponse>> handleSAlreadyFollowingException(CustomExceptions.AlreadyFollowingException ex) {
+    private ResponseEntity<List<CustomResponse>> handleAlreadyFollowingException(CustomExceptions.AlreadyFollowingException ex) {
         List<FieldError> errors = new ArrayList<>();
         errors.add(new FieldError("user", "user", ex.getMessage()));
         return ResponseEntity.status(HttpStatus.CONFLICT).body(errors.stream().map(CustomResponse::new).toList());
@@ -195,6 +187,13 @@ public class ControllerAdvice {
         List<FieldError> errors = new ArrayList<>();
         errors.add(new FieldError("user", "user", ex.getMessage()));
         return ResponseEntity.status(HttpStatus.CONFLICT).body(errors.stream().map(CustomResponse::new).toList());
+    }
+
+    @ExceptionHandler(CustomExceptions.HostNotAllowedException.class)
+    private ResponseEntity<List<CustomResponse>> handleHostNotAllowedException(CustomExceptions.HostNotAllowedException ex) {
+        List<FieldError> errors = new ArrayList<>();
+        errors.add(new FieldError("user", "host", ex.getMessage()));
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(errors.stream().map(CustomResponse::new).toList());
     }
 
 }

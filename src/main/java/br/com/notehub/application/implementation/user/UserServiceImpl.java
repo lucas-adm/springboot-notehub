@@ -60,6 +60,10 @@ public class UserServiceImpl implements UserService {
         historian.setHistory(user, field, String.valueOf(oldValue), newValue.toString());
     }
 
+    private void validateHost(String host) {
+        if (!Objects.equals(host, "NoteHub")) throw new CustomExceptions.HostNotAllowedException();
+    }
+
     private String validatePassword(String oldPassword, String newPassword) {
         if (encoder.matches(newPassword, oldPassword)) throw new CustomExceptions.SamePasswordException();
         return encoder.encode(newPassword);
@@ -140,6 +144,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public void changePassword(String email, String newPassword) {
         User entity = repository.findByEmail(email).orElseThrow(EntityNotFoundException::new);
+        validateHost(entity.getHost());
         String password = validatePassword(entity.getPassword(), newPassword);
         changeField(entity.getId(), "password", User::getPassword, user -> user.setPassword(password));
     }
@@ -148,8 +153,9 @@ public class UserServiceImpl implements UserService {
     @Override
     public void changeEmail(String oldEmail, String newEmail) {
         validateEmail(oldEmail, newEmail);
-        UUID id = repository.findByEmail(oldEmail).orElseThrow(EntityNotFoundException::new).getId();
-        changeField(id, "email", User::getEmail, user -> user.setEmail(newEmail.toLowerCase()));
+        User entity = repository.findByEmail(oldEmail).orElseThrow(EntityNotFoundException::new);
+        validateHost(entity.getHost());
+        changeField(entity.getId(), "email", User::getEmail, user -> user.setEmail(newEmail.toLowerCase()));
     }
 
     @Transactional

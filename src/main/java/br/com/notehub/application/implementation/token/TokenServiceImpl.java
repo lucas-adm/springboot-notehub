@@ -6,6 +6,7 @@ import br.com.notehub.domain.token.TokenRepository;
 import br.com.notehub.domain.token.TokenService;
 import br.com.notehub.domain.user.User;
 import br.com.notehub.domain.user.UserRepository;
+import br.com.notehub.infra.exception.CustomExceptions;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTCreationException;
@@ -31,6 +32,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 
 @Component
@@ -61,7 +63,7 @@ public class TokenServiceImpl implements TokenService {
         }
     }
 
-    public Map getUserInfoFromGitHub(String code) {
+    private Map getUserInfoFromGitHub(String code) {
         RestTemplate rt = new RestTemplate();
         ResponseEntity<Map> fResponse = rt.getForEntity(
                 String.format("https://github.com/login/oauth/access_token?client_id=%s&client_secret=%s&code=%s", GHCI, GHCS, code),
@@ -79,6 +81,10 @@ public class TokenServiceImpl implements TokenService {
         );
         if (!sResponse.getStatusCode().is2xxSuccessful() || sResponse.getBody() == null) throw new JWTDecodeException("Token inválido");
         return sResponse.getBody();
+    }
+
+    private void validateHost(String host) {
+        if (!Objects.equals(host, "NoteHub")) throw new CustomExceptions.HostNotAllowedException();
     }
 
     @Override
@@ -119,7 +125,8 @@ public class TokenServiceImpl implements TokenService {
 
     @Override
     public String generatePasswordChangeToken(String email) {
-        userRepository.findByEmail(email).orElseThrow(EntityNotFoundException::new);
+        User user = userRepository.findByEmail(email).orElseThrow(EntityNotFoundException::new);
+        validateHost(user.getHost());
         try {
             Algorithm algorithm = Algorithm.HMAC256(secret);
             return JWT.create()
@@ -134,7 +141,8 @@ public class TokenServiceImpl implements TokenService {
 
     @Override
     public String generateEmailChangeToken(String email) {
-        userRepository.findByEmail(email).orElseThrow(EntityNotFoundException::new);
+        User user = userRepository.findByEmail(email).orElseThrow(EntityNotFoundException::new);
+        validateHost(user.getHost());
         try {
             Algorithm algorithm = Algorithm.HMAC256(secret);
             return JWT.create()
