@@ -37,7 +37,7 @@ services:
     ports:
       - '8080:8080'
     env_file:
-      - .env
+      - .env.example
     depends_on:
       - postgres
       - rabbitmq
