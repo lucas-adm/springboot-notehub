@@ -146,7 +146,7 @@
 
   8. Para acessar a caixa de e-mails acesse `http://localhost:8025`.
 
-  8. Para parar e remover containers acione `CTRL+C` no terminal e em seguide digite:
+  9. Para parar e remover containers acione `CTRL+C` no terminal e em seguide digite:
   ```bash
     docker compose down --rmi all --volumes
   ```
