@@ -36,7 +36,8 @@
 
   2. Copie o arquivo de exemplo de variáveis de ambiente e ajuste conforme necessário:
   ```bash
-    cp env.example .env
+    (Linux e macOS) cp .env.example .env
+    (Windows) copy .env.example .env
   ```
 
   3. Suba a aplicação com Docker Compose:
@@ -105,7 +106,29 @@
     docker compose up -d
   ```
 
-  4. Em `src/main/java/br/com/notehub/domain/notification/Notification.java` comente a seguinte parte:
+  4. Em `src/main/resources/application-dev.properties` preencha os valores das variáveis de ambiente:
+  > O arquivo .env só atende ao ambiente de produção.
+  ```properties
+    api.server.host=${SERVER:http://localhost:8080}
+    api.client.host=${http://localhost:3000}
+    api.server.security.token.secret=${SECRET:seu-segredo}
+    
+    oauth.github.client.id=${GHCI:seu-github-client-id}
+    oauth.github.client.secret=${GHCS:seu-github-client-secret}
+    
+    spring.rabbitmq.addresses=${RABBITMQ_ADDRESSES:amqp://user:root@rabbitmq:5672}
+    broker.queue.activation.name=default.activation
+    broker.queue.password.name=default.password
+    broker.queue.email.name=default.email
+    
+    spring.mail.host=${SPRING_MAIL_HOST:mailhog}
+    spring.mail.port=${SPRING_MAIL_PORT:1025}
+    spring.mail.friendly.name=${SPRING_MAIL_FRIENDLY_NAME:seu-nome-amigável}
+    spring.mail.username=${SPRING_MAIL_USERNAME:seu-email-de-teste}
+    spring.mail.password=${SPRING_MAIL_PASSWORD:}
+  ```
+
+  5. Em `src/main/java/br/com/notehub/domain/notification/Notification.java` comente a seguinte parte:
   > O banco de dados em memória não oferece suporte ao tipo de coluna JSON/JSONB.
   ```java
     // @Column(columnDefinition = "JSONB")
@@ -114,14 +137,16 @@
     private Map<String, Object> info;
   ```
 
-  5. Inicie a aplicação.
+  6. Inicie a aplicação.
   ```bash
     ./mvnw spring-boot:run
   ```
 
-  6. Acesse a API em `http://localhost:8080` (por padrão). A documentação interativa normalmente fica em `http://localhost:8080/docs`.
+  7. Acesse a API em `http://localhost:8080` (por padrão). A documentação interativa normalmente fica em `http://localhost:8080/docs`.
 
-  7. Para parar e remover containers acione `CTRL+C` no terminal e em seguide digite:
+  8. Para acessar a caixa de e-mails acesse `http://localhost:8025`.
+
+  8. Para parar e remover containers acione `CTRL+C` no terminal e em seguide digite:
   ```bash
     docker compose down --rmi all --volumes
   ```
