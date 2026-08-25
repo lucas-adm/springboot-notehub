@@ -12,6 +12,19 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
+  postgres-e2e:
+    image: postgres:14
+    container_name: postgres-e2e
+    profiles: [ "e2e" ]
+    environment:
+      POSTGRES_DB: ${PGDATABASE}
+      POSTGRES_USER: ${PGUSERNAME}
+      POSTGRES_PASSWORD: ${PGPASSWORD}
+    ports:
+      - '5433:5432'
+    tmpfs:
+      - /var/lib/postgresql/data
+
   rabbitmq:
     image: rabbitmq:3-management
     container_name: rabbitmq
@@ -40,7 +53,7 @@ services:
     ports:
       - '8080:8080'
     env_file:
-      - .env.example
+      - .env
     depends_on:
       - postgres
       - rabbitmq
